@@ -107,6 +107,15 @@ Claude Code 세션이 중단된 뒤 작업을 이어갈 때 참고하는 인수�
 - 구현 순서: `/my` 본인 확인 → 목록 → `/my/[id]` 상세 → `/my/[id]/edit` 수정 → 삭제 및 Storage 정리
 - 명세서 작성 이후 아직 CRUD 기능 코드는 수정하지 않음
 
+### 미션 6 완료 후 최종 배포
+
+- 최신 CRUD 코드와 QA 결과를 GitHub에 반영한다.
+- Vercel Production 배포를 확인한다.
+- Vercel 프로젝트에 `tedoori.com` 커스텀 도메인을 추가한다.
+- 도메인 DNS 관리 화면에 Vercel이 안내하는 레코드를 등록한다.
+- HTTPS 발급과 `https://tedoori.com` 접속을 확인한다.
+- 실제 연결 대상은 로컬 `localhost:3000`이 아니라 Vercel Production 배포본이다.
+
 ### 확인 필요
 
 - 기존 Netlify 배포를 유지할지, Vercel을 최종 제출 대상으로 사용할지 결정
