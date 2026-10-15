@@ -91,6 +91,7 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
   const [notice, setNotice] = useState("");
   const [resendIn, setResendIn] = useState(0);
   const [receiptNo, setReceiptNo] = useState("");
+  const [quoteId, setQuoteId] = useState("");
 
   const headingRef = useRef<HTMLHeadingElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -319,6 +320,7 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
       }).catch(() => {});
 
       setReceiptNo(data.receipt_no);
+      setQuoteId(data.id);
       try {
         sessionStorage.removeItem(STORAGE_KEY);
       } catch {}
@@ -450,17 +452,17 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
           </dl>
         )}
 
-        <p className="q-hint">추가 자료나 수정·취소 요청은 접수 메일에 회신해주세요.</p>
+        <p className="q-hint">사진을 더하거나 내용을 바꾸려면 내 신청에서 바로 고칠 수 있어요.</p>
         <div className="q-help">
-          <Link href={`/contact?type=수정&receipt=${encodeURIComponent(receiptNo)}`} className="q-help__card">
+          <Link href={quoteId ? `/my/${quoteId}/edit` : "/my"} className="q-help__card">
             <span className="q-help__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 20h4L19 9l-4-4L4 16v4Z" />
                 <path d="m13.5 6.5 4 4" />
               </svg>
             </span>
-            <strong>수정·보완 요청</strong>
-            <span>접수번호가 채워진 문의 양식으로 이동해요.</span>
+            <strong>신청 수정하기</strong>
+            <span>사진·요청사항·연락처를 바로 고칠 수 있어요.</span>
           </Link>
           <a href={KAKAO_URL} target="_blank" rel="noopener noreferrer" className="q-help__card q-help__card--kakao">
             <span className="q-help__icon" aria-hidden="true">
