@@ -547,6 +547,7 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
         </ul>
       )}
 
+      <div key={phase} className="q-step">
       {phase === "region" && (
         <>
           <Question title="어느 지역의 정원인가요?" hint="서울·경기·인천에서 요청할 수 있어요." />
@@ -1202,6 +1203,7 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
           <Back />
         </>
       )}
+      </div>
     </div>
   );
 }
