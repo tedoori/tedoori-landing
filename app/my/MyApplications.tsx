@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Callout, StatusBadge, type QuoteStatus } from "../_components/ui";
 import { isSupabaseConfigured, getSupabase } from "../../lib/supabase";
+import { QuoteApiError, quoteApi } from "../../lib/quote-api";
 
 type QuoteRow = {
   id: string;
@@ -50,32 +51,21 @@ export function MyApplications() {
 
     setBusy(true);
     setError("");
-    const from = (nextPage - 1) * PAGE_SIZE;
-    const to = from + PAGE_SIZE - 1;
-    const { data: authData } = await supabase.auth.getUser();
-    const userEmail = authData.user?.email;
-
-    if (!userEmail) {
-      setPhase("email");
-      setError("이메일 인증이 만료됐어요. 다시 확인해주세요.");
-      setBusy(false);
-      return;
-    }
-
-    const { data, count, error: queryError } = await supabase
-      .from("quote_requests")
-      .select("id, receipt_no, region, district, housing, works, works_unknown, status, created_at", { count: "exact" })
-      .order("created_at", { ascending: false })
-      .range(from, to);
-
-    if (queryError) {
-      setError("신청 목록을 불러오지 못했어요. 잠시 후 다시 시도해주세요.");
-    } else {
-      setVerifiedEmail(userEmail);
-      setRows((data ?? []).map((row) => ({ ...row, status: safeStatus(row.status) })) as QuoteRow[]);
-      setTotal(count ?? 0);
-      setPage(nextPage);
+    // 목록은 서버(Route Handler)에서 본인 신청만 최신순 10건씩
+    try {
+      const data = await quoteApi<{ email: string; items: QuoteRow[]; total: number; page: number }>(`?page=${nextPage}`);
+      setVerifiedEmail(data.email);
+      setRows(data.items.map((row) => ({ ...row, status: safeStatus(row.status) })));
+      setTotal(data.total);
+      setPage(data.page);
       setPhase("list");
+    } catch (e) {
+      if (e instanceof QuoteApiError && e.status === 401) {
+        setPhase("email");
+        setError("이메일 인증이 만료됐어요. 다시 확인해주세요.");
+      } else {
+        setError(e instanceof QuoteApiError ? e.message : "신청 목록을 불러오지 못했어요. 잠시 후 다시 시도해주세요.");
+      }
     }
     setBusy(false);
   };

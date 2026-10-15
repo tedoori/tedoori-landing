@@ -19,6 +19,7 @@ import {
   type Step,
 } from "@/lib/quote";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
+import { QuoteApiError, quoteApi } from "@/lib/quote-api";
 import { PrivacyContent } from "../_components/legal/PrivacyContent";
 import { TermsContent } from "../_components/legal/TermsContent";
 
@@ -313,12 +314,10 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
         photoPaths.push(path);
       }
 
-      const now = new Date().toISOString();
-      const { data, error: insErr } = await supabase
-        .from("quote_requests")
-        .insert({
-          user_id: uid,
-          email: answers.email,
+      // 등록은 서버(Route Handler)에서 검증한 뒤 저장
+      const data = await quoteApi<{ id: string; receipt_no: string }>("", {
+        method: "POST",
+        body: JSON.stringify({
           region: answers.region,
           district: answers.district,
           housing: answers.housing,
@@ -332,12 +331,9 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
           budget: answers.budgetUndecided ? null : answers.budget || null,
           name: answers.name.trim(),
           phone: answers.phone.trim(),
-          privacy_agreed_at: now,
-          terms_agreed_at: now,
-        })
-        .select("id, receipt_no")
-        .single();
-      if (insErr || !data) throw new Error("insert");
+          agreed: agreePrivacy && agreeTerms,
+        }),
+      });
 
       // 접수 확인 메일 (실패해도 접수는 완료)
       fetch("/api/quote-notify", {
@@ -353,9 +349,13 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
       setPhase("done");
     } catch (e) {
       setError(
-        e instanceof Error && e.message === "photo"
-          ? "사진을 올리지 못했어요. 사진을 빼거나 JPG·PNG로 바꿔 다시 시도해주세요."
-          : "신청을 접수하지 못했어요. 잠시 후 다시 시도해주세요.",
+        e instanceof QuoteApiError && e.detail.fields
+          ? Object.values(e.detail.fields)[0]
+          : e instanceof QuoteApiError
+            ? e.message
+            : e instanceof Error && e.message === "photo"
+              ? "사진을 올리지 못했어요. 사진을 빼거나 JPG·PNG로 바꿔 다시 시도해주세요."
+              : "신청을 접수하지 못했어요. 잠시 후 다시 시도해주세요.",
       );
     } finally {
       setBusy(false);
