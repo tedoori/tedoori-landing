@@ -7,6 +7,7 @@ import "./quote.css";
 
 export const metadata: Metadata = {
   title: "무료 견적 요청 · 테두리",
+  description: "서울·경기·인천 전원주택의 필요한 공간부터 시작하는 무료 조경 견적 신청.",
 };
 
 export default async function QuotePage({ searchParams }: { searchParams: Promise<{ work?: string }> }) {

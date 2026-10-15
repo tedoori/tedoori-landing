@@ -16,6 +16,12 @@ export const metadata: Metadata = {
   title: "테두리 · 전원주택 조경 견적",
   description:
     "정원 전체 말고, 필요한 곳부터. 서울·경기·인천 단독·전원주택의 식재·잔디·자갈·디딤석·화단 부분조경 무료 견적.",
+  verification: {
+    google: "RvtzZL7m6LZlrh5BUFiYQQWOl5F8yKoiAyeehc8Rflg",
+    other: {
+      "naver-site-verification": "d538490d2d87b3dd4c00bd1d0d5f8bf42423060f",
+    },
+  },
   metadataBase: new URL("https://tedoori.com"),
   openGraph: {
     title: "테두리 · 전원주택 조경 견적",

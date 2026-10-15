@@ -6,6 +6,7 @@ import { Showcase } from "./Showcase";
 
 export const metadata: Metadata = {
   title: "디자인 시스템 · 테두리",
+  description: "테두리 서비스 화면의 디자인 시스템과 UI 구성 요소를 확인합니다.",
   robots: { index: false, follow: false },
 };
 

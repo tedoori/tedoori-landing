@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "./_components/SiteFooter";
 import { SiteHeader } from "./_components/SiteHeader";
@@ -15,6 +16,11 @@ import "./_components/home/motion.css";
 import "./home.css";
 
 // 문구는 피그마 Lo-Fi 와이어프레임(홈) 그대로
+
+export const metadata: Metadata = {
+  title: "테두리",
+  description: "전원주택 조경 견적",
+};
 
 export default function Home() {
   return (

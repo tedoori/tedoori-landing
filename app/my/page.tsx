@@ -5,7 +5,10 @@ import { SiteHeader } from "../_components/SiteHeader";
 import { MyApplications } from "./MyApplications";
 import "./my.css";
 
-export const metadata: Metadata = { title: "내 신청 · 테두리" };
+export const metadata: Metadata = {
+  title: "내 신청 · 테두리",
+  description: "이메일 인증 후 테두리 견적 신청 내역과 진행 상태를 확인하세요.",
+};
 
 export default function MyPage() {
   return (
