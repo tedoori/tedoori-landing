@@ -53,12 +53,24 @@ Claude Code 세션이 중단된 뒤 작업을 이어갈 때 참고하는 인수�
 
 ## 실행한 점검
 
-- `npm run build` 성공: 컴파일, TypeScript 검사, 정적 페이지 생성 완료
+- `npm run build` 성공 이력 확인: 컴파일, TypeScript 검사, 정적 페이지 생성 완료
+- 최신 수정 후 `npx tsc --noEmit --incremental false` 성공
 - 배포 URL HTTP 200 확인
 - 배포 홈 화면의 접근성 트리와 핵심 CTA 확인
 - `/quote`에서 지역 선택 후 다음 단계로 이동하는 흐름 확인
 - 배포 HTML에서 `og:title`, `og:description`, `og:image`, Twitter 카드 메타데이터 확인
-- Vercel 프로젝트 환경변수 화면 확인: 현재 등록된 프로젝트 환경변수 없음
+- Vercel Production 환경변수 6개 등록 확인: Supabase 2개, Resend 1개, 메일 주소 3개
+
+### Lighthouse 최종 측정
+
+- 측정 대상: `https://tedoori-landing.vercel.app/`
+- Performance: 63
+- Accessibility: 100
+- Best Practices: 100
+- SEO: 100
+- 개선 내용: 히어로 영상 지연 로딩, 사용하지 않는 히어로 이미지 요청 제거, CTA·안내 문구 대비 보완
+- 주요 지표: FCP 2.5초, LCP 14.2초, Speed Index 6.0초, CLS 0.113
+- 측정 결과 파일은 로컬 `lighthouse-report-final.json`에 생성되며, 비밀값은 포함하지 않습니다.
 
 ## Codex가 실제로 수정한 내용
 
@@ -68,14 +80,14 @@ Claude Code 세션이 중단된 뒤 작업을 이어갈 때 참고하는 인수�
 - README에 기술 스택 및 구성 설명 보강
 - 관련 의존성 설치 및 lock 파일 갱신
 
-## 제출을 위해 남은 작업
+## 제출 전 남은 확인 작업
 
 ### 필수
 
 1. 시크릿 창과 실제 모바일 기기에서 최종 접속 확인
-2. Lighthouse 점검 실행 및 결과 기록
-3. Vercel Production 환경변수 등록
-4. 환경변수 등록 후 실제 견적 제출과 Supabase 저장 결과 확인
+2. 제출 화면에 GitHub·Vercel 링크 입력
+3. 실제 모바일 기기에서 첫 화면과 `/quote` CTA 확인
+4. 가능하면 테스트용 견적 1건을 제출해 Supabase 저장·메일 수신 확인
 
 ## 현재 제출 결과
 
@@ -84,15 +96,15 @@ Claude Code 세션이 중단된 뒤 작업을 이어갈 때 참고하는 인수�
 - Vercel 배포 빌드 성공 확인
 - 배포 홈 화면과 `/quote` 견적 흐름 확인
 - 지역 선택 후 다음 단계로 넘어가는 동작 확인
-- 최신 보완 커밋: `dae9fa1 feat: add submission readiness metadata and ui setup`
+- 최신 보완 커밋: `1782df9 perf: defer hero intro video`
 
 ### 확인 필요
 
 - 기존 Netlify 배포를 유지할지, Vercel을 최종 제출 대상으로 사용할지 결정
 - GitHub 저장소 공개 여부와 저장소 URL
 - 실제 서비스용 약관·개인정보 처리방침의 최종 승인 여부
-- Supabase 및 메일 환경변수의 Vercel Production 등록
-- 비밀값 등록 후 실제 견적 제출 테스트
+- 테스트용 견적 제출 후 Supabase 저장 및 운영자 메일 수신 확인
+- Vercel 환경변수 중 `RESEND_API_KEY`는 기능상 등록됐지만, Vercel에서 Secret 형식 저장을 권장하는 경고가 있을 수 있음
 
 ## 작업 원칙
 
