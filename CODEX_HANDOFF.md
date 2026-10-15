@@ -79,6 +79,14 @@ An IO error occurred while attempting to create and acquire the lockfile
 5. Vercel 배포
 6. 배포 URL에서 핵심 페이지와 인터랙션 재검증
 
+## 현재 제출 결과
+
+- GitHub: https://github.com/tedoori/tedoori-landing
+- Vercel: https://tedoori-landing.vercel.app
+- Vercel 배포 빌드 성공 확인
+- 배포 홈 화면과 `/quote` 견적 흐름 확인
+- 지역 선택 후 다음 단계로 넘어가는 동작 확인
+
 ### 확인 필요
 
 - 기존 Netlify 배포를 유지할지, Vercel을 최종 제출 대상으로 사용할지 결정
