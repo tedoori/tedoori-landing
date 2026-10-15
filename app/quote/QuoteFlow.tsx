@@ -20,6 +20,7 @@ import {
 } from "@/lib/quote";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 import { QuoteApiError, quoteApi } from "@/lib/quote-api";
+import { checkPhotos, formatPhone, PHONE_RE, PHOTO_ACCEPT, shrinkPhoto } from "@/lib/photo";
 import { PrivacyContent } from "../_components/legal/PrivacyContent";
 import { TermsContent } from "../_components/legal/TermsContent";
 
@@ -34,15 +35,6 @@ const MORE_LINKS = [
 // 예산 눈금 막대 높이(%) — 장식용
 const BAR_H = [34, 48, 60, 74, 88, 100, 90, 76, 62, 48, 36];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_RE = /^01[016789]\d{7,8}$/;
-// 숫자만 남기고 010-0000-0000 모양으로
-const formatPhone = (v: string) => {
-  const d = v.replace(/\D/g, "").slice(0, 11);
-  if (d.length < 4) return d;
-  if (d.length < 8) return `${d.slice(0, 3)}-${d.slice(3)}`;
-  return `${d.slice(0, 3)}-${d.slice(3, d.length - 4)}-${d.slice(-4)}`;
-};
-
 type Photo = { id: string; file: File; url: string };
 type Phase = Step | "outside" | "done";
 
@@ -62,20 +54,6 @@ function CheckIcon() {
     <svg className="q-check" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <path d="M3 8.5 6.5 12 13 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
-  );
-}
-
-// 사진을 긴 변 2000px 이하 JPEG로 줄여서 올림
-async function shrinkPhoto(file: File): Promise<Blob> {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, 2000 / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-  return new Promise((resolve, reject) =>
-    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("encode"))), "image/jpeg", 0.85),
   );
 }
 
@@ -263,12 +241,10 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
 
   const addPhotos = (files: FileList | null) => {
     if (!files) return;
-    const room = MAX_PHOTOS - photos.length;
-    const picked = Array.from(files)
-      .filter((f) => f.type.startsWith("image/"))
-      .slice(0, room)
-      .map((file) => ({ id: crypto.randomUUID(), file, url: URL.createObjectURL(file) }));
-    if (files.length > room) setError(`사진은 ${MAX_PHOTOS}장까지 올릴 수 있어요.`);
+    // 형식(JPG·PNG·WebP) · 크기(장당 10MB) · 개수(5장) 확인
+    const checked = checkPhotos(Array.from(files), MAX_PHOTOS - photos.length);
+    const picked = checked.ok.map((file) => ({ id: crypto.randomUUID(), file, url: URL.createObjectURL(file) }));
+    setError(checked.error);
     if (picked.length) {
       setPhotos((p) => [...p, ...picked]);
       update({ noPhoto: false });
@@ -711,7 +687,7 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
             ref={fileRef}
             id="q-photo-input"
             type="file"
-            accept="image/*"
+            accept={PHOTO_ACCEPT}
             multiple
             className="sr-only"
             onChange={(e) => addPhotos(e.target.files)}

@@ -94,3 +94,25 @@
 .my-form .btn, .my-form .my-link { justify-self: center; }
 .my-panel { text-align: center; }
 .my-panel .my-field { text-align: left; }
+
+/* ---------- 신청 수정 /my/[id]/edit ---------- */
+.my-edit .my-card { gap: 16px; }
+.my-row2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.my-field select, .my-field textarea { width: 100%; min-height: 54px; padding: 12px 15px; border: 1px solid rgba(22, 35, 27, .25); border-radius: var(--radius-control); background: #fff; font: inherit; font-weight: 500; }
+.my-field textarea { min-height: 112px; resize: vertical; line-height: 1.6; }
+.my-field select:focus, .my-field textarea:focus { outline: 3px solid rgba(29, 160, 73, .25); border-color: var(--green); }
+.my-field [aria-invalid="true"] { border-color: #a63124; }
+.my-fieldset { display: grid; gap: 8px; margin: 0; padding: 0; border: 0; }
+.my-fieldset legend { margin-bottom: 8px; font-size: 14px; font-weight: 700; }
+.my-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.my-chip { min-height: 44px; padding: 8px 16px; border: 1px solid rgba(22, 35, 27, .22); border-radius: 999px; background: #fff; font: inherit; font-size: 15px; cursor: pointer; transition: background-color 160ms var(--ease-out), border-color 160ms var(--ease-out); }
+.my-chip:hover { border-color: var(--green); }
+.my-chip.is-on { border-color: var(--green); background: var(--green); color: #fff; font-weight: 700; }
+.my-photos__item { position: relative; overflow: hidden; border-radius: 14px; aspect-ratio: 4 / 3; background: var(--sand); }
+.my-photos__item img { width: 100%; height: 100%; object-fit: cover; }
+.my-photos__new { position: absolute; left: 8px; top: 8px; padding: 3px 8px; border-radius: 999px; background: var(--green); color: #fff; font-size: 12px; font-weight: 700; }
+.my-photos__remove { position: absolute; right: 6px; top: 6px; width: 32px; height: 32px; border: 0; border-radius: 50%; background: rgba(22, 35, 27, .72); color: #fff; font-size: 20px; line-height: 1; cursor: pointer; }
+.my-upload { justify-self: center; width: auto; min-width: 180px; cursor: pointer; }
+@media (max-width: 599px) {
+  .my-row2 { grid-template-columns: 1fr; }
+}
