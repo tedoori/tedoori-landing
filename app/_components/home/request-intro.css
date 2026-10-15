@@ -1,0 +1,517 @@
+/* 01 · 집에서 견적 요청 (Tara 오마주): 원 → 글 채움 → 원이 배경으로 → 휴대폰 */
+
+/* 히어로 마지막 한 화면과 겹쳐서, 히어로가 올라가 사라지는 동안 원이 들어옴 */
+.ri {
+  --mint: #d7efdd;
+  position: relative;
+  z-index: 2;
+  margin-top: -100svh;
+}
+
+.ri-track {
+  --a: 0;
+  --t: 0;
+  --g: 0;
+  --ph: 0;
+  --gs: 12;
+  position: relative;
+  height: 420vh;
+}
+
+.ri-stage {
+  --ph-h: min(64svh, 600px);
+  --pw: calc(var(--ph-h) * 0.48);
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  background: color-mix(in srgb, #f7f8f6 calc(var(--a) * 100%), transparent);
+  pointer-events: none;
+}
+
+.ri-info,
+.ri-phone {
+  pointer-events: auto;
+}
+
+/* ---------- 원 두 개 ---------- */
+.ri-circle {
+  --cs: 132px;
+  position: absolute;
+  left: 50%;
+  top: 32svh;
+  display: grid;
+  place-items: center;
+  width: var(--cs);
+  height: var(--cs);
+  margin: calc(var(--cs) / -2) 0 0 calc(var(--cs) / -2);
+  border-radius: 50%;
+  color: var(--forest-900);
+  will-change: transform;
+}
+
+.ri-circle--mint {
+  z-index: 1;
+  background: var(--mint);
+  transform: translateX(calc((1 - var(--a)) * -62vw - var(--cs) * 0.32 * (1 - var(--g))))
+    scale(calc(1 + (var(--gs) - 1) * var(--g)));
+}
+
+.ri-circle--mint svg {
+  opacity: calc(1 - var(--g) * 5);
+}
+
+.ri-circle--sand {
+  z-index: 2;
+  background: var(--sand-300);
+  mix-blend-mode: multiply;
+  opacity: calc(1 - var(--g) * 2);
+  transform: translateX(calc((1 - var(--a)) * 62vw + var(--cs) * 0.32)) scale(calc(1 - var(--g) * 0.5));
+}
+
+/* ---------- 큰 문장: 한 단어씩 채워짐 ---------- */
+.ri-head {
+  --fs0: clamp(34px, 2.6vw + 18px, 64px);
+  --fs1: clamp(28px, 1.4vw + 18px, 42px);
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  top: calc(47svh * (1 - var(--g)) + 11svh * var(--g));
+  z-index: 3;
+  text-align: center;
+  opacity: var(--a);
+}
+
+.ri-title {
+  font-size: calc(var(--fs0) - (var(--fs0) - var(--fs1)) * var(--g));
+  font-weight: 800;
+  line-height: 1.22;
+  letter-spacing: -0.035em;
+}
+
+.ri-w {
+  --wt: clamp(0, var(--t) * var(--n) - var(--i), 1);
+  color: color-mix(in srgb, var(--text) calc(var(--wt) * 100%), #c9cfca);
+}
+
+.ri-w--em {
+  color: color-mix(in srgb, var(--primary) calc(var(--wt) * 100%), #c9cfca);
+}
+
+.ri-lead {
+  font-size: var(--fs-body-l);
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.ri-lead--m {
+  display: none;
+}
+
+/* ---------- 왼쪽 안내 (PC) ---------- */
+.ri-info {
+  position: absolute;
+  top: 46svh;
+  right: calc(50% + var(--pw) / 2 + 64px);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  width: min(300px, 26vw);
+  opacity: var(--ph);
+  transform: translateX(calc((1 - var(--ph)) * -28px));
+}
+
+.ri-info .btn {
+  margin-top: var(--sp-2);
+}
+
+/* ---------- 휴대폰 ---------- */
+.ri-phone {
+  position: absolute;
+  left: 50%;
+  top: 27svh;
+  z-index: 4;
+  width: var(--pw);
+  margin: 0 0 0 calc(var(--pw) / -2);
+  opacity: clamp(0, var(--ph) * 3, 1);
+  transform: perspective(1400px) translateY(calc((1 - var(--ph)) * 70svh)) rotateX(calc((1 - var(--ph)) * 14deg))
+    rotateY(calc((1 - var(--ph)) * -16deg)) rotateZ(calc((1 - var(--ph)) * -5deg));
+  will-change: transform;
+}
+
+.ri-phone figcaption {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.ri-device {
+  position: relative;
+  height: var(--ph-h);
+  padding: calc(var(--ph-h) * 0.016);
+  border-radius: calc(var(--ph-h) * 0.09);
+  background: linear-gradient(145deg, #59605b 0%, #222825 40%, #3c423e 100%);
+  box-shadow:
+    inset 0 0 0 1.5px #6b726d,
+    0 44px 80px -34px rgba(22, 35, 27, 0.6),
+    0 18px 30px -20px rgba(22, 35, 27, 0.45);
+}
+
+.ri-btn {
+  position: absolute;
+  width: 3px;
+  border-radius: 2px;
+  background: #3c423e;
+}
+
+.ri-btn--a {
+  left: -3px;
+  top: 17%;
+  height: 4%;
+}
+
+.ri-btn--b {
+  left: -3px;
+  top: 24%;
+  height: 8%;
+}
+
+.ri-btn--c {
+  right: -3px;
+  top: 22%;
+  height: 11%;
+}
+
+.ri-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: calc(var(--ph-h) * 0.075);
+  background: #fff;
+  font-size: 13px;
+}
+
+.ri-status {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  padding: 10px 24px 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ri-island {
+  position: absolute;
+  left: 50%;
+  top: 9px;
+  width: 30%;
+  height: 24px;
+  border-radius: 999px;
+  background: #0b0e0c;
+  transform: translateX(-50%);
+}
+
+.ri-status__icons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ri-app {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ri-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px 8px 10px;
+}
+
+.ri-bar strong {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.ri-bar__count {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.ri-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 0 14px 10px;
+}
+
+.ri-steps span {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--gray-200);
+  transition: background-color 300ms linear;
+}
+
+.ri-steps .is-on {
+  background: var(--primary);
+}
+
+.ri-chat {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 0;
+  overflow: hidden;
+  padding: 10px 12px;
+  background: var(--gray-50);
+}
+
+.ri-msgs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ri-msg {
+  max-width: 82%;
+  padding: 9px 12px;
+  border-radius: 16px;
+  line-height: 1.45;
+  animation: ri-in 450ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.ri-msg--bot {
+  align-self: flex-start;
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+  background: #fff;
+  font-weight: 700;
+}
+
+.ri-msg--me {
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 600;
+}
+
+.ri-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 5px;
+  transition: opacity 300ms linear;
+}
+
+.ri-chips.is-done {
+  opacity: 0.5;
+}
+
+.ri-chip {
+  padding: 5px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  animation: ri-in 400ms var(--d) cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.ri-chip.is-pick {
+  animation:
+    ri-in 400ms var(--d) cubic-bezier(0.2, 0.8, 0.2, 1) both,
+    ri-pick 260ms calc(var(--d) + 520ms) linear both;
+}
+
+.ri-photos {
+  display: flex;
+  align-self: flex-end;
+  gap: 4px;
+}
+
+.ri-photos span {
+  width: 54px;
+  height: 54px;
+  border-radius: 10px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0) 55%, rgba(156, 125, 94, 0.55) 56%),
+    linear-gradient(180deg, #cfe3ef 0%, #9fca8a 55%, #6fa35a 100%);
+  animation: ri-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.ri-photos span:nth-child(2) {
+  background:
+    linear-gradient(200deg, rgba(255, 255, 255, 0) 60%, rgba(120, 110, 100, 0.5) 61%),
+    linear-gradient(180deg, #dbe7ee 0%, #c9b79c 60%, #a89377 100%);
+  animation-delay: 120ms;
+}
+
+.ri-photos span:nth-child(3) {
+  background:
+    radial-gradient(circle at 60% 40%, #7fb069 0 22%, transparent 23%),
+    linear-gradient(180deg, #e3edf2 0%, #b7d29f 60%, #8cb874 100%);
+  animation-delay: 240ms;
+}
+
+.ri-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 12px 16px;
+  padding: 6px 6px 6px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--text-disabled);
+  font-size: 12.5px;
+}
+
+.ri-input span {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ri-input i {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+}
+
+@keyframes ri-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+}
+
+@keyframes ri-pick {
+  to {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: #fff;
+  }
+}
+
+/* ---------- 접수 카드 (휴대폰 옆에 떠오름) ---------- */
+.ri-float {
+  position: absolute;
+  left: calc(50% + var(--pw) / 2 - 40px);
+  top: 58svh;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: var(--shadow-pop);
+  opacity: 0;
+  transform: translateY(14px) scale(0.92);
+  transition:
+    opacity 300ms linear,
+    transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1.2);
+}
+
+.ri-float strong {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.ri-float.is-on {
+  opacity: 1;
+  transform: none;
+}
+
+/* 휴대폰 아래 안내 (모바일) */
+.ri-after {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .ri-stage {
+    --ph-h: min(560px, calc(100svh - 64px - 150px - 36px));
+  }
+
+  .ri-circle {
+    --cs: 96px;
+    top: 30svh;
+  }
+
+  .ri-circle svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .ri-head {
+    --fs0: 32px;
+    --fs1: 24px;
+    top: calc(44svh * (1 - var(--g)) + 74px * var(--g));
+  }
+
+  .ri-lead--m {
+    display: block;
+    margin-top: 6px;
+    font-size: 15px;
+    opacity: var(--ph);
+  }
+
+  .ri-info {
+    display: none;
+  }
+
+  .ri-phone {
+    top: calc(64px + 150px);
+  }
+
+  .ri-float {
+    display: none;
+  }
+
+  .ri-after {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-4);
+    padding-top: var(--sp-2);
+    padding-bottom: var(--sp-14);
+    background: var(--mint);
+    text-align: center;
+  }
+
+  .ri-after .btn {
+    max-width: 360px;
+  }
+}
+
+/* 다음 섹션으로 이어지는 색 */
+.ri::after {
+  content: "";
+  display: block;
+  height: 120px;
+  background: linear-gradient(180deg, var(--mint), #f3f5f0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ri-msg,
+  .ri-chip,
+  .ri-photos span {
+    animation: none;
+  }
+}

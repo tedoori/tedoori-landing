@@ -1,0 +1,652 @@
+/* 스크롤로 완성되는 미니어처 마당 */
+
+.ys {
+  position: relative;
+  height: 640vh;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f2ea 40%, #eee7d8 100%);
+}
+
+.ys-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* 장면: 모바일은 위쪽 큰 영역, PC는 오른쪽 넓은 영역 */
+.ys-stage {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 104px;
+  height: calc(100svh - 104px - 236px);
+  min-height: 300px;
+}
+
+.ys-stage canvas {
+  touch-action: pan-y;
+}
+
+.ys-tags {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ys-tag-pos {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+
+/* 장면 속 이름표: 작업 이름만 */
+.yard-tag {
+  display: inline-block;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--forest);
+  color: #fff;
+  font-family: var(--font-pretendard), sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(8px) scale(0.9);
+  transition:
+    opacity 280ms var(--ease-out),
+    transform 380ms var(--ease-out),
+    background-color 280ms var(--ease-out);
+  box-shadow: 0 8px 18px -10px rgba(22, 35, 27, 0.6);
+}
+
+.yard-tag.is-on {
+  opacity: 1;
+  transform: none;
+}
+
+.yard-tag.is-focus {
+  background: var(--green);
+  color: var(--forest);
+}
+
+/* 모바일: 지금 단계 이름표 하나만 */
+@media (max-width: 899px) {
+  .ys-tags--focus .yard-tag:not(.is-focus) {
+    opacity: 0;
+  }
+}
+
+/* 글 영역 */
+.ys-copy {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ys-title {
+  font-size: clamp(27px, 0.9rem + 3.4vw, 64px);
+  line-height: 1.22;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  animation: ys-in 520ms var(--ease-out) both;
+}
+
+.ys-word {
+  opacity: clamp(0.14, calc(var(--t, 1) * (var(--n) + 1.5) - var(--i)), 1);
+  transition: opacity 140ms linear;
+}
+
+.ys-body {
+  white-space: pre-line;
+  max-width: 34ch;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--muted-on-sand);
+  animation: ys-in 520ms 60ms var(--ease-out) both;
+}
+
+.ys-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.ys-actions .btn {
+  min-height: 52px;
+}
+
+.ys-hint {
+  font-size: 13px;
+  color: var(--muted-on-sand);
+}
+
+@keyframes ys-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 진행 표시 */
+.ys-progress {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 10px;
+  max-width: 240px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ys-progress__label {
+  color: var(--muted-on-sand);
+}
+
+.ys-progress__count {
+  font-variant-numeric: tabular-nums;
+}
+
+.ys-progress__track {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(22, 35, 27, 0.12);
+  overflow: hidden;
+}
+
+.ys-progress__track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green);
+  transition: width 420ms var(--ease-out);
+}
+
+/* 견적서: PC에서 글 아래에 */
+.ys-quote {
+  display: none;
+}
+
+.ys-quote__head {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 6px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.ys-quote__head span:last-child {
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.ys-quote__rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.ys-quote__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  padding: 7px 10px;
+  border-top: 1px solid var(--line);
+  border-radius: 8px;
+  opacity: 0.3;
+  transition:
+    opacity 300ms var(--ease-out),
+    background-color 300ms var(--ease-out);
+}
+
+.ys-quote__row.is-on {
+  opacity: 1;
+}
+
+.ys-quote__row.is-focus {
+  background: #e3f3e6;
+  border-top-color: transparent;
+}
+
+.ys-quote__name {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.ys-quote__items {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.ys-quote__foot {
+  padding-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+@media (min-width: 900px) {
+  .ys-stage {
+    top: 70px;
+    left: calc(var(--gutter) + min(460px, 33vw) + 16px);
+    right: 0;
+    height: calc(100svh - 70px);
+  }
+
+  .ys-copy {
+    top: calc(70px + 50%);
+    bottom: auto;
+    right: auto;
+    width: min(460px, 33vw);
+    transform: translateY(calc(-50% - 35px));
+    gap: 16px;
+  }
+
+  .ys-title {
+    font-size: clamp(38px, 1.6vw + 18px, 56px);
+  }
+
+  .ys-body {
+    font-size: 17px;
+  }
+
+  .ys-actions {
+    margin-top: 8px;
+  }
+
+  .ys-actions .btn {
+    max-width: none;
+  }
+
+  .ys-quote {
+    display: flex;
+    flex-direction: column;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+
+  .yard-tag {
+    padding: 7px 14px;
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 900px) and (max-height: 760px) {
+  .ys-quote {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ys-title,
+  .ys-body {
+    animation: none;
+  }
+
+  .ys-word {
+    opacity: 1;
+  }
+}
+
+/* ---------- 배경 효과 ---------- */
+
+.ys {
+  background: #f7f4ee;
+}
+
+.ys-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ys-bg--sand {
+  background: linear-gradient(180deg, #ffffff 0%, #f6f2ea 40%, #eee7d8 100%);
+}
+
+.ys-bg--sky {
+  background: linear-gradient(180deg, #dcebf6 0%, #eef4f6 45%, #f7efe3 100%);
+}
+
+.ys-bg--mesh {
+  background: #f3f1ea;
+}
+
+.ys-bg--bokeh {
+  background: linear-gradient(180deg, #eef5e8 0%, #f5f3e9 100%);
+}
+
+.ys-bg--dusk {
+  background: linear-gradient(180deg, #f1e6f2 0%, #fbe9dc 55%, #f7dcc8 100%);
+}
+
+/* 스크롤에 따라 아침 하늘 → 늦은 오후 빛으로 */
+.ys-bg--scroll {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, #d7e9f6 calc((1 - var(--p, 0)) * 100%), #f9dcc4) 0%,
+    color-mix(in srgb, #f2f6f4 calc((1 - var(--p, 0)) * 100%), #fbeadb) 55%,
+    color-mix(in srgb, #f4efe4 calc((1 - var(--p, 0)) * 100%), #f3d7c4) 100%
+  );
+}
+
+.ys-bg__blob {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  filter: blur(70px);
+  opacity: 0.85;
+  animation: ys-drift var(--d, 20s) ease-in-out infinite alternate;
+}
+
+.ys-bg--bokeh .ys-bg__blob {
+  filter: blur(36px);
+  opacity: 0.7;
+}
+
+.ys-bg--mesh .ys-bg__blob {
+  filter: blur(90px);
+  opacity: 0.7;
+}
+
+@keyframes ys-drift {
+  to {
+    transform: translate(calc(-50% + var(--dx, 0)), calc(-50% + var(--dy, 0)));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ys-bg__blob {
+    animation: none;
+  }
+}
+
+/* ---------- 글 배치·강조 (v3) ---------- */
+
+.ys-line {
+  display: block;
+}
+
+.ys-line--em {
+  color: #12873b;
+}
+
+/* 글 뒤 은은한 흰빛: 배경 빛과 글자를 분리 */
+.ys-copy::before {
+  content: "";
+  position: absolute;
+  inset: -40px -60px;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+
+/* 모바일: 제목은 위, 미니어처는 가운데, 버튼은 아래 */
+@media (max-width: 899px) {
+  .ys-copy {
+    top: 112px;
+    bottom: 18px;
+    left: var(--gutter);
+    right: var(--gutter);
+    gap: 8px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .ys-copy::before {
+    inset: -20px -24px auto;
+    height: 220px;
+  }
+
+  .ys-copy a,
+  .ys-copy button {
+    pointer-events: auto;
+  }
+
+  .ys-title {
+    font-size: clamp(30px, 8.6vw, 38px);
+    line-height: 1.2;
+  }
+
+  .ys-body {
+    font-size: 15px;
+  }
+
+  .ys-actions {
+    margin-top: auto;
+  }
+
+  .ys-stage {
+    top: 250px;
+    bottom: 86px;
+    height: auto;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 899px) and (max-height: 700px) {
+  .ys-body {
+    display: none;
+  }
+
+  .ys-stage {
+    top: 200px;
+  }
+}
+
+/* PC: 다른 섹션과 같은 안쪽 기준선, 장면은 화면 전체 */
+@media (min-width: 900px) {
+  .ys-stage {
+    left: 0;
+    right: 0;
+    top: 70px;
+  }
+
+  .ys-copy {
+    left: max(var(--gutter), calc((100vw - 1240px) / 2));
+    width: min(520px, 38vw);
+    z-index: 2;
+  }
+
+  .ys-title {
+    font-size: clamp(44px, 2.4vw + 18px, 72px);
+    line-height: 1.16;
+  }
+
+  .ys-body {
+    font-size: 18px;
+    max-width: 30ch;
+  }
+
+  .ys-actions .btn {
+    max-width: 360px;
+  }
+}
+
+/* ---------- 헤더 아래 고정 (v4) ---------- */
+
+.ys-sticky {
+  top: var(--hdr, 0px);
+  height: calc(100svh - var(--hdr, 0px));
+}
+
+@media (max-width: 899px) {
+  .ys-copy {
+    top: 14px;
+  }
+
+  .ys-stage {
+    top: 150px;
+  }
+}
+
+@media (max-width: 899px) and (max-height: 700px) {
+  .ys-stage {
+    top: 104px;
+  }
+}
+
+@media (min-width: 900px) {
+  .ys-stage {
+    top: 0;
+  }
+
+  .ys-copy {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+/* ---------- 모바일 글 위 여백 (v5) ---------- */
+
+@media (max-width: 899px) {
+  .ys-copy {
+    top: clamp(36px, 7svh, 64px);
+  }
+
+  .ys-stage {
+    top: calc(clamp(36px, 7svh, 64px) + 196px);
+  }
+}
+
+@media (max-width: 899px) and (max-height: 700px) {
+  .ys-copy {
+    top: 28px;
+  }
+
+  .ys-stage {
+    top: 150px;
+  }
+}
+
+/* ---------- 모바일 버튼 가운데 (v6) ---------- */
+
+@media (max-width: 899px) {
+  .ys-actions {
+    align-items: center;
+    text-align: center;
+  }
+
+  .ys-actions .btn {
+    width: 100%;
+    max-width: 360px;
+  }
+}
+
+/* ---------- 04 작업 조합 미리보기 ---------- */
+
+.yc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-5);
+}
+
+.yc-stage {
+  position: relative;
+  width: 100%;
+  height: clamp(300px, 52vw, 560px);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: linear-gradient(180deg, #e9f2f8 0%, #f6f7f5 100%);
+  overflow: hidden;
+}
+
+.yc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-2);
+}
+
+.yc-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  width: 100%;
+  max-width: 560px;
+}
+
+.yc-tools .btn:disabled {
+  background: transparent;
+  color: var(--text-disabled);
+}
+
+.yc-note {
+  text-align: center;
+}
+
+.yc-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  width: 100%;
+  max-width: 360px;
+}
+
+@media (min-width: 900px) {
+  .yc-actions {
+    flex-direction: row;
+    max-width: none;
+    width: auto;
+  }
+
+  .yc-actions .btn {
+    width: auto;
+    min-width: 240px;
+  }
+}
+
+.ys-kicker {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-height: 21px;
+}
+
+
+/* ---------- 히어로 디오라마 (배경 있는 영상 그대로, 가장자리만 배경색으로 녹임) ---------- */
+.ys--dio {
+  background: radial-gradient(70% 70% at 68% 50%, #d6d1ca 0%, #cdc8c1 100%);
+}
+
+.ys--dio .ys-bg {
+  display: none;
+}
+
+.hd {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.hd-video {
+  width: 100%;
+  max-height: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  -webkit-mask-image: radial-gradient(58% 58% at 50% 52%, #000 45%, transparent 100%);
+  mask-image: radial-gradient(58% 58% at 50% 52%, #000 45%, transparent 100%);
+}
+
+@media (min-width: 900px) {
+  /* 디오라마는 글자 오른쪽에만 */
+  .ys--dio .ys-stage {
+    left: calc(var(--gutter) + min(460px, 33vw) + 24px);
+    right: 0;
+  }
+}

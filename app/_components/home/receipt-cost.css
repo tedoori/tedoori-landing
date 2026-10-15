@@ -1,0 +1,193 @@
+/* 07 · 비용: 영수증이 출력되며 항목이 한 줄씩 찍힘 */
+
+.home-flow section.h-cost2 {
+  background: #f5ede2;
+}
+
+.rc-track {
+  --feed: 0;
+  --stamp: 0;
+}
+
+.rc-stage {
+  display: grid;
+  align-content: center;
+  gap: var(--sp-8);
+  padding-block: var(--section-y);
+}
+
+@media (min-width: 900px) {
+  .rc-stage {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+  }
+}
+
+.rc-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.rc-title {
+  font-size: clamp(32px, 1.8vw + 18px, 52px);
+  font-weight: 800;
+  line-height: 1.22;
+  letter-spacing: -0.035em;
+}
+
+/* ---------- 프린터 출력구 ---------- */
+.rc-printer {
+  position: relative;
+  width: min(100%, 440px);
+  justify-self: center;
+}
+
+.rc-slot {
+  position: relative;
+  z-index: 2;
+  height: 44px;
+  border-radius: 14px 14px 10px 10px;
+  background: linear-gradient(180deg, #2b3a31 0%, var(--forest-900) 100%);
+  box-shadow: 0 14px 24px -14px rgba(22, 35, 27, 0.6);
+}
+
+.rc-slot span {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 10px;
+  height: 6px;
+  border-radius: 3px;
+  background: #050806;
+}
+
+/* 출력구 아래로만 보이게 */
+.rc-paper-clip {
+  position: relative;
+  z-index: 1;
+  margin: -14px 26px 0;
+  overflow: hidden;
+  padding-bottom: 24px;
+}
+
+.rc-paper {
+  position: relative;
+  padding: 34px 26px 54px;
+  background: #fffefb;
+  color: #2a2a28;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 20px 34px -22px rgba(60, 45, 30, 0.45);
+  transform: translateY(calc((1 - var(--feed)) * -100%));
+  /* 아래 지그재그 절취선 */
+  -webkit-mask:
+    linear-gradient(#000 0 0) top / 100% calc(100% - 10px) no-repeat,
+    conic-gradient(from -45deg at bottom, transparent, #000 1deg 89deg, transparent 90deg) bottom / 16px 10px repeat-x;
+  mask:
+    linear-gradient(#000 0 0) top / 100% calc(100% - 10px) no-repeat,
+    conic-gradient(from -45deg at bottom, transparent, #000 1deg 89deg, transparent 90deg) bottom / 16px 10px repeat-x;
+}
+
+/* 한 줄씩 찍힘: 왼쪽부터 드러남 */
+.rc-line {
+  clip-path: inset(0 calc((1 - var(--k)) * 100%) 0 0);
+  opacity: calc(0.2 + var(--k) * 0.8);
+}
+
+.rc-paper__head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+}
+
+.rc-dots {
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: #a9a49a;
+}
+
+.rc-row {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 12px;
+  align-items: baseline;
+  padding: 14px 0;
+  border-bottom: 1px dashed #d8d2c6;
+}
+
+.rc-row dt {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.rc-row dd {
+  font-size: 15px;
+  color: #5b5850;
+}
+
+.rc-paper__foot {
+  margin-top: 18px;
+  font-size: 13.5px;
+  color: #6b675e;
+  text-align: center;
+}
+
+.rc-barcode {
+  display: block;
+  height: 34px;
+  margin: 20px auto 0;
+  width: 70%;
+  background: repeating-linear-gradient(
+    90deg,
+    #2a2a28 0 2px,
+    transparent 2px 4px,
+    #2a2a28 4px 5px,
+    transparent 5px 8px,
+    #2a2a28 8px 11px,
+    transparent 11px 12px
+  );
+  opacity: calc(var(--l9) * 0.85);
+}
+
+/* '견적 도착' 도장 */
+.rc-stamp {
+  position: absolute;
+  right: 14px;
+  top: 22px;
+  padding: 8px;
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  opacity: var(--stamp);
+  transform: rotate(-10deg) scale(calc(2.2 - var(--stamp) * 1.2));
+}
+
+.rc-stamp .ui-status {
+  font-size: 15px;
+}
+
+@media (max-width: 899px) {
+  .rc-stage {
+    align-content: start;
+    gap: var(--sp-5);
+  }
+
+  .rc-paper {
+    padding: 26px 20px 46px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rc-paper {
+    transform: none;
+  }
+
+  .rc-line {
+    clip-path: none;
+    opacity: 1;
+  }
+}

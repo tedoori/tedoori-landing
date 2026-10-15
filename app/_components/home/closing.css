@@ -1,0 +1,221 @@
+/* 08 · 마무리: 숲색 카드가 커지며 화면을 채움 + 대화형 FAQ + 거대한 '테두리' */
+
+.cl {
+  --enter: 1;
+  position: relative;
+  padding: 0 calc((1 - var(--enter)) * 4vw);
+  background: #f5ede2;
+}
+
+.cl-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: calc((1 - var(--enter)) * 48px) calc((1 - var(--enter)) * 48px) 0 0;
+  background: var(--forest-900);
+  color: #fff;
+  transform: translateY(calc((1 - var(--enter)) * 60px));
+}
+
+.cl-inner {
+  display: grid;
+  gap: var(--sp-10);
+  padding-top: clamp(80px, 12vh, 140px);
+  padding-bottom: var(--sp-10);
+}
+
+.cl-inner {
+  justify-items: center;
+  padding-bottom: clamp(80px, 12vh, 140px);
+}
+
+.cl-chat {
+  width: min(100%, 640px);
+}
+
+.cl-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  text-align: center;
+}
+
+.cl-title {
+  font-size: clamp(34px, 2.2vw + 18px, 60px);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.cl-lead {
+  font-size: var(--fs-body-l);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.cl-cta {
+  margin-top: var(--sp-4);
+}
+
+.cl-cta .btn {
+  min-width: 240px;
+}
+
+/* ---------- 대화형 FAQ ---------- */
+.cl-chat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: clamp(18px, 2.4vw, 28px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.cl-chat__log {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 140px;
+  justify-content: flex-end;
+}
+
+.cl-chat__log:empty::before {
+  content: "자주 묻는 질문을 눌러보세요";
+  align-self: center;
+  margin: auto 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.cl-msg {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 86%;
+  padding: 11px 14px;
+  border-radius: 18px;
+  font-size: 15px;
+  line-height: 1.5;
+  animation: cl-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1.2) both;
+}
+
+.cl-msg--me {
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+  background: var(--primary);
+  font-weight: 700;
+}
+
+.cl-msg--bot {
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+  background: #fff;
+  color: var(--forest-900);
+}
+
+.cl-avatar {
+  flex: none;
+  width: 26px;
+  height: auto;
+  margin-top: 2px;
+}
+
+.cl-msg--typing {
+  gap: 5px;
+  padding: 14px 16px;
+}
+
+.cl-msg--typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gray-400);
+  animation: cl-dot 900ms ease-in-out infinite;
+}
+
+.cl-msg--typing span:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.cl-msg--typing span:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+@keyframes cl-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+}
+
+@keyframes cl-dot {
+  50% {
+    transform: translateY(-4px);
+    opacity: 0.5;
+  }
+}
+
+.cl-chat__ask {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: var(--sp-4);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.cl-q {
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 200ms linear,
+    opacity 200ms linear;
+}
+
+.cl-q:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.cl-q:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ---------- 거대한 '테두리': 한 글자씩 올라옴 ---------- */
+.cl-word {
+  display: flex;
+  justify-content: center;
+  gap: 0.02em;
+  margin: 0;
+  overflow: hidden;
+  font-size: clamp(120px, 30vw, 440px);
+  font-weight: 900;
+  line-height: 0.82;
+  letter-spacing: -0.06em;
+  color: var(--green-brand);
+  user-select: none;
+}
+
+.cl-word span {
+  display: inline-block;
+  transform: translateY(calc((1 - var(--w)) * 100%));
+}
+
+@media (max-width: 899px) {
+  .cl-cta .btn {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cl-msg,
+  .cl-msg--typing span {
+    animation: none;
+  }
+}

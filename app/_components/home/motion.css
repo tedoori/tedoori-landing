@@ -1,0 +1,289 @@
+/* =========================================================
+   홈 스크롤 연출 (HomeMotion 과 짝)
+   ========================================================= */
+
+/* ---------- 이어지는 하늘 배경 ---------- */
+.home-sky {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--sky-a, #eaf2f6) 0%, var(--sky-b, #f7f5ef) 100%);
+}
+
+.home-sky__glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.6;
+  animation: home-drift 22s ease-in-out infinite alternate;
+}
+
+.home-sky__glow--a {
+  left: -10vmax;
+  top: -12vmax;
+  width: 48vmax;
+  height: 48vmax;
+  background: #ffffff;
+}
+
+.home-sky__glow--b {
+  right: -14vmax;
+  bottom: -16vmax;
+  width: 56vmax;
+  height: 56vmax;
+  background: color-mix(in srgb, var(--sky-b, #f7f5ef) 55%, #ffe2c6);
+  animation-duration: 28s;
+}
+
+@keyframes home-drift {
+  to {
+    transform: translate(6vmax, 4vmax);
+  }
+}
+
+.home-flow .section:not(.section--forest) {
+  background: transparent;
+}
+
+/* 히어로: 배경은 화면 맨 위까지(떠 있는 헤더 뒤로), 글·장면만 헤더 높이만큼 내림 */
+.home-flow .ys-sticky {
+  top: 0;
+  height: 100svh;
+}
+
+.home-flow .ys-stage,
+.home-flow .ys-copy {
+  margin-top: var(--hdr, 0px);
+}
+
+@media (min-width: 900px) {
+  .home-flow .ys-copy {
+    margin-top: calc(var(--hdr, 0px) / 2);
+  }
+}
+
+/* ---------- 떠 있는 헤더 ---------- */
+.site-header.site-header--float {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 12px 0;
+  border-bottom: 0;
+  background: transparent;
+  backdrop-filter: none;
+  pointer-events: none;
+  transition: transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.site-header--float .site-header__inner {
+  grid-template-columns: auto 1fr auto auto;
+  grid-template-areas: "brand . cta menu";
+  max-width: 1240px;
+  padding: 6px 6px 6px 16px;
+  border: 1px solid rgba(22, 35, 27, 0.08);
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  backdrop-filter: blur(16px) saturate(1.5);
+  pointer-events: auto;
+  transition:
+    background-color 300ms linear,
+    box-shadow 300ms linear,
+    border-color 300ms linear;
+}
+
+.site-header--float.is-past-hero .site-header__inner {
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 10px 28px -16px rgba(22, 35, 27, 0.35);
+}
+
+.site-header--float.is-hidden {
+  transform: translateY(calc(-100% - 12px));
+}
+
+.site-header--float:focus-within {
+  transform: none;
+}
+
+.site-header--float .brand__mark {
+  width: 42px;
+}
+
+.site-header--float .site-nav {
+  display: none;
+}
+
+.site-header--float .header-cta {
+  display: none;
+}
+
+/* 숲색 마무리 위에서는 어둡게 */
+.site-header--float.is-dark .site-header__inner {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(22, 35, 27, 0.72);
+}
+
+.site-header--float.is-dark .brand,
+.site-header--float.is-dark .site-nav a {
+  color: #fff;
+}
+
+.site-header--float.is-dark .icon-link img,
+.site-header--float.is-dark .brand__mark {
+  filter: brightness(0) invert(1);
+}
+
+.site-header--float.is-dark .icon-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+@media (min-width: 900px) {
+  .site-header.site-header--float {
+    padding: 14px 24px 0;
+  }
+
+  .site-header--float .site-header__inner {
+    grid-template-columns: auto 1fr auto auto auto;
+    grid-template-areas: "brand . nav cta menu";
+    padding: 6px 6px 6px 22px;
+  }
+
+  .site-header--float .brand__mark {
+    width: 50px;
+  }
+
+  .site-header--float .site-nav {
+    display: flex;
+    margin-right: 4px;
+  }
+
+  .site-header--float .site-nav a {
+    min-height: 44px;
+    border-radius: var(--r-pill);
+  }
+
+  /* 견적 버튼: 다른 페이지와 같게 처음부터 항상 보임 */
+  .site-header--float .header-cta {
+    display: inline-flex;
+    gap: 8px;
+    min-width: 0;
+    padding: 0 20px;
+    border-radius: var(--r-pill);
+  }
+
+  .site-header--float .header-cta::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    animation: home-pulse 1.8s ease-out infinite;
+  }
+
+}
+
+@keyframes home-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 0 7px rgba(255, 255, 255, 0);
+  }
+}
+
+/* ---------- 왼쪽 진행 막대 ---------- */
+.home-rail {
+  position: fixed;
+  left: 28px;
+  top: 50%;
+  z-index: 15;
+  width: 3px;
+  height: 160px;
+  margin-top: -80px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: rgba(22, 35, 27, 0.12);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 400ms linear;
+}
+
+.home-rail.is-on {
+  opacity: 1;
+}
+
+.home-rail__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--primary);
+  transform: scaleY(0);
+  transform-origin: top;
+}
+
+@media (max-width: 1199px) {
+  .home-rail {
+    display: none;
+  }
+}
+
+/* ---------- 모바일 아래 견적 버튼 ---------- */
+.home-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  justify-content: center;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  pointer-events: none;
+  visibility: hidden;
+  transform: translateY(120%);
+  transition:
+    transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    visibility 0s 420ms;
+}
+
+.home-dock .btn {
+  max-width: 360px;
+  box-shadow: var(--shadow-pop);
+  pointer-events: auto;
+}
+
+.home-dock.is-on {
+  visibility: visible;
+  transform: none;
+  transition: transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (min-width: 900px) {
+  .home-dock {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-sky__glow,
+  .site-header--float .header-cta::before {
+    animation: none;
+  }
+}
+
+/* ---------- 모바일: 홈의 모든 버튼은 가운데 ---------- */
+@media (max-width: 899px) {
+  .home-flow .btn {
+    display: flex;
+    width: 100%;
+    max-width: 360px;
+    margin-inline: auto;
+  }
+
+  .home-flow .ms-actions .btn {
+    width: auto;
+    max-width: none;
+    margin: 0;
+  }
+}

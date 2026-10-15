@@ -1,0 +1,507 @@
+/* 06 · 신청부터 견적까지: 혼자 천천히 넘어가고, 끌어서 넘길 수도 있는 카드 */
+
+.home-flow section.h-steps {
+  padding-block: var(--section-y);
+  overflow: hidden;
+  background: #eaf1f4;
+}
+
+.sr {
+  --card: min(880px, 86vw);
+}
+
+.sr-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  text-align: center;
+}
+
+.sr-title {
+  font-size: clamp(32px, 1.8vw + 18px, 52px);
+  font-weight: 800;
+  line-height: 1.22;
+  letter-spacing: -0.035em;
+}
+
+/* '무료 견적 요청' 카드: 배지가 단계에 따라 바뀜 */
+.sr-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: var(--sp-4);
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--shadow-pop);
+}
+
+.sr-status__label {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.sr-status__badge {
+  display: inline-flex;
+  animation: sr-badge 520ms cubic-bezier(0.2, 0.8, 0.2, 1.4) both;
+}
+
+@keyframes sr-badge {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.8);
+  }
+}
+
+/* 카드 줄: 지금 카드가 가운데 오도록 */
+.sr-view {
+  margin-top: var(--sp-8);
+  padding: 10px 0;
+  overflow: visible;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+}
+
+.sr-view.is-drag {
+  cursor: grabbing;
+}
+
+.sr-rail {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  margin-left: calc(50% - var(--card) / 2);
+  transition: transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+
+.sr-view.is-drag .sr-rail {
+  transition: none;
+}
+
+.sr-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: clamp(20px, 3vw, 36px);
+  align-items: stretch;
+  width: var(--card);
+  min-height: min(40svh, 320px);
+  padding: clamp(24px, 3vw, 36px);
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(22, 35, 27, 0.06);
+  opacity: 0.5;
+  transform: scale(0.92);
+  transition:
+    opacity 500ms linear,
+    transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 500ms linear,
+    color 500ms linear;
+}
+
+.sr-panel.is-on {
+  background: var(--forest-900);
+  color: #fff;
+  opacity: 1;
+  transform: none;
+}
+
+.sr-panel__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: auto;
+  padding-bottom: var(--sp-8);
+}
+
+.sr-panel__no {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.sr-panel.is-on .sr-panel__no {
+  border-color: var(--green-brand);
+  background: var(--green-brand);
+  color: #fff;
+}
+
+.sr-panel__icon {
+  width: 64px;
+  opacity: 0.8;
+}
+
+.sr-panel__icon svg {
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.sr-panel h3 {
+  margin-bottom: 8px;
+  font-size: clamp(26px, 1.4vw + 16px, 38px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.sr-panel p {
+  font-size: 17px;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+/* 아래: 진행 막대(자동으로 차오름) + 화살표 */
+.sr-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-5);
+  margin-top: var(--sp-6);
+}
+
+.sr-bars {
+  display: flex;
+  gap: 6px;
+}
+
+.sr-bar {
+  position: relative;
+  width: 56px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.sr-bar::before,
+.sr-bar span {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 2px;
+}
+
+.sr-bar::before {
+  background: rgba(22, 35, 27, 0.14);
+}
+
+.sr-bar span {
+  background: var(--primary);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.sr-bar.is-done span {
+  transform: none;
+}
+
+.sr-bar.is-on span {
+  animation: sr-fill var(--dur) linear both;
+}
+
+.sr-bar.is-on.is-paused span {
+  animation-play-state: paused;
+}
+
+@keyframes sr-fill {
+  to {
+    transform: none;
+  }
+}
+
+.sr-arrows {
+  display: flex;
+  gap: 8px;
+}
+
+.sr-arrows button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color 200ms linear;
+}
+
+.sr-arrows button:hover {
+  background: var(--gray-50);
+}
+
+.sr-more {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--sp-8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sr-rail,
+  .sr-panel {
+    transition: none;
+  }
+
+  .sr-bar.is-on span {
+    animation: none;
+    transform: none;
+  }
+}
+
+
+/* ---------- 단계별 사진·목업 ---------- */
+.sr-panel__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.sr-panel__visual {
+  order: 2;
+  position: relative;
+  min-height: 240px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #dfe8ec;
+  pointer-events: none;
+}
+
+@media (max-width: 699px) {
+  .sr-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sr-panel__visual {
+    order: 0;
+    min-height: 190px;
+  }
+
+  .sr-panel__top {
+    padding-bottom: var(--sp-4);
+  }
+}
+
+/* 1 · 사진이 올라감 */
+.sv0,
+.sv1,
+.sv2 {
+  position: absolute;
+  inset: 0;
+}
+
+.sv0__bg,
+.sv1 img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sv0__bg {
+  filter: blur(6px) brightness(0.75);
+  transform: scale(1.1);
+}
+
+.sv0__thumbs {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.sv0__thumbs span {
+  position: relative;
+  width: 28%;
+  aspect-ratio: 3 / 4;
+  border: 3px solid #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 14px 24px -12px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transform: translateY(40px) rotate(calc((var(--k) - 1) * 6deg));
+}
+
+.sv0__thumbs img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sv0__thumbs i {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cpath d='M6 11.5 9.5 15 16 8' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+      center / 100% no-repeat,
+    var(--green-brand);
+  transform: scale(0);
+}
+
+.sr-panel.is-on .sv0__thumbs span {
+  animation: sv-up 600ms cubic-bezier(0.2, 0.8, 0.2, 1.2) both;
+  animation-delay: calc(250ms + var(--k) * 220ms);
+}
+
+.sr-panel.is-on .sv0__thumbs i {
+  animation: sv-pop 360ms cubic-bezier(0.2, 0.8, 0.2, 1.6) both;
+  animation-delay: calc(900ms + var(--k) * 220ms);
+}
+
+@keyframes sv-up {
+  to {
+    opacity: 1;
+    transform: translateY(calc((var(--k) - 1) * -6px)) rotate(calc((var(--k) - 1) * 6deg));
+  }
+}
+
+@keyframes sv-pop {
+  to {
+    transform: scale(1);
+  }
+}
+
+/* 2 · 돋보기가 사진을 훑음 */
+.sv1__lens {
+  position: absolute;
+  left: 20%;
+  top: 25%;
+  width: 92px;
+  height: 92px;
+  border: 4px solid #fff;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 0 0 999px rgba(10, 16, 12, 0.35),
+    0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.sv1__lens::after {
+  content: "";
+  position: absolute;
+  right: -22px;
+  bottom: -14px;
+  width: 30px;
+  height: 6px;
+  border-radius: 3px;
+  background: #fff;
+  transform: rotate(45deg);
+}
+
+.sr-panel.is-on .sv1__lens {
+  animation: sv-scan 3.6s ease-in-out infinite alternate;
+}
+
+@keyframes sv-scan {
+  0% {
+    left: 12%;
+    top: 22%;
+  }
+  50% {
+    left: 55%;
+    top: 48%;
+  }
+  100% {
+    left: 70%;
+    top: 18%;
+  }
+}
+
+.sv1__badge {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  padding: 6px;
+  border-radius: 12px;
+  background: #fff;
+}
+
+/* 3 · 작은 견적서 */
+.sv2 {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(160deg, #f6f2ea, #e9e1d2);
+}
+
+.sv2__doc {
+  width: min(82%, 300px);
+  padding: 18px;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--forest-900);
+  box-shadow: 0 18px 30px -18px rgba(60, 45, 30, 0.5);
+  transform: translateY(14px) rotate(-2deg);
+  transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sr-panel.is-on .sv2__doc {
+  transform: none;
+}
+
+.sv2__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--border-strong);
+  font-size: 13px;
+}
+
+.sv2__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.sv2__row i {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--gray-200);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.sr-panel.is-on .sv2__row i {
+  animation: sv-bar 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(400ms + var(--k) * 250ms);
+}
+
+@keyframes sv-bar {
+  to {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sr-panel.is-on .sv0__thumbs span,
+  .sr-panel.is-on .sv0__thumbs i,
+  .sr-panel.is-on .sv1__lens,
+  .sr-panel.is-on .sv2__row i {
+    animation-duration: 1ms;
+    animation-delay: 0ms;
+  }
+}

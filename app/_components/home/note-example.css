@@ -1,0 +1,268 @@
+/* 03 · 요청사항 작성 예시: 책상 위 종이 소품 (메모 3장 + 포스트잇 3장) */
+
+.ne {
+  position: relative;
+  background-color: #f6f2ea;
+  /* 모눈 종이 책상 */
+  background-image:
+    linear-gradient(rgba(140, 120, 90, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(140, 120, 90, 0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.ne-track {
+  --head: 0;
+}
+
+.ne-stage {
+  display: grid;
+  align-content: center;
+  gap: var(--sp-10);
+  padding-block: var(--section-y);
+}
+
+@media (min-width: 900px) {
+  .ne-stage {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    align-items: center;
+    gap: var(--sp-14);
+  }
+}
+
+.ne-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  opacity: calc(0.3 + var(--head) * 0.7);
+  transform: translateY(calc((1 - var(--head)) * 20px));
+}
+
+.ne-title {
+  font-size: clamp(36px, 2.4vw + 14px, 60px);
+  white-space: nowrap;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.ne-head .lead {
+  font-size: clamp(18px, 0.4vw + 15px, 21px);
+}
+
+/* ---------- 책상: 메모 세트를 흩어 놓음 ---------- */
+.ne-desk {
+  position: relative;
+  height: min(78svh, 680px);
+}
+
+.ne-set {
+  --rot: -3deg;
+  --prot: 4deg;
+  position: absolute;
+  width: 66%;
+  opacity: var(--d);
+  transform: translateY(calc((1 - var(--d)) * -90px)) rotate(calc(var(--rot) + (1 - var(--d)) * -9deg));
+  transform-origin: 30% 0;
+}
+
+.ne-set--0 {
+  left: 0;
+  top: 0;
+}
+
+.ne-set--1 {
+  --rot: 2.2deg;
+  --prot: -4deg;
+  right: 0;
+  top: 36%;
+}
+
+.ne-set--2 {
+  --rot: -1.4deg;
+  --prot: 5deg;
+  left: 2%;
+  top: 70%;
+}
+
+.ne-paper {
+  position: relative;
+  padding: 42px 30px 30px 56px;
+  border-radius: 4px;
+  background-color: #fffdf7;
+  background-image:
+    linear-gradient(90deg, transparent 40px, rgba(217, 58, 43, 0.35) 40px 41.5px, transparent 41.5px),
+    repeating-linear-gradient(180deg, transparent 0 39px, rgba(70, 110, 160, 0.18) 39px 40px);
+  background-position: 0 0, 0 28px;
+  color: #26344f;
+  box-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.04),
+    0 22px 40px -24px rgba(60, 45, 30, 0.45);
+}
+
+.ne-tape {
+  position: absolute;
+  top: -14px;
+  left: 40%;
+  width: 104px;
+  height: 28px;
+  background: rgba(231, 223, 207, 0.85);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  transform: rotate(-4deg);
+}
+
+.ne-paper__label {
+  font-size: 21px;
+  line-height: 40px;
+  color: #6b7c99;
+}
+
+.ne-paper__text {
+  font-size: clamp(27px, 0.8vw + 19px, 33px);
+  line-height: 40px;
+}
+
+/* 형광펜: 스크롤만큼 왼쪽부터 그어짐 */
+.ne-hl {
+  padding: 0 3px;
+  background: linear-gradient(180deg, transparent 0 48%, rgba(160, 225, 110, 0.8) 48% 90%, transparent 90%) no-repeat 0 0;
+  background-size: calc(var(--k) * 100%) 100%;
+  color: inherit;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* ---------- 포스트잇: 메모 모서리에 붙음 ---------- */
+.ne-postit {
+  position: absolute;
+  right: -56%;
+  top: 30%;
+  z-index: 1;
+  width: 64%;
+  padding: 18px 18px 22px;
+  background: linear-gradient(180deg, #e3f4d9 0%, #d6eecb 100%);
+  box-shadow: 0 18px 30px -16px rgba(40, 70, 40, 0.45);
+  opacity: var(--s);
+  transform: translateY(calc((1 - var(--s)) * -36px)) rotate(calc(var(--prot) + (1 - var(--s)) * 7deg))
+    scale(calc(1 + (1 - var(--s)) * 0.22));
+}
+
+.ne-set--1 .ne-postit {
+  right: auto;
+  left: -56%;
+  background: linear-gradient(180deg, #fff3c4 0%, #fbe9a6 100%);
+}
+
+.ne-set--2 .ne-postit {
+  background: linear-gradient(180deg, #e8e4f6 0%, #ddd6f0 100%);
+}
+
+.ne-postit::after {
+  /* 접힌 귀퉁이 */
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.12) 50%, #f6f2ea 50%);
+}
+
+.ne-postit__label {
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.ne-postit__text {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--forest-900);
+}
+
+/* 펜 밑줄: 스크롤만큼 그어짐 */
+.ne-postit__text u {
+  padding-bottom: 2px;
+  text-decoration: none;
+  background: linear-gradient(var(--primary), var(--primary)) no-repeat 0 100%;
+  background-size: calc(var(--k) * 100%) 2.5px;
+}
+
+/* ---------- 모바일: 메모가 한 장씩 위로 쌓임 ---------- */
+@media (max-width: 899px) {
+  .ne-stage {
+    align-content: start;
+    gap: var(--sp-6);
+  }
+
+  .ne-title {
+    font-size: 30px;
+    white-space: normal;
+  }
+
+  .ne-head .lead {
+    font-size: 16px;
+  }
+
+  .ne-desk {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    height: auto;
+  }
+
+  .ne-set {
+    position: relative;
+    left: auto;
+    right: auto;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ne-set--0 {
+    top: 0;
+  }
+
+  .ne-set--0,
+  .ne-set--1,
+  .ne-set--2 {
+    top: 0;
+  }
+
+
+  .ne-paper {
+    padding: 32px 18px 22px 44px;
+    background-image:
+      linear-gradient(90deg, transparent 30px, rgba(217, 58, 43, 0.35) 30px 31.5px, transparent 31.5px),
+      repeating-linear-gradient(180deg, transparent 0 31px, rgba(70, 110, 160, 0.18) 31px 32px);
+    background-position: 0 0, 0 22px;
+  }
+
+  .ne-paper__label {
+    font-size: 18px;
+    line-height: 32px;
+  }
+
+  .ne-paper__text {
+    font-size: 23px;
+    line-height: 32px;
+  }
+
+  .ne-postit,
+  .ne-set--1 .ne-postit {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    align-self: flex-end;
+    width: 82%;
+    margin-top: -14px;
+    padding: 14px 16px 18px;
+  }
+
+  .ne-postit__text {
+    font-size: 14px;
+  }
+}

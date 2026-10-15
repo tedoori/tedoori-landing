@@ -1,0 +1,18 @@
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+.env*
+!.env.local.example
+.impeccable/config.local.json
+
+# Local Netlify folder
+.netlify
+
+# Local agent, preview, and generated workspaces
+.agents/
+.aider-desk/
+.claude/
+.gen/
+.impeccable/
+.playwright-mcp/

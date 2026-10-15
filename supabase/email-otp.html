@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>테두리 이메일 확인</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f1ea;">
+<!-- 메일 목록에서 제목 옆에 보이는 미리보기 문구 -->
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#f4f1ea;">견적 신청 화면에 확인 코드를 입력해주세요.</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f1ea;">
+  <tr>
+    <td align="center" style="padding:32px 16px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px;background-color:#ffffff;border-radius:16px;">
+
+        <!-- 로고: 피그마 로고 마크(PNG, Supabase Storage brand 보관함) + 이름 -->
+        <tr>
+          <td style="padding:28px 32px 0 32px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="vertical-align:middle;"><img src="https://fhadxdmpuhlbfwvbciuz.supabase.co/storage/v1/object/public/brand/teduri-logo-mark.png" width="59" height="20" alt="" style="display:block;border:0;outline:none;text-decoration:none;width:59px;height:20px;"></td>
+                <td style="vertical-align:middle;padding-left:10px;font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:18px;font-weight:800;color:#16231B;letter-spacing:-0.02em;">테두리</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- 제목과 안내 -->
+        <tr>
+          <td style="padding:28px 32px 0 32px;font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;">
+            <h1 style="margin:0;font-size:22px;line-height:1.4;font-weight:800;color:#16231B;letter-spacing:-0.02em;">이메일을 확인해주세요</h1>
+            <p style="margin:10px 0 0 0;font-size:15px;line-height:1.6;color:#4E5A53;">견적 신청 화면에 아래 확인 코드를 입력해주세요.</p>
+          </td>
+        </tr>
+
+        <!-- 확인 코드 -->
+        <tr>
+          <td style="padding:24px 32px 0 32px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center" style="background-color:#E7DFCF;border-radius:12px;padding:22px 12px;">
+                  <div style="font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:13px;color:#46524B;margin-bottom:6px;">확인 코드</div>
+                  <div style="font-family:'SF Mono','Consolas','Menlo',monospace;font-size:34px;line-height:1.2;font-weight:700;letter-spacing:8px;color:#16231B;">{{ .Token }}</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- 유의 사항 -->
+        <tr>
+          <td style="padding:20px 32px 28px 32px;font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:13px;line-height:1.7;color:#4E5A53;">
+            코드는 발급 후 1시간 동안 쓸 수 있어요.<br>
+            직접 요청하지 않으셨다면 이 메일은 무시하셔도 괜찮아요.
+          </td>
+        </tr>
+
+        <!-- 아래 띠 -->
+        <tr>
+          <td style="padding:16px 32px;border-top:1px solid #ECE7DC;font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:12px;line-height:1.6;color:#5F6A64;">
+            테두리 · 서울·경기·인천 부분조경 견적<br>
+            이 메일은 발신 전용이에요.
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

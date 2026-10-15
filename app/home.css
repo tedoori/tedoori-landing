@@ -1,0 +1,451 @@
+/* 홈 아래 섹션 (디자인 시스템 v2: 평평하게, 실제 제품 UI처럼) */
+
+.h-split {
+  display: grid;
+  gap: var(--sp-10);
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .h-split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--sp-18);
+  }
+
+  .h-split--reverse > :first-child {
+    order: 2;
+  }
+
+  .h-split--top {
+    align-items: start;
+  }
+
+  .h-split .section-head {
+    margin-bottom: 0;
+  }
+}
+
+.h-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-4);
+  margin-top: var(--sp-2);
+}
+
+.h-actions .btn--primary {
+  width: 100%;
+}
+
+@media (min-width: 900px) {
+  .h-actions .btn--primary {
+    width: auto;
+    min-width: 200px;
+  }
+}
+
+.h-after {
+  margin-top: var(--sp-6);
+}
+
+/* 휴대폰 모양 신청 예시: 평평하게 */
+.h-phone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.h-phone__screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  width: min(100%, 360px);
+  padding: var(--sp-5) var(--sp-4) var(--sp-6);
+  border: 8px solid var(--gray-900);
+  border-radius: 36px;
+  background: #fff;
+}
+
+.h-phone__progress {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-subtle);
+}
+
+.h-phone__chips {
+  display: flex;
+  gap: var(--sp-1);
+  align-self: flex-end;
+}
+
+.h-phone__photos {
+  display: grid;
+  grid-template-columns: repeat(3, 64px);
+  gap: 6px;
+  align-self: flex-end;
+}
+
+.h-phone__photos span {
+  aspect-ratio: 1;
+  border-radius: var(--r-md);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0) 55%, rgba(156, 125, 94, 0.55) 56%),
+    linear-gradient(180deg, #cfe3ef 0%, #9fca8a 55%, #6fa35a 100%);
+}
+
+.h-phone__photos .h-phone__add {
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--border-strong);
+  background: var(--gray-50);
+  color: var(--text-subtle);
+}
+
+/* 큰 문장: 왼쪽 정렬 */
+.h-statement {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.h-statement .title-xl {
+  max-width: 16ch;
+}
+
+/* 요청 예시 대화 */
+.h-chat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  padding: var(--sp-6);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--bg-subtle);
+}
+
+.h-chat__row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  align-items: flex-start;
+}
+
+.h-chat__row--me {
+  align-items: flex-end;
+}
+
+.h-chat__who {
+  font-size: var(--fs-tiny);
+  font-weight: 700;
+  color: var(--text-subtle);
+}
+
+.h-chat .bubble {
+  max-width: 92%;
+}
+
+.h-chat .bubble--ask {
+  background: #fff;
+  border: 1px solid var(--border);
+}
+
+/* 비교표 */
+.h-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: #fff;
+}
+
+.h-table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  font-size: var(--fs-body);
+}
+
+.h-table th,
+.h-table td {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+.h-table tbody tr:last-child th,
+.h-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.h-table thead th {
+  font-size: var(--fs-body-l);
+  font-weight: 800;
+  background: var(--gray-50);
+}
+
+.h-table tbody th {
+  width: 40%;
+  text-align: left;
+  font-weight: 600;
+}
+
+.h-yes,
+.h-no {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.h-yes {
+  background: var(--primary);
+  color: #fff;
+}
+
+.h-yes .ui-ico,
+.h-no .ui-ico {
+  width: 16px;
+  height: 16px;
+}
+
+.h-no {
+  color: var(--gray-400);
+}
+
+/* 타임라인 */
+.h-timeline {
+  display: grid;
+  gap: var(--sp-6);
+  counter-reset: none;
+}
+
+.h-timeline li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: var(--sp-4);
+}
+
+.h-timeline li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 19px;
+  top: 44px;
+  bottom: calc(-1 * var(--sp-6) + 4px);
+  width: 2px;
+  background: var(--border);
+}
+
+.h-timeline__dot {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--gray-900);
+  color: #fff;
+  font-weight: 800;
+}
+
+.h-timeline h3 {
+  font-size: var(--fs-h3);
+  font-weight: 800;
+  line-height: 40px;
+}
+
+.h-timeline p {
+  margin: 2px 0 var(--sp-3);
+  color: var(--text-muted);
+}
+
+@media (min-width: 900px) {
+  .h-timeline {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sp-8);
+  }
+
+  .h-timeline li {
+    grid-template-columns: 1fr;
+    gap: var(--sp-4);
+  }
+
+  .h-timeline li:not(:last-child)::after {
+    left: 52px;
+    right: calc(-1 * var(--sp-8) + 12px);
+    top: 19px;
+    bottom: auto;
+    width: auto;
+    height: 2px;
+  }
+
+  .h-timeline h3 {
+    line-height: 1.4;
+  }
+}
+
+/* 비용 목록 */
+.h-cost {
+  border-top: 2px solid var(--text);
+}
+
+.h-cost__row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: var(--sp-4);
+  align-items: baseline;
+  padding-block: var(--sp-5);
+  border-bottom: 1px solid var(--border);
+}
+
+.h-cost dt {
+  font-size: var(--fs-h3);
+  font-weight: 800;
+}
+
+.h-cost dd {
+  color: var(--text-muted);
+}
+
+/* ---------- 와이어프레임 복원 (v2 모양) ---------- */
+
+/* 01 신청 화면 예시: 질문 + 입력칸 */
+.h-phone__q {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.h-phone__q p {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+
+/* 02 부분조경의 이유 */
+.h-reason {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  text-align: center;
+}
+
+.h-reason__img {
+  width: 100%;
+  max-width: 1100px;
+  margin-block: var(--sp-4) 0;
+}
+
+/* 03 요청 예시 */
+.h-examples {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.h-example {
+  padding: var(--sp-5) var(--sp-6);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--bg-subtle);
+}
+
+.h-example__label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-subtle);
+}
+
+.h-example__text {
+  margin-top: 6px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.55;
+}
+
+/* 05 맡길 범위 */
+.h-rows {
+  border-top: 2px solid var(--text);
+}
+
+.h-row {
+  display: grid;
+  gap: 6px;
+  padding-block: var(--sp-5);
+  border-bottom: 1px solid var(--border);
+}
+
+.h-row__name {
+  font-size: var(--fs-h3);
+  font-weight: 800;
+}
+
+.h-row__items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--text-muted);
+}
+
+@media (min-width: 900px) {
+  .h-row {
+    grid-template-columns: 220px 1fr;
+    gap: var(--sp-6);
+    align-items: baseline;
+  }
+}
+
+/* 07 견적 구성 예시 */
+.h-cost {
+  padding: var(--sp-6);
+  border: 1px solid var(--border);
+  border-top: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: #fff;
+}
+
+.h-cost__label {
+  margin-bottom: var(--sp-2);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-subtle);
+}
+
+.h-cost__row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* 08 마무리: 어두운 바탕 위 아코디언 */
+.h-faq {
+  width: 100%;
+  max-width: 720px;
+  margin-block: var(--sp-4);
+  text-align: left;
+}
+
+.section--forest .ui-accordion,
+.section--forest .ui-accordion details {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.section--forest .ui-accordion summary {
+  color: #fff;
+}
+
+.section--forest .ui-accordion summary .ui-ico {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.section--forest .ui-accordion__body {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.section--forest .btn--primary {
+  max-width: 360px;
+}
