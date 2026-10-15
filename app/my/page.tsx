@@ -16,7 +16,7 @@ export default function MyPage() {
           <h1 className="title-l">신청 내용은<br />안전하게 확인해요.</h1>
           <p className="lead">신청 이메일로 확인 코드를 받은 뒤, 내 견적 신청 목록을 확인할 수 있어요.</p>
           <MyApplications />
-          <div className="btn-row btn-row--start">
+          <div className="btn-row">
             <Link href="/contact" className="btn btn--secondary">
               신청 이메일을 찾기 어려워요
             </Link>

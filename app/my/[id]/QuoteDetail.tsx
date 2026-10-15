@@ -113,7 +113,7 @@ export function QuoteDetail({ id }: { id: string }) {
         <Callout tone="danger" title="불러오지 못했어요">
           {state.message}
         </Callout>
-        <div className="btn-row btn-row--start">
+        <div className="btn-row">
           <button type="button" className="btn btn--primary" onClick={() => void load()}>
             다시 시도
           </button>

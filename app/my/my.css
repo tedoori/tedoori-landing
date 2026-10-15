@@ -85,3 +85,12 @@
 @media (prefers-reduced-motion: reduce) {
   .my-skeleton span { animation: none; }
 }
+
+/* 버튼(CTA)은 모두 가운데 정렬 */
+.my-page .btn-row { justify-content: center; }
+.my-empty { justify-items: center; text-align: center; }
+.my-detail__actions { justify-content: center; }
+.my-form { margin-inline: auto; width: 100%; }
+.my-form .btn, .my-form .my-link { justify-self: center; }
+.my-panel { text-align: center; }
+.my-panel .my-field { text-align: left; }
