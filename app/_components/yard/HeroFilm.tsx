@@ -35,6 +35,7 @@ export function HeroFilm({ step }: { step: YardStep["id"] }) {
   const video = useRef<HTMLVideoElement>(null);
   const run = useRef(0);
   const [src, setSrc] = useState<string | null>(null);
+  const [introSrc, setIntroSrc] = useState<string | null>(null);
 
   // 화면 크기에 맞는 영상을 첫 화면이 뜬 뒤에 불러옴
   useEffect(() => {
@@ -42,6 +43,12 @@ export function HeroFilm({ step }: { step: YardStep["id"] }) {
     if (document.readyState === "complete") pick();
     else window.addEventListener("load", pick, { once: true });
     return () => window.removeEventListener("load", pick);
+  }, []);
+
+  // 첫 화면은 포스터를 먼저 보여주고, 초기 렌더가 끝난 뒤 반복 영상을 불러옴
+  useEffect(() => {
+    const id = window.setTimeout(() => setIntroSrc("/hero/intro.mp4"), 1200);
+    return () => window.clearTimeout(id);
   }, []);
 
   useEffect(() => {
@@ -120,9 +127,9 @@ export function HeroFilm({ step }: { step: YardStep["id"] }) {
       {/* 모바일: 영상을 자르지 않고, 남는 위아래는 흐린 정원으로 */}
       <img className="hf-blur" src="/hero/final.webp" alt="" />
       <video ref={video} className="hf-video" src={src ?? undefined} muted playsInline preload="metadata" />
-      <img className={`hf-still${showLawn ? " is-on" : ""}`} src="/hero/lawn.webp" alt="" />
+      {showLawn && <img className="hf-still is-on" src="/hero/lawn.webp" alt="" />}
       {/* 첫 화면: 완성된 정원이 바람에 살짝 흔들리는 영상이 계속 반복 */}
-      <video className={`hf-still${showIntro ? " is-on" : ""}`} src="/hero/intro.mp4" poster="/hero/intro-poster.webp" muted loop autoPlay playsInline preload="metadata" />
+      <video className={`hf-still${showIntro ? " is-on" : ""}`} src={introSrc ?? undefined} poster="/hero/intro-poster.webp" muted loop autoPlay playsInline preload="metadata" />
       <span className="hf-shade" />
     </div>
   );
