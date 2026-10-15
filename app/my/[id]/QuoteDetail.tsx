@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Callout, EmptyState, StatusBadge, type QuoteStatus } from "../../_components/ui";
 import { QuoteApiError, quoteApi } from "../../../lib/quote-api";
+import { useIdleSignOut } from "../../../lib/idle";
 
 export type QuoteDetailData = {
   id: string;
@@ -48,6 +49,8 @@ export function splitWish(wish: string | null) {
 export function QuoteDetail({ id }: { id: string }) {
   const router = useRouter();
   const [state, setState] = useState<State>({ kind: "loading" });
+  // 상세를 띄워 둔 채 1시간이 지나면 자동 로그아웃 → 이메일 확인 화면
+  useIdleSignOut(useCallback(() => setState({ kind: "auth" }), []));
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");

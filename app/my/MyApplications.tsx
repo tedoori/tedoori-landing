@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Callout, StatusBadge, type QuoteStatus } from "../_components/ui";
 import { isSupabaseConfigured, getSupabase } from "../../lib/supabase";
 import { QuoteApiError, quoteApi } from "../../lib/quote-api";
+import { touchActivity, useIdleSignOut } from "../../lib/idle";
 
 type QuoteRow = {
   id: string;
@@ -70,7 +71,8 @@ export function MyApplications() {
     } catch (e) {
       if (e instanceof QuoteApiError && e.status === 401) {
         setPhase("email");
-        setError("이메일 인증이 만료됐어요. 다시 확인해주세요.");
+        setRows([]);
+        setError(e.detail.code === "idle" ? e.message : "이메일 인증이 만료됐어요. 다시 확인해주세요.");
       } else {
         setError(e instanceof QuoteApiError ? e.message : "신청 목록을 불러오지 못했어요. 잠시 후 다시 시도해주세요.");
       }
@@ -135,21 +137,29 @@ export function MyApplications() {
       setError("확인 코드가 맞지 않거나 만료됐어요. 코드를 확인해주세요.");
     } else {
       setCode("");
+      touchActivity(); // 새로 인증했으니 1시간을 지금부터 셈
       await loadList(1);
     }
     setBusy(false);
   };
 
-  // 다른 이메일로 확인: 지금 인증 세션을 끝내야 다시 열었을 때 이전 목록이 보이지 않음
-  const reset = async () => {
+  // 로그아웃: 인증 세션을 끝내야 다시 열었을 때 이전 목록이 보이지 않음
+  const reset = async (message = "") => {
     await getSupabase()?.auth.signOut();
     setPhase("email");
     setCode("");
     setRows([]);
     setTotal(0);
-    setError("");
+    setError(message);
     setNotice("");
   };
+
+  // 목록을 띄워 둔 채 1시간이 지나면 자동 로그아웃
+  const onIdle = useCallback(() => {
+    void reset("1시간 동안 사용하지 않아 로그아웃됐어요. 이메일을 다시 확인해주세요.");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useIdleSignOut(onIdle);
 
   const summary = useMemo(() => {
     if (total === 0) return "아직 접수한 신청이 없어요.";
@@ -201,7 +211,7 @@ export function MyApplications() {
               <h2 id="my-list-title" className="my-panel__title">내 신청 목록</h2>
               <p className="my-panel__text">{verifiedEmail} · {summary}</p>
             </div>
-            <button className="my-link" type="button" onClick={() => void reset()}>다른 이메일로 확인</button>
+            <button className="my-link" type="button" onClick={() => void reset()}>로그아웃</button>
           </div>
           {deleted !== null && (
             <Callout tone="success" title="신청을 삭제했어요">

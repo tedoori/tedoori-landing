@@ -8,6 +8,7 @@ import { DISTRICTS, REGIONS, type Region } from "../../../../lib/districts";
 import { checkPhotos, formatPhone, PHONE_RE, PHOTO_ACCEPT, shrinkPhoto } from "../../../../lib/photo";
 import { HOUSING_TYPES, MAX_PHOTOS, SCOPES, TIMINGS, VISITS, WORK_TYPES } from "../../../../lib/quote";
 import { QuoteApiError, quoteApi } from "../../../../lib/quote-api";
+import { useIdleSignOut } from "../../../../lib/idle";
 import { getSupabase } from "../../../../lib/supabase";
 import { splitWish, type QuoteDetailData } from "../QuoteDetail";
 
@@ -65,6 +66,8 @@ function check(f: Form) {
 export function QuoteEdit({ id }: { id: string }) {
   const router = useRouter();
   const [load, setLoad] = useState<Load>({ kind: "loading" });
+  // 수정 화면을 띄워 둔 채 1시간이 지나면 자동 로그아웃 → 이메일 확인 화면
+  useIdleSignOut(useCallback(() => setLoad({ kind: "auth" }), []));
   const [receipt, setReceipt] = useState("");
   const [form, setForm] = useState<Form | null>(null);
   const [photos, setPhotos] = useState<Photo[]>([]);

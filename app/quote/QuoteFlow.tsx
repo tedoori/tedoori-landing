@@ -21,6 +21,7 @@ import {
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 import { QuoteApiError, quoteApi } from "@/lib/quote-api";
 import { checkPhotos, formatPhone, PHONE_RE, PHOTO_ACCEPT, shrinkPhoto } from "@/lib/photo";
+import { touchActivity } from "@/lib/idle";
 import { PrivacyContent } from "../_components/legal/PrivacyContent";
 import { TermsContent } from "../_components/legal/TermsContent";
 
@@ -207,6 +208,7 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
     const { error: err } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
     setBusy(false);
     if (err) return setError(authErrorMessage(err.message));
+    touchActivity(); // 접수 직후 내 신청에서 1시간을 지금부터 셈
     update({ email });
     setCode("");
     setNotice("");
@@ -221,6 +223,7 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
     const { error: err } = await supabase.auth.signInWithOtp({ email: answers.email, options: { shouldCreateUser: true } });
     setBusy(false);
     if (err) return setError(authErrorMessage(err.message));
+    touchActivity(); // 접수 직후 내 신청에서 1시간을 지금부터 셈
     setNotice("확인 메일을 다시 보냈어요.");
     setResendIn(60);
   };
@@ -235,6 +238,7 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
     const { error: err } = await supabase.auth.verifyOtp({ email: answers.email, token, type: "email" });
     setBusy(false);
     if (err) return setError(authErrorMessage(err.message));
+    touchActivity(); // 접수 직후 내 신청에서 1시간을 지금부터 셈
     setPhase("review");
   };
 
