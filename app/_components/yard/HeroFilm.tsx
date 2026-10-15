@@ -119,10 +119,10 @@ export function HeroFilm({ step }: { step: YardStep["id"] }) {
     >
       {/* 모바일: 영상을 자르지 않고, 남는 위아래는 흐린 정원으로 */}
       <img className="hf-blur" src="/hero/final.webp" alt="" />
-      <video ref={video} className="hf-video" src={src ?? undefined} muted playsInline preload="auto" />
+      <video ref={video} className="hf-video" src={src ?? undefined} muted playsInline preload="metadata" />
       <img className={`hf-still${showLawn ? " is-on" : ""}`} src="/hero/lawn.webp" alt="" />
       {/* 첫 화면: 완성된 정원이 바람에 살짝 흔들리는 영상이 계속 반복 */}
-      <video className={`hf-still${showIntro ? " is-on" : ""}`} src="/hero/intro.mp4" poster="/hero/intro-poster.webp" muted loop autoPlay playsInline preload="auto" />
+      <video className={`hf-still${showIntro ? " is-on" : ""}`} src="/hero/intro.mp4" poster="/hero/intro-poster.webp" muted loop autoPlay playsInline preload="metadata" />
       <span className="hf-shade" />
     </div>
   );

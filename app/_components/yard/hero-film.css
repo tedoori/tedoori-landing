@@ -128,7 +128,7 @@
   min-height: 60px;
   padding-inline: 36px;
   font-size: 18px;
-  background: #1ea64c;
+  background: #12873b;
   box-shadow:
     0 0 0 4px rgba(184, 240, 196, 0.25),
     0 14px 40px -8px rgba(30, 166, 76, 0.75);
@@ -136,7 +136,7 @@
 }
 
 .ys.ys--film .ys-actions .btn:hover {
-  background: #23b956;
+  background: #0d6e30;
 }
 
 @keyframes hf-cta {

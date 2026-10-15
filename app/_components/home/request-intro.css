@@ -498,6 +498,10 @@
   .ri-after .btn {
     max-width: 360px;
   }
+
+  .ri-after .note {
+    color: #55615a;
+  }
 }
 
 /* 다음 섹션으로 이어지는 색 */
