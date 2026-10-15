@@ -31,6 +31,15 @@ const HEAD = ["서울·경기·인천,", "\n", "집에서", "견적을", "요청
 export function RequestIntro() {
   const track = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState(-1);
+  const after = useRef<HTMLDivElement>(null);
+  const [afterIn, setAfterIn] = useState(false);
+
+  // 모바일: 휴대폰 아래 안내·버튼이 화면에 들어올 때 부드럽게 올라옴
+  useEffect(() => {
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && setAfterIn(true), { threshold: 0.2 });
+    if (after.current) io.observe(after.current);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     const el = track.current!;
@@ -53,7 +62,8 @@ export function RequestIntro() {
       // 초록 원이 화면을 다 덮을 만큼의 배율 (원 중심에서 가장 먼 모서리까지)
       const cs = vw < 900 ? 96 : 132;
       const cy = vh * (vw < 900 ? 0.3 : 0.32);
-      const far = Math.hypot(vw / 2 + cs, Math.max(cy, vh - cy));
+      // 아이폰은 툴바가 접히면 화면이 길어지므로 여유 있게 (아래 흰 줄 방지)
+      const far = Math.hypot(vw / 2 + cs, Math.max(cy, vh * 1.25 - cy));
       el.style.setProperty("--a", a.toFixed(4));
       el.style.setProperty("--t", t.toFixed(4));
       el.style.setProperty("--g", g.toFixed(4));
@@ -239,7 +249,7 @@ export function RequestIntro() {
         </div>
       </div>
 
-      <div className="ri-after container">
+      <div ref={after} className={`ri-after container${afterIn ? " is-in" : ""}`}>
         <p className="note">
           이어서 희망 시기, 요청사항과 이메일을 확인해요.
           <br />

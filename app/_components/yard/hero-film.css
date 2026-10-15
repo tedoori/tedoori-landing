@@ -206,3 +206,19 @@
   height: 100vh;
   height: 100lvh;
 }
+
+/* 모바일 장면 멈춤 지점 (스냅은 YardStory 가 히어로 안에서만 켬) */
+.ys-snap {
+  position: absolute;
+  left: 0;
+  top: calc((100% - 100svh) * var(--f));
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.ys-snap--end {
+  top: 100%;
+}

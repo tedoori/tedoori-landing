@@ -468,3 +468,34 @@
     grid-area: stage;
   }
 }
+
+/* 모바일: 작업 버튼 01~05 가운데 정렬 (홀수 마지막 05도 가운데),
+   선택 초기화 · 연출 예시 문구도 가운데 */
+@media (max-width: 999px) {
+  .ms-studio {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ms-works {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .ms-works > .ms-work {
+    flex: 0 0 calc(50% - 4px);
+    min-width: 0;
+  }
+
+  .ms-actions {
+    justify-content: center;
+  }
+
+  .ms-demo {
+    text-align: center;
+  }
+}

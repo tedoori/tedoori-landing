@@ -35,6 +35,8 @@ function Words({ text }: { text: string }) {
   );
 }
 
+const SNAP_POINTS = YARD_STEPS.map((s, i) => (i === 0 ? 0 : s.start + (s.end - s.start) * 0.75));
+
 export function YardStory() {
   const sectionRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -44,6 +46,26 @@ export function YardStory() {
   const [inView, setInView] = useState(true);
   const [reduced] = useState(false);
   const [compact, setCompact] = useState(false);
+
+  // 모바일(손가락 스크롤): 세게 쓸어도 장면 하나씩 멈추도록 히어로 안에서만 스냅을 켬.
+  // 히어로를 지난 뒤 화면을 만지면 스냅을 꺼서 아래 섹션은 평소처럼 자유 스크롤
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || !window.matchMedia("(pointer: coarse)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const root = document.documentElement;
+    const onTouch = () => {
+      const r = el.getBoundingClientRect();
+      // 히어로 마지막 장면을 지나 반 화면 이상 내려왔으면 끔
+      const inHero = r.bottom - window.innerHeight * 0.5 > 0;
+      root.style.scrollSnapType = inHero ? "y mandatory" : "";
+    };
+    window.addEventListener("touchstart", onTouch, { passive: true });
+    return () => {
+      window.removeEventListener("touchstart", onTouch);
+      root.style.scrollSnapType = "";
+    };
+  }, []);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 899px)");
@@ -144,6 +166,11 @@ export function YardStory() {
           </div>
         </div>
       </div>
+      {/* 모바일 장면 멈춤 지점: 데스크톱 휠 넘김과 같은 위치(각 장면 75%) + 히어로 끝 */}
+      {SNAP_POINTS.map((f, i) => (
+        <span key={i} className="ys-snap" style={{ "--f": f } as React.CSSProperties} aria-hidden="true" />
+      ))}
+      <span className="ys-snap ys-snap--end" aria-hidden="true" />
       {/* 화면 읽기 프로그램용 요약 */}
       <ol className="sr-only">
         {YARD_STEPS.map((s) => (

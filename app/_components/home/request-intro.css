@@ -671,3 +671,39 @@
   line-height: 1.5;
   color: var(--muted);
 }
+
+/* 아이폰: 툴바가 접혀 화면이 길어져도 아래에 흰 줄이 생기지 않게 */
+.ri-stage {
+  height: 100vh;
+  height: 100lvh;
+}
+
+@media (max-width: 899px) {
+  .ri-after {
+    margin-top: -1px;
+  }
+
+  .ri-after > * {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 500ms linear,
+      transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .ri-after > :nth-child(2) {
+    transition-delay: 120ms;
+  }
+
+  .ri-after.is-in > * {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ri-after > * {
+    opacity: 1;
+    transform: none;
+  }
+}
