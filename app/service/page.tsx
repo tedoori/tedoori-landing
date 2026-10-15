@@ -7,8 +7,8 @@ import { ZoneExplorer } from "./ZoneExplorer";
 import "./service.css";
 
 export const metadata: Metadata = {
-  title: "전원주택 조경업체 | 테두리",
-  description: "전원주택 고객을 위한 식재·잔디·자갈·판석·디딤석 조경을 필요한 공간부터 상담해요.",
+  title: "조경업체·조경 플랫폼 | 테두리",
+  description: "전원주택 고객을 위한 조경 플랫폼으로 식재·잔디·자갈·판석·디딤석 상담을 도와드려요.",
 };
 
 // 문구는 와이어프레임 그대로, 연출은 섹션마다 다르게
