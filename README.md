@@ -68,8 +68,8 @@ Supabase 기능을 사용하려면 `.env.local.example`을 참고해 환경변�
 
 ## 배포
 
-- GitHub 저장소: 배포 후 연결
-- Vercel 배포 URL: 배포 후 기입
+- GitHub 저장소: https://github.com/tedoori/tedoori-landing
+- Vercel 배포 URL: https://tedoori-landing.vercel.app
 
 ## 참고
 
