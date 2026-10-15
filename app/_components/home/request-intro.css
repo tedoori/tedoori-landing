@@ -509,7 +509,8 @@
   content: "";
   display: block;
   height: 120px;
-  background: linear-gradient(180deg, var(--mint), #f3f5f0);
+  /* 다음 섹션(대문을 열고) 시작 색인 하늘색으로 이어지게 */
+  background: linear-gradient(180deg, var(--mint), #cfe3f2);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -680,7 +681,13 @@
 
 @media (max-width: 899px) {
   .ri-after {
-    margin-top: -1px;
+    /* 목업(위 214px + 높이 + 설명 31px)이 끝나는 곳 바로 아래로: 화면이 길거나 아이폰 툴바가 접혀도 간격이 벌어지지 않게 */
+    --ov: max(1px, calc(100lvh - 214px - min(560px, 100svh - 250px) - 31px));
+    margin-top: calc(-1 * var(--ov));
+    position: relative;
+    z-index: 1;
+    /* 목업과 겹치는 위쪽은 투명하게 (휴대폰 그림자가 끊기지 않게), 무대가 끝난 뒤부터 민트 */
+    background: linear-gradient(180deg, transparent var(--ov), var(--mint) var(--ov));
   }
 
   .ri-after > * {
@@ -705,5 +712,21 @@
   .ri-after > * {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* 민트 원이 다 커지면 무대 바닥색도 민트로: 원이 닿지 않는 무대 맨 아래에 옅은 띠가 보이지 않게 */
+.ri-stage {
+  background: color-mix(
+    in srgb,
+    var(--mint) calc(var(--g) * 100%),
+    color-mix(in srgb, #f7f8f6 calc(var(--a) * 100%), transparent)
+  );
+}
+
+/* 모바일: 무대와 안내 문구가 모두 끝난 섹션 맨 아래 틈도 민트로 (위쪽 절반은 히어로와 겹치는 구간이라 투명) */
+@media (max-width: 899px) {
+  .ri {
+    background: linear-gradient(180deg, transparent 50%, var(--mint) 50%);
   }
 }
