@@ -106,7 +106,7 @@
 | `terms_agreed_at` | timestamptz | 예 | 약관 동의 시각 |
 | `status` | text | 예 | `received` 등 진행 상태 |
 | `created_at` | timestamptz | 예 | 등록 시각 |
-| `updated_at` | timestamptz | 추가 예정 | 수정 시각 |
+| `updated_at` | timestamptz | 예 | 수정 시각 (트리거, 적용 완료) |
 
 ### Storage: `quote-photos`
 
@@ -183,3 +183,7 @@
 ## 10. 완료 기준
 
 등록 → 목록 → 상세 → 수정 → 삭제 흐름이 실제 Supabase 데이터로 동작하고, 새로고침·권한·오류·파일 업로드 시나리오가 QA 체크리스트를 통과하면 미션 6 기본 요구사항을 완료한 것으로 본다.
+
+## 11. 구현 결과
+
+1~8단계 구현을 마쳤습니다. 화면·API·테이블 정리는 [README](../README.md), 점검 결과는 [QA 체크리스트](mission-6-qa.md)에 있습니다.

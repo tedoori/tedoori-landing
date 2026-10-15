@@ -143,3 +143,15 @@ Claude Code 세션이 중단된 뒤 작업을 이어갈 때 참고하는 인수�
 - `.next/`, `.netlify/`, 미디어 자산은 임의로 삭제하지 않습니다.
 - 배포 전에는 모바일과 데스크톱의 핵심 CTA 흐름을 모두 확인합니다.
 
+
+### 2026-10-16 미션 6 CRUD 구현 완료 (Claude Code)
+
+- Supabase 에 `supabase/mission-6-crud.sql` 실행 완료 (`updated_at`, 수정·삭제·사진 삭제 정책, 목록 인덱스)
+- Route Handler: `app/api/quotes/route.ts`(목록 GET·등록 POST), `app/api/quotes/[id]/route.ts`(상세 GET·수정 PATCH·삭제 DELETE)
+  - 이메일 인증 토큰으로 사용자 권한 Supabase 클라이언트를 만들어 RLS 유지, 검증은 `lib/quote-server.ts`
+- 화면: `/my` 목록(API 사용) → `/my/[id]` 상세 → `/my/[id]/edit` 수정 → 상세의 삭제 확인 창
+- 사진 규칙 공용화 `lib/photo.ts` (JPG·PNG·WebP, 10MB, 5장) — `/quote` 에도 적용
+- 운영자 메일: 수정 시 바뀐 항목만 전/후, 삭제 시 취소 알림 (`lib/mail.ts`, `lib/emails.ts`) — 로컬에서 수신 확인
+- 확인 코드 메일 문구를 견적 신청·내 신청 공용으로 변경 (`supabase/email-otp.html`, Supabase 템플릿에도 반영 완료)
+- README 를 미션 6 기준으로 다시 작성, QA 결과 `docs/mission-6-qa.md`
+- 남은 일: 배포 환경에서 등록(사진 포함)→목록→상세→수정→삭제·메일 점검 후 QA 표 갱신
