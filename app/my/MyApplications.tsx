@@ -41,6 +41,14 @@ export function MyApplications() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  // 상세에서 삭제하고 돌아왔을 때 (/my?deleted=접수번호) 한 번 안내
+  const [deleted, setDeleted] = useState<string | null>(null);
+  useEffect(() => {
+    const v = new URLSearchParams(window.location.search).get("deleted");
+    if (v === null) return;
+    setDeleted(v);
+    window.history.replaceState(null, "", "/my");
+  }, []);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const hasNext = page < totalPages;
@@ -195,6 +203,11 @@ export function MyApplications() {
             </div>
             <button className="my-link" type="button" onClick={() => void reset()}>다른 이메일로 확인</button>
           </div>
+          {deleted !== null && (
+            <Callout tone="success" title="신청을 삭제했어요">
+              {deleted ? `${deleted} 신청과 올린 사진을 지웠어요.` : "신청과 올린 사진을 지웠어요."}
+            </Callout>
+          )}
           {error && <Callout tone="danger" title="조회할 수 없어요">{error}</Callout>}
           {total === 0 ? (
             <div className="my-empty">

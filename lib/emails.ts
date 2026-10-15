@@ -182,3 +182,59 @@ export function operatorEmail(q: QuoteRow) {
     html: shell({ preheader: `${q.region} ${q.district} · ${q.scope}`, body, footer: "테두리 운영 알림" }),
   };
 }
+
+// ---------- 운영자 알림: 고객이 /my 에서 수정·삭제 ----------
+
+/** 수정 비교·삭제 요약에 쓰는 전체 항목 (연락처 포함) */
+function allRows(q: QuoteRow): [string, string][] {
+  return [...summaryRows(q), ["이름", q.name ?? "-"], ["휴대전화", q.phone ?? "-"]];
+}
+
+const nowKst = () => new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
+
+/** 바뀐 항목만 [항목, 전, 후] 로 */
+export function quoteChanges(before: QuoteRow, after: QuoteRow): [string, string, string][] {
+  const a = allRows(after);
+  return allRows(before)
+    .map(([k, v], i) => [k, v, a[i][1]] as [string, string, string])
+    .filter(([, b, n]) => b !== n);
+}
+
+export function operatorUpdateEmail(before: QuoteRow, after: QuoteRow) {
+  const changes = quoteChanges(before, after);
+  const table = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${changes
+    .map(
+      ([k, b, n], i) => `
+      <tr><td style="padding:12px 0 4px 0;${i ? "border-top:1px solid #ECE7DC;" : ""}font-family:${FONT};font-size:13px;font-weight:800;color:#16231B;">${esc(k)}</td></tr>
+      <tr><td style="padding:0 0 4px 0;font-family:${FONT};font-size:13px;line-height:1.5;color:#8A938D;text-decoration:line-through;white-space:pre-wrap;">${esc(b)}</td></tr>
+      <tr><td style="padding:0 0 12px 0;font-family:${FONT};font-size:14px;line-height:1.5;font-weight:600;color:#0E7A33;white-space:pre-wrap;">→ ${esc(n)}</td></tr>`,
+    )
+    .join("")}</table>`;
+  const body = `
+    ${section(`
+      <h1 style="margin:0;font-family:${FONT};font-size:20px;line-height:1.4;font-weight:800;color:#16231B;">신청 수정 ${esc(after.receipt_no)}</h1>
+      <p style="margin:8px 0 0 0;font-family:${FONT};font-size:14px;line-height:1.6;color:#4E5A53;">고객이 내 신청에서 ${changes.length}개 항목을 바꿨어요. · ${esc(nowKst())}</p>
+    `, "28px 32px 0 32px")}
+    ${section(`${heading("바뀐 내용")}${table}`)}
+    ${section(`${heading("연락처")}${rowsTable([["이메일", after.email], ["이름", after.name ?? "-"], ["휴대전화", after.phone ?? "-"]])}`, "24px 32px 28px 32px")}
+  `;
+  return {
+    subject: `[테두리 운영] 신청 수정 ${after.receipt_no}`,
+    html: shell({ preheader: changes.map(([k]) => k).join(", "), body, footer: "테두리 운영 알림" }),
+  };
+}
+
+export function operatorDeleteEmail(q: QuoteRow) {
+  const body = `
+    ${section(`
+      <h1 style="margin:0;font-family:${FONT};font-size:20px;line-height:1.4;font-weight:800;color:#16231B;">신청 취소 ${esc(q.receipt_no)}</h1>
+      <p style="margin:8px 0 0 0;font-family:${FONT};font-size:14px;line-height:1.6;color:#4E5A53;">고객이 내 신청에서 신청을 삭제했어요. 신청 내용과 사진은 지워졌어요. · ${esc(nowKst())}</p>
+    `, "28px 32px 0 32px")}
+    ${section(`${heading("삭제 전 연락처")}${rowsTable([["이메일", q.email], ["이름", q.name ?? "-"], ["휴대전화", q.phone ?? "-"]])}`)}
+    ${section(`${heading("삭제 전 신청 내용")}${rowsTable(summaryRows(q))}`, "24px 32px 28px 32px")}
+  `;
+  return {
+    subject: `[테두리 운영] 신청 취소 ${q.receipt_no}`,
+    html: shell({ preheader: `${q.region} ${q.district} 신청이 삭제됐어요`, body, footer: "테두리 운영 알림" }),
+  };
+}

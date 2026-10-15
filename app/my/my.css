@@ -116,3 +116,10 @@
 @media (max-width: 599px) {
   .my-row2 { grid-template-columns: 1fr; }
 }
+
+/* 삭제: 위험한 동작은 빨간 계열로 구분 */
+.my-danger { border-color: #e2b4ad; color: #a63124; }
+.my-danger:hover { border-color: #a63124; background: #fbefed; }
+.my-danger--solid, .my-danger--solid:hover { border-color: #b3382a; background: #b3382a; color: #fff; }
+.my-confirm { max-width: 420px; text-align: left; }
+.my-confirm .ui-dialog__actions .btn { flex: 1; width: auto; min-height: 48px; }

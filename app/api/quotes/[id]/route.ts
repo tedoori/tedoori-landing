@@ -1,3 +1,5 @@
+import { operatorDeleteEmail, operatorUpdateEmail, quoteChanges, type QuoteRow } from "../../../../lib/emails";
+import { notifyOperator } from "../../../../lib/mail";
 import { authorize, fail, isUuid, notFound, PHOTO_BUCKET, signPhotos, validateQuote } from "../../../../lib/quote-server";
 
 // 견적 신청 상세(GET) · 수정(PATCH) · 삭제(DELETE)
@@ -28,27 +30,31 @@ export async function PATCH(req: Request, { params }: Ctx) {
   const auth = await authorize(req);
   if (auth instanceof Response) return auth;
 
-  const { data: before } = await auth.supabase.from("quote_requests").select("photo_paths").eq("id", id).maybeSingle();
+  const { data: before } = await auth.supabase.from("quote_requests").select("*").eq("id", id).maybeSingle<QuoteRow>();
   if (!before) return notFound();
 
   const checked = validateQuote(await req.json().catch(() => null), auth.user.id);
   if (!checked.ok) return fail(400, "invalid", "입력한 내용을 다시 확인해주세요.", checked.fields);
 
   // 접수번호·상태·신청 이메일·작성자·신청일은 validateQuote 가 받지 않으므로 바뀌지 않음
-  const { data, error } = await auth.supabase
+  const { data: after, error } = await auth.supabase
     .from("quote_requests")
     .update(checked.value)
     .eq("id", id)
-    .select("id, updated_at")
-    .maybeSingle();
+    .select("*")
+    .maybeSingle<QuoteRow & { updated_at: string }>();
   if (error) return fail(500, "save_failed", "저장하지 못했어요. 잠시 후 다시 시도해주세요.");
-  if (!data) return notFound();
+  if (!after) return notFound();
 
   // 수정하면서 뺀 사진은 저장소에서도 정리 (실패해도 수정 결과는 유지)
   const removed = (before.photo_paths ?? []).filter((p: string) => !checked.value.photo_paths.includes(p));
   if (removed.length) await auth.supabase.storage.from(PHOTO_BUCKET).remove(removed);
 
-  return Response.json(data);
+  // 바뀐 항목이 있으면 운영자에게 전/후 비교 메일 (실패해도 수정은 완료)
+  const changed = quoteChanges(before, after).length > 0;
+  const operatorMailed = changed ? await notifyOperator(operatorUpdateEmail(before, after)) : false;
+
+  return Response.json({ id: after.id, updated_at: after.updated_at, changed, operatorMailed });
 }
 
 export async function DELETE(req: Request, { params }: Ctx) {
@@ -62,8 +68,8 @@ export async function DELETE(req: Request, { params }: Ctx) {
     .from("quote_requests")
     .delete()
     .eq("id", id)
-    .select("photo_paths")
-    .maybeSingle();
+    .select("*")
+    .maybeSingle<QuoteRow>();
   if (error) return fail(500, "delete_failed", "삭제하지 못했어요. 잠시 후 다시 시도해주세요.");
   if (!data) return notFound();
 
@@ -72,5 +78,7 @@ export async function DELETE(req: Request, { params }: Ctx) {
     const { error: rmError } = await auth.supabase.storage.from(PHOTO_BUCKET).remove(data.photo_paths);
     photosRemoved = !rmError;
   }
-  return Response.json({ deleted: true, photosRemoved });
+  // 운영자에게 취소 알림 (삭제 직전 내용 포함, 실패해도 삭제는 완료)
+  const operatorMailed = await notifyOperator(operatorDeleteEmail(data));
+  return Response.json({ deleted: true, photosRemoved, operatorMailed });
 }
