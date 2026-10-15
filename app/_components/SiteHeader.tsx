@@ -1,9 +1,13 @@
 import Link from "next/link";
+import { HeaderScroll } from "./HeaderScroll";
+import "./site-header.css";
 
-// floating: 홈에서만 쓰는 떠 있는 둥근 헤더 (스크롤 동작은 HomeMotion 이 붙임)
+// 모든 페이지에서 홈과 같은 떠 있는 둥근 헤더
+// floating: 홈 전용 — 스크롤 동작은 HomeMotion 이 붙이고, 히어로가 헤더 아래까지 올라감
 export function SiteHeader({ floating = false }: { floating?: boolean }) {
   return (
-    <header className={floating ? "site-header site-header--float" : "site-header"}>
+    <>
+    <header className={floating ? "site-header site-header--float" : "site-header site-header--float site-header--page"}>
       <div className="site-header__inner">
         <Link href="/" className="brand" aria-label="테두리 홈">
           <img className="brand__mark" src="/figma/logo-mark.svg" width={187} height={63} alt="" />
@@ -23,5 +27,8 @@ export function SiteHeader({ floating = false }: { floating?: boolean }) {
         </Link>
       </div>
     </header>
+    {!floating && <HeaderScroll />}
+    {!floating && <div className="site-header-space" aria-hidden="true" />}
+    </>
   );
 }
