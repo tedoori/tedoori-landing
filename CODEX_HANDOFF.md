@@ -27,6 +27,8 @@ Claude Code 세션이 중단된 뒤 작업을 이어갈 때 참고하는 인수�
 - 전체 메뉴
 - 3D 정원 미리보기와 영상·이미지 자산
 - Supabase 기반 견적·문의 API
+- Tailwind CSS 설정과 shadcn/ui 구성 기반
+- Open Graph/Twitter 공유 메타데이터
 
 주요 경로:
 
@@ -51,33 +53,29 @@ Claude Code 세션이 중단된 뒤 작업을 이어갈 때 참고하는 인수�
 
 ## 실행한 점검
 
-`npm run build`를 실행했으나 코드 컴파일 오류가 아니라 `.next/trace`와 `.next/trace-build` 파일 접근 권한 오류로 중단되었습니다.
-
-오류 요약:
-
-```text
-EPERM: operation not permitted, open 'C:\Users\Admin\my-site\.next\trace'
-An IO error occurred while attempting to create and acquire the lockfile
-```
-
-기존 Next.js 프로세스를 임의로 종료하거나 `.next/`를 삭제하지 않았습니다.
+- `npm run build` 성공: 컴파일, TypeScript 검사, 정적 페이지 생성 완료
+- 배포 URL HTTP 200 확인
+- 배포 홈 화면의 접근성 트리와 핵심 CTA 확인
+- `/quote`에서 지역 선택 후 다음 단계로 이동하는 흐름 확인
+- 배포 HTML에서 `og:title`, `og:description`, `og:image`, Twitter 카드 메타데이터 확인
+- Vercel 프로젝트 환경변수 화면 확인: 현재 등록된 프로젝트 환경변수 없음
 
 ## Codex가 실제로 수정한 내용
 
-- `C:\Users\Admin\my-site`의 기존 소스 코드는 수정하지 않았습니다.
-- 잘못된 ChatGPT 프로젝트 미러 경로에 중단된 패치가 일부 생성되었지만, 실제 Claude Code 프로젝트인 `my-site`에는 적용하지 않았습니다.
-- 실제 프로젝트에서는 읽기 전용 점검과 빌드 확인만 수행했습니다.
+- 기존 화면과 컴포넌트를 대체하지 않고 `tailwind.config.ts`, `postcss.config.mjs`, `app/tailwind.css` 추가
+- `components.json`, `components/ui/button.tsx`, `lib/utils.ts`로 shadcn/ui 구성 기반 추가
+- `app/layout.tsx`에 Open Graph/Twitter 메타데이터와 배포 URL 기준 추가
+- README에 기술 스택 및 구성 설명 보강
+- 관련 의존성 설치 및 lock 파일 갱신
 
 ## 제출을 위해 남은 작업
 
 ### 필수
 
-1. 기존 `.next/` 점유 프로세스 상태를 확인한 뒤 빌드 재검증
-2. 서비스 소개, 견적 신청, CTA, 모바일·PC 흐름을 실제 브라우저에서 점검
-3. 제출용 `README.md` 작성
-4. Git 저장소 초기화 및 GitHub 저장소 연결
-5. Vercel 배포
-6. 배포 URL에서 핵심 페이지와 인터랙션 재검증
+1. 시크릿 창과 실제 모바일 기기에서 최종 접속 확인
+2. Lighthouse 점검 실행 및 결과 기록
+3. Vercel Production 환경변수 등록
+4. 환경변수 등록 후 실제 견적 제출과 Supabase 저장 결과 확인
 
 ## 현재 제출 결과
 
@@ -86,13 +84,15 @@ An IO error occurred while attempting to create and acquire the lockfile
 - Vercel 배포 빌드 성공 확인
 - 배포 홈 화면과 `/quote` 견적 흐름 확인
 - 지역 선택 후 다음 단계로 넘어가는 동작 확인
+- 최신 보완 커밋: `dae9fa1 feat: add submission readiness metadata and ui setup`
 
 ### 확인 필요
 
 - 기존 Netlify 배포를 유지할지, Vercel을 최종 제출 대상으로 사용할지 결정
 - GitHub 저장소 공개 여부와 저장소 URL
 - 실제 서비스용 약관·개인정보 처리방침의 최종 승인 여부
-- Supabase 환경변수와 배포 환경변수 설정
+- Supabase 및 메일 환경변수의 Vercel Production 등록
+- 비밀값 등록 후 실제 견적 제출 테스트
 
 ## 작업 원칙
 
