@@ -18,8 +18,8 @@ import "./home.css";
 // 문구는 피그마 Lo-Fi 와이어프레임(홈) 그대로
 
 export const metadata: Metadata = {
-  title: "테두리",
-  description: "전원주택 조경 견적",
+  title: "전원주택조경 견적 | 테두리",
+  description: "전원주택의 마당 조경이 필요한 분께 맞춤 견적을 안내해요. 필요한 곳부터 무료로 상담받아보세요.",
 };
 
 export default function Home() {

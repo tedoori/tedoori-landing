@@ -4,8 +4,8 @@ import { SiteFooter } from "../_components/SiteFooter";
 import { SiteHeader } from "../_components/SiteHeader";
 
 export const metadata: Metadata = {
-  title: "전체 메뉴 · 테두리",
-  description: "테두리의 서비스 소개, 이용 안내, 무료 견적 신청과 내 신청 메뉴.",
+  title: "전원주택 조경 메뉴 | 테두리",
+  description: "전원주택 조경 서비스와 견적 신청, 이용 안내를 한곳에서 확인하고 원하는 메뉴로 이동하세요.",
 };
 
 const MAIN = [

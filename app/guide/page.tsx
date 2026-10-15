@@ -6,8 +6,8 @@ import { Checklist, CostTags, DayClock, DecideLine, LogoDraw, RouteMap } from ".
 import "./guide.css";
 
 export const metadata: Metadata = {
-  title: "이용 안내 · 테두리",
-  description: "신청은 집에서, 진행은 견적을 보고. 테두리 부분조경 견적의 신청부터 진행까지.",
+  title: "전원주택 조경 견적 안내 | 테두리",
+  description: "조경이 처음인 전원주택 고객도 사진과 이메일만으로 견적을 시작할 수 있어요. 신청 방법을 확인하세요.",
 };
 
 // 문구는 와이어프레임 그대로, 연출은 섹션마다 다르게

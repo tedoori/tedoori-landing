@@ -6,8 +6,8 @@ import { MyApplications } from "./MyApplications";
 import "./my.css";
 
 export const metadata: Metadata = {
-  title: "내 신청 · 테두리",
-  description: "이메일 인증 후 테두리 견적 신청 내역과 진행 상태를 확인하세요.",
+  title: "조경견적 신청내역 확인 | 테두리",
+  description: "테두리에 조경견적을 신청한 고객이 이메일 인증으로 진행 상태와 신청 내역을 확인할 수 있어요.",
 };
 
 export default function MyPage() {
