@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { JOURNAL_ARTICLES } from "./journal/data";
 
 const SITE_URL = "https://tedoori.com";
 
@@ -7,6 +8,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: SITE_URL, priority: 1, changeFrequency: "weekly" },
     { url: `${SITE_URL}/service`, priority: 0.8, changeFrequency: "monthly" },
     { url: `${SITE_URL}/guide`, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${SITE_URL}/journal`, priority: 0.8, changeFrequency: "weekly" },
+    ...JOURNAL_ARTICLES.map((article) => ({
+      url: `${SITE_URL}/journal/${article.slug}`,
+      priority: 0.7,
+      changeFrequency: "monthly" as const,
+    })),
     { url: `${SITE_URL}/quote`, priority: 0.9, changeFrequency: "monthly" },
     { url: `${SITE_URL}/my`, priority: 0.5, changeFrequency: "monthly" },
     { url: `${SITE_URL}/contact`, priority: 0.5, changeFrequency: "monthly" },
