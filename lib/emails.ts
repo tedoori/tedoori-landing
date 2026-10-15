@@ -195,9 +195,18 @@ const nowKst = () => new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul"
 /** 바뀐 항목만 [항목, 전, 후] 로 */
 export function quoteChanges(before: QuoteRow, after: QuoteRow): [string, string, string][] {
   const a = allRows(after);
-  return allRows(before)
+  const rows = allRows(before)
     .map(([k, v], i) => [k, v, a[i][1]] as [string, string, string])
-    .filter(([, b, n]) => b !== n);
+    .filter(([k, b, n]) => k !== "현장 사진" && b !== n);
+
+  // 사진은 장수가 같아도 바꿔 끼웠을 수 있어 파일 경로로 비교
+  const added = after.photo_paths.filter((p) => !before.photo_paths.includes(p)).length;
+  const removed = before.photo_paths.filter((p) => !after.photo_paths.includes(p)).length;
+  if (added || removed) {
+    const what = [added && `${added}장 추가`, removed && `${removed}장 삭제`].filter(Boolean).join(" · ");
+    rows.push(["현장 사진", `${before.photo_paths.length}장`, `${after.photo_paths.length}장 (${what})`]);
+  }
+  return rows;
 }
 
 export function operatorUpdateEmail(before: QuoteRow, after: QuoteRow) {
