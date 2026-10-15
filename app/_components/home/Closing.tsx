@@ -64,6 +64,7 @@ export function Closing() {
   return (
     <section ref={sec} className="cl" aria-labelledby="closing-title">
       <div className="cl-card">
+        <img className="cl-bg" src="/dio/final.webp" alt="" aria-hidden="true" loading="lazy" decoding="async" />
         <div className="cl-inner container">
           <div className="cl-head">
             <h2 id="closing-title" className="cl-title">

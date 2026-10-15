@@ -1335,3 +1335,8 @@ button {
     align-items: center;
   }
 }
+
+/* 화면 밖으로 나간 장식 요소 때문에 모바일 페이지 폭이 넓어지지 않게 */
+html {
+  overflow-x: clip;
+}

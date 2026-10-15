@@ -1044,7 +1044,7 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
           <button type="submit" className="btn btn--primary q-wide" disabled={busy}>
             {busy ? "보내는 중…" : "확인 코드 받기"}
           </button>
-          <p className="q-hint">이름과 휴대전화는 마지막 확인에서 선택해요.</p>
+          <p className="q-hint">이름과 휴대전화는 마지막 확인에서 입력해요.</p>
           <Back />
         </form>
       )}

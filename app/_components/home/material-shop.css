@@ -434,3 +434,37 @@
     opacity: 0.3;
   }
 }
+
+/* 데스크톱: 오른쪽 영상 위쪽을 01~05 작업 목록 위쪽에 맞춤 */
+@media (min-width: 1000px) {
+  .ms-studio {
+    grid-template-areas:
+      "head ."
+      "works stage"
+      "actions stage";
+    grid-template-rows: auto auto 1fr;
+    align-items: start;
+    row-gap: 24px;
+  }
+
+  .ms-side {
+    display: contents;
+  }
+
+  .ms-head {
+    grid-area: head;
+    margin-bottom: 0;
+  }
+
+  .ms-works {
+    grid-area: works;
+  }
+
+  .ms-actions {
+    grid-area: actions;
+  }
+
+  .ms-stage {
+    grid-area: stage;
+  }
+}

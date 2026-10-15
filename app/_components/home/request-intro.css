@@ -519,3 +519,155 @@
     animation: none;
   }
 }
+
+/* 고른 작업 칩은 회색으로 */
+@keyframes ri-pick {
+  to {
+    border-color: #6b7069;
+    background: #6b7069;
+    color: #fff;
+  }
+}
+
+/* 현재 모습 사진: 실제 사진 썸네일 */
+.ri-photos img {
+  width: 54px;
+  height: 54px;
+  border-radius: 10px;
+  object-fit: cover;
+  animation: ri-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.ri-photos img:nth-child(2) {
+  animation-delay: 120ms;
+}
+
+.ri-photos img:nth-child(3) {
+  animation-delay: 240ms;
+}
+
+/* 접수 완료 화면 (휴대폰 안에서 아래에서 올라옴) */
+.ri-app {
+  position: relative;
+}
+
+.ri-done {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 16px;
+  background: #fff;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(24px);
+  pointer-events: none;
+  transition:
+    opacity 300ms linear,
+    transform 520ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ri-done.is-on {
+  opacity: 1;
+  transform: none;
+}
+
+.ri-done__mark {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+}
+
+.ri-done__title {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.ri-done__no {
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: var(--sand);
+  font-size: 12px;
+}
+
+.ri-done__track {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  max-width: 180px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.ri-done__track li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ri-done__track i {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--border-strong);
+  border-radius: 50%;
+}
+
+.ri-done__track .is-done i {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.ri-done__track .is-now {
+  color: var(--forest);
+  font-weight: 700;
+}
+
+.ri-done__track .is-now i {
+  border-color: var(--primary);
+}
+
+.ri-done__note {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* 접수 메일 알림 카드 */
+.ri-float {
+  max-width: 260px;
+}
+
+.ri-float__from {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.ri-float__from img {
+  width: 18px;
+  height: 18px;
+}
+
+.ri-float strong {
+  font-size: 14px;
+}
+
+.ri-float__body {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}

@@ -505,3 +505,34 @@
     animation-delay: 0ms;
   }
 }
+
+/* 방문 실측 단계: 줄자가 그어지고 '필수' 칩 */
+.sv3__tape {
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: 22%;
+  height: 10px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(90deg, #f2c94c 0 9px, #16231b 9px 10px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transform-origin: left center;
+  transform: scaleX(0.15);
+}
+
+.sr-panel.is-on .sv3__tape {
+  transition: transform 1.6s var(--ease-out) 0.2s;
+  transform: scaleX(1);
+}
+
+.sv3__chip {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--forest-900, #16231b);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}

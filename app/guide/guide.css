@@ -944,3 +944,42 @@
     animation-delay: 0ms;
   }
 }
+
+/* ---------- 노선도: 가운데 정렬 · 진행 결정까지 이어진 선 · 천천히 ---------- */
+@media (min-width: 700px) {
+  .rm-stop {
+    align-items: center;
+    text-align: center;
+  }
+
+  .rm-dot {
+    left: 50%;
+    margin-left: -11px;
+  }
+
+  /* 첫 칸 가운데 ~ 마지막 칸 가운데 (칸 사이 간격 12px × 4) */
+  .rm-line {
+    left: calc((100% - 48px) / 10);
+    right: calc((100% - 48px) / 10);
+  }
+}
+
+.rm.is-on .rm-line__fill,
+.rm.is-on .rm-train {
+  animation-duration: 4.8s;
+  animation-timing-function: linear;
+  animation-delay: 400ms;
+}
+
+.rm.is-on .rm-dot,
+.rm.is-on .rm-stop strong,
+.rm.is-on .rm-stop span {
+  animation-delay: calc(400ms + var(--i) * 1200ms);
+}
+
+@media (max-width: 699px) {
+  .rm-line {
+    bottom: auto;
+    height: calc(100% - 54px);
+  }
+}

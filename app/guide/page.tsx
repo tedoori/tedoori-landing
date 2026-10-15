@@ -100,7 +100,7 @@ export default function GuidePage() {
                 <br />
                 계약과 대금은 업체와 직접.
               </h2>
-              <p className="lead">진행 상담 요청은 계약이나 결제 확정이 아니에요.</p>
+              <p className="lead">견적은 현장 실측 후에 나와요. 진행 상담 요청은 계약이나 결제 확정이 아니에요.</p>
             </div>
             <DecideLine />
           </div>

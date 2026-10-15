@@ -12,7 +12,9 @@ export function SiteFooter() {
               <img src="/figma/logo-mark.svg" width={187} height={63} alt="" />
               테두리
             </p>
-            <p className="site-footer__desc">서울·경기·인천 단독·전원주택의 필요한 곳부터 하는 부분조경.</p>
+            <p className="site-footer__desc">서울·경기·인천 단독·전원주택
+              <br />
+              필요한 곳부터 선택하는 부분조경.</p>
           </div>
 
           <nav className="site-footer__cols" aria-label="바닥글 메뉴">

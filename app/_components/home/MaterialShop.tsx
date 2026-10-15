@@ -74,7 +74,11 @@ export function MaterialShop() {
               <br />
               함께 바꿔보세요.
             </h2>
-            <p className="lead">작업을 하나씩 더할 때마다 마당이 어떻게 달라지는지 확인해보세요.</p>
+            <p className="lead">
+              작업을 하나씩 더할 때마다
+              <br />
+              내 테두리가 어떻게 달라지는지 확인해보세요.
+            </p>
           </div>
 
           <div className="ms-works" role="group" aria-label="작업 고르기">

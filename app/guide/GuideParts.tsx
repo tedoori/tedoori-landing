@@ -58,7 +58,7 @@ const PREP = [
 ];
 
 export function Checklist() {
-  const ref = usePlayP<HTMLUListElement>(1600);
+  const ref = usePlayP<HTMLUListElement>(4200);
   return (
     <ul ref={ref} className="ck">
       {PREP.map(([name, desc], i) => (
@@ -167,13 +167,13 @@ export function CostTags() {
 
 // ---------- 결정: 세로 선이 그려지며 카드가 좌우에서 ----------
 const DECIDE = [
-  ["진행 의사 전달", "접수 메일에 회신해 진행 여부와 궁금한 내용을 알려주세요."],
-  ["필요하면 현장 확인", "동의를 받아 방문 일정을 조율해요. 업체와 상담하며 범위를 정해요."],
+  ["현장 실측 · 필수", "견적 전에 담당자가 방문해 현장을 실측해요. 실측한 내용으로 견적이 나와요."],
+  ["진행 의사 전달", "견적을 보고 접수 메일에 회신해 진행 여부와 궁금한 내용을 알려주세요."],
   ["계약·시공", "업체와 작업 범위·일정·대금을 확인하고 직접 계약해요."],
 ];
 
 export function DecideLine() {
-  const ref = usePlayP<HTMLOListElement>(1800);
+  const ref = usePlayP<HTMLOListElement>(3600);
   return (
     <ol ref={ref} className="dl">
       <span className="dl-line" aria-hidden="true" />

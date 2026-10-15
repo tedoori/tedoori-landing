@@ -191,3 +191,9 @@
     opacity: 1;
   }
 }
+
+@media (max-width: 599px) {
+  .rc-br {
+    display: none;
+  }
+}

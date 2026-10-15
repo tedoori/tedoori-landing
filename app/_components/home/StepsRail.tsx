@@ -8,6 +8,7 @@ import "./steps-rail.css";
 const STEPS = [
   { title: "견적 요청", desc: "사진과 요청을 보내면 접수가 시작돼요.", status: "received" as QuoteStatus, icon: "send" },
   { title: "내용 확인", desc: "24시간 안에 필요한 내용을 함께 확인해요.", status: "checking" as QuoteStatus, icon: "check" },
+  { title: "방문 실측", desc: "담당자가 방문해 현장을 실측해요. 견적은 실측 후에 나와요.", status: "checking" as QuoteStatus, icon: "ruler" },
   { title: "견적 확인", desc: "항목별 금액을 보고 진행 여부를 결정해요.", status: "quoted" as QuoteStatus, icon: "doc" },
 ];
 const AUTO_MS = 2800;
@@ -36,6 +37,14 @@ function Visual({ i }: { i: number }) {
         <span className="sv1__badge">
           <StatusBadge status="checking" />
         </span>
+      </div>
+    );
+  if (i === 2)
+    return (
+      <div className="sv1 sv3">
+        <img src="/service/prep-size.webp" alt="" draggable={false} />
+        <span className="sv3__tape" aria-hidden="true" />
+        <span className="sv3__chip">방문 실측 · 필수</span>
       </div>
     );
   return (
@@ -73,6 +82,13 @@ function Icon({ name }: { name: string }) {
         <circle cx="21" cy="21" r="12" />
         <path d="m30 30 10 10" />
         <path d="m15 21 4 4 8-8" />
+      </svg>
+    );
+  if (name === "ruler")
+    return (
+      <svg viewBox="0 0 48 48" {...p}>
+        <rect x="4" y="16" width="40" height="16" rx="2" />
+        <path d="M11 16v6M18 16v9M25 16v6M32 16v9M39 16v6" />
       </svg>
     );
   return (

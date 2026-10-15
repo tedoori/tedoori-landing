@@ -40,7 +40,11 @@ export function ReceiptCost() {
             <br />
             항목별로 확인해요.
           </h2>
-          <p className="lead">자재비·배송비·시공비를 나눠 보여드려요.</p>
+          <p className="lead">
+            방문 실측한 내용을 토대로 테두리가 빠르게 확인·정리해
+            <br className="rc-br" />
+            자재비·배송비·시공비로 나눈 견적서를 보내드려요.
+          </p>
         </div>
 
         <div className="rc-printer">
@@ -64,7 +68,7 @@ export function ReceiptCost() {
                 ))}
               </dl>
               <p className="rc-line rc-paper__foot" style={{ "--k": "var(--l9)" } as React.CSSProperties}>
-                실제 금액과 일정은 견적에서 확인해요.
+                실측 내용을 바탕으로 금액과 일정을 정리해요.
               </p>
               <span className="rc-barcode" aria-hidden="true" />
               <span className="rc-stamp" aria-hidden="true">

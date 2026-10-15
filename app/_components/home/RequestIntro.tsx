@@ -17,8 +17,9 @@ const QUESTIONS = [
 ];
 const WORKS = ["식재", "잔디", "자갈", "디딤석", "화단"];
 const PICKED = ["잔디", "디딤석"];
-// 대화 순서: 0 질문1 · 1 답1 · 2 질문2 · 3 칩 고르기 · 4 답2 · 5 질문3 · 6 사진 · 7 끝
-const CHAT_STEPS = 8;
+// 대화 순서: 0 질문1 · 1 답1 · 2 질문2 · 3 칩 고르기 · 4 답2 · 5 질문3 · 6 사진 · 7 접수 완료 화면 · 8 접수 메일 도착
+const CHAT_STEPS = 9;
+const PHOTOS = ["/service/garden-end.webp", "/service/look-left.webp", "/service/look-right.webp"];
 
 const HEAD = ["서울·경기·인천,", "\n", "집에서", "견적을", "요청하세요."];
 
@@ -79,7 +80,7 @@ export function RequestIntro() {
 
   const on = (k: number) => step >= k;
   const qIndex = step < 2 ? 0 : step < 5 ? 1 : 2;
-  const answered = step >= 7 ? 3 : step >= 6 ? 3 : step >= 4 ? 2 : step >= 1 ? 1 : 0;
+  const answered = step >= 6 ? 3 : step >= 4 ? 2 : step >= 1 ? 1 : 0;
   let wi = 0;
   const words = HEAD.filter((w) => w !== "\n").length;
 
@@ -183,12 +184,33 @@ export function RequestIntro() {
                       <Msg show={on(5)} who="bot">{QUESTIONS[2].q}</Msg>
                       {on(6) && (
                         <div className="ri-photos">
-                          <span />
-                          <span />
-                          <span />
+                          {PHOTOS.map((src) => (
+                            <img key={src} src={src} alt="" draggable={false} />
+                          ))}
                         </div>
                       )}
                     </div>
+                  </div>
+
+                  <div className={`ri-done${on(7) ? " is-on" : ""}`} aria-hidden={!on(7)}>
+                    <span className="ri-done__mark" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2.6">
+                        <path d="m6 12.5 4 4 8-9" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                    <strong className="ri-done__title">견적 요청이 접수됐어요.</strong>
+                    <span className="ri-done__no">
+                      접수번호 <b>TD-2610-0001</b>
+                    </span>
+                    <ol className="ri-done__track">
+                      {["견적 요청", "내용 확인", "방문 실측", "견적 확인"].map((t, k) => (
+                        <li key={t} className={k === 0 ? "is-done" : k === 1 ? "is-now" : ""}>
+                          <i />
+                          {t}
+                        </li>
+                      ))}
+                    </ol>
+                    <span className="ri-done__note">방문 실측 일정은 문자로 안내해요.</span>
                   </div>
 
                   <div className="ri-input">
@@ -205,9 +227,14 @@ export function RequestIntro() {
             <figcaption className="note">신청 화면 예시</figcaption>
           </figure>
 
-          <div className={`ri-float${on(7) ? " is-on" : ""}`} aria-hidden="true">
+          <div className={`ri-float${on(8) ? " is-on" : ""}`} aria-hidden="true">
+            <span className="ri-float__from">
+              <img src="/figma/logo-mark.svg" alt="" />
+              테두리 · 방금
+            </span>
+            <strong>[테두리] 견적 요청이 접수됐어요</strong>
+            <span className="ri-float__body">접수번호 TD-2610-0001 · 경기 용인시 · 잔디, 디딤석</span>
             <StatusBadge status="received" />
-            <strong>무료 견적 요청</strong>
           </div>
         </div>
       </div>
