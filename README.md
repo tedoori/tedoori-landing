@@ -31,6 +31,8 @@
 - Next.js 16 App Router
 - React 19
 - TypeScript
+- Tailwind CSS (기존 디자인 시스템과 충돌하지 않도록 preflight 비활성화)
+- shadcn/ui 구성 기반 (`components.json`, 재사용 Button, `cn` 유틸리티)
 - Supabase
 - Three.js / React Three Fiber
 - GSAP / Lenis
@@ -53,6 +55,10 @@ npm run start
 ```
 
 Supabase 기능을 사용하려면 `.env.local.example`을 참고해 환경변수를 설정해야 합니다.
+
+Tailwind와 shadcn/ui 기반 컴포넌트는 `tailwind.config.ts`, `components.json`,
+`components/ui/`, `lib/utils.ts`에 구성되어 있으며, 기존 화면의 디자인 시스템은
+그대로 유지하면서 점진적으로 재사용할 수 있도록 준비되어 있습니다.
 
 ## 주요 경로
 
