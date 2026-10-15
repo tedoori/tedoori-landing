@@ -97,6 +97,14 @@ Claude Code 세션이 중단된 뒤 작업을 이어갈 때 참고하는 인수�
 - 배포 홈 화면과 `/quote` 견적 흐름 확인
 - 지역 선택 후 다음 단계로 넘어가는 동작 확인
 - 최신 보완 커밋: `1782df9 perf: defer hero intro video`
+- 미션 6 CRUD 명세서 추가 커밋: `dd7aa4d docs: define mission 6 quote crud spec`
+
+### 미션 6 다음 작업
+
+- 상세 명세: [`docs/mission-6-crud-spec.md`](docs/mission-6-crud-spec.md)
+- 핵심 기능: 이메일 인증 사용자의 견적 신청 관리 CRUD
+- 구현 순서: `/my` 목록 → `/my/[id]` 상세 → `/my/[id]/edit` 수정 → 삭제 및 Storage 정리
+- 명세서 작성 이후 아직 CRUD 기능 코드는 수정하지 않음
 
 ### 확인 필요
 
