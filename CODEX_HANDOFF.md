@@ -27,6 +27,7 @@ Claude Code 세션이 중단된 뒤 작업을 이어갈 때 참고하는 인수�
 - 전체 메뉴
 - 3D 정원 미리보기와 영상·이미지 자산
 - Supabase 기반 견적·문의 API
+- `/my` 이메일 OTP 인증 및 본인 신청 목록 조회 화면(페이지네이션 포함)
 - Tailwind CSS 설정과 shadcn/ui 구성 기반
 - Open Graph/Twitter 공유 메타데이터
 
@@ -104,8 +105,18 @@ Claude Code 세션이 중단된 뒤 작업을 이어갈 때 참고하는 인수�
 - 상세 명세: [`docs/mission-6-crud-spec.md`](docs/mission-6-crud-spec.md)
 - 핵심 기능: 이메일 인증 사용자의 견적 신청 관리 CRUD
 - 사용자 흐름: 회원가입 없이 접수번호 + 신청 이메일 + 이메일 OTP로 본인 확인
-- 구현 순서: `/my` 본인 확인 → 목록 → `/my/[id]` 상세 → `/my/[id]/edit` 수정 → 삭제 및 Storage 정리
-- 명세서 작성 이후 아직 CRUD 기능 코드는 수정하지 않음
+- 구현 순서: `/my` 본인 확인 및 목록 조회(구현 완료) → `/my/[id]` 상세 → `/my/[id]/edit` 수정 → 삭제 및 Storage 정리
+- 이 메모 아래의 `/my` 목록 구현 메모부터 CRUD 기능 코드를 단계적으로 추가함
+
+### 2026-10-16 `/my` 목록 구현 메모
+
+- `app/my/MyApplications.tsx`를 추가해 신청 이메일 OTP 발송·검증과 Supabase `quote_requests` 목록 조회를 구현했습니다.
+- 인증된 Supabase 세션의 본인 데이터만 RLS를 통해 조회합니다. 접수번호만 입력하는 방식은 제공하지 않습니다.
+- 목록은 최신순 10건 페이지네이션이며, 접수번호·지역·작업·주거 형태·신청일·진행 상태를 표시합니다.
+- 신청이 없을 때 빈 상태와 `/quote` CTA를 표시하고, 조회 오류·이메일 오류·코드 오류를 안내합니다.
+- 기존 상세·수정·삭제 라우트는 아직 구현하지 않았습니다. 목록 항목의 `/my/[id]` 링크는 다음 구현 단계에서 연결해야 합니다.
+- 스타일은 `app/my/my.css`에 추가했으며 기존 공통 디자인 토큰과 상태 배지를 재사용합니다.
+- 검증: `npx tsc --noEmit --incremental false` 성공, `npm run build` 성공, `http://localhost:3000/my` HTTP 200 확인.
 
 ### 미션 6 완료 후 최종 배포
 
