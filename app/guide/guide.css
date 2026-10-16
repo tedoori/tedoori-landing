@@ -987,3 +987,62 @@
 .gd-hero__note {
   text-align: center;
 }
+
+/* ---------- 노선도 · 휴대폰: 세로 목록 대신 6칸 가로 한 줄 ---------- */
+@media (max-width: 699px) {
+  .rm {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0;
+    padding: 34px 0 0;
+  }
+  .rm-line {
+    left: calc(100% / 12);
+    right: calc(100% / 12);
+    top: 10px;
+    bottom: auto;
+    width: auto;
+    height: 4px;
+  }
+  .rm-line__fill {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  @keyframes rm-fill {
+    to {
+      transform: scaleX(1);
+    }
+  }
+  .rm-stop {
+    align-items: center;
+    text-align: center;
+  }
+  .rm-dot {
+    left: 50%;
+    top: -33px;
+    margin-left: -11px;
+  }
+  .rm-stop strong {
+    font-size: 15px;
+  }
+  .rm-stop span:not(.rm-dot) {
+    display: none;
+  }
+}
+
+/* 목업 섹션: 앞뒤 섹션과 구분되는 짙은 숲색 배경 */
+.gd-flow {
+  background: var(--forest-900, #16231b);
+  color: #fff;
+}
+.gd-flow .gd-title {
+  color: #fff;
+}
+.gd-flow .lead {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* 노선도 동그라미: 글자용 애니메이션(rm-text)에 덮이지 않게 */
+.rm.is-on .rm-stop .rm-dot {
+  animation: rm-dot 400ms cubic-bezier(0.2, 0.8, 0.2, 1.6) both;
+  animation-delay: calc(400ms + var(--i) * 960ms);
+}
