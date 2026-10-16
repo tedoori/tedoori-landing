@@ -143,25 +143,25 @@ export function CostTags() {
     <div ref={ref} className={`ct${on ? " is-on" : ""}`}>
       <p className="ct-label">견적 구성 예시</p>
       <span className="ct-string" aria-hidden="true" />
-      <dl className="ct-tags">
+      <ul className="ct-tags">
         {COSTS.map(([name, desc], i) => (
-          <div key={name} className={`ct-tag ct-tag--${i}`} style={{ "--i": i } as React.CSSProperties}>
+          <li key={name} className={`ct-tag ct-tag--${i}`} style={{ "--i": i } as React.CSSProperties}>
             <span className="ct-tag__cord" aria-hidden="true" />
             <div className="ct-tag__card">
               <span className="ct-tag__hole" aria-hidden="true" />
               <span className="ct-tag__no" aria-hidden="true">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <dt>{name}</dt>
-              <dd>{desc}</dd>
+              <strong className="ct-tag__name">{name}</strong>
+              <span className="ct-tag__desc">{desc}</span>
               <span className="ct-tag__bars" aria-hidden="true">
                 <i />
                 <i />
               </span>
             </div>
-          </div>
+          </li>
         ))}
-      </dl>
+      </ul>
     </div>
   );
 }

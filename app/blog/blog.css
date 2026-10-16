@@ -219,3 +219,7 @@
 .bl-prose img { display: block; max-width: 100%; height: auto; margin-inline: auto; border-radius: 16px; }
 .bl-prose hr { border: 0; border-top: 1px solid #e2e6e1; margin-block: 32px; }
 .bl-prose p:empty::before { content: "\00a0"; }
+
+/* 회색 글자 대비 높이기 (흰 바탕 4.5:1 이상) */
+.bl-crumb, .bl-crumb__time, .bl-postnav__label, .bl-postnav__cat { color: #5f6862; }
+.bl-postnav__none { color: #6b746e; }
