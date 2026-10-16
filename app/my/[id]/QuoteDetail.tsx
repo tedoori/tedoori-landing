@@ -89,7 +89,7 @@ const canReview = (x: { status: string; build_at: string | null }) => x.status =
 type Tab = "home" | "list" | "visit" | "estimate" | "complete" | "review";
 
 /** 메뉴 아이콘 (선 아이콘) */
-const ICON: Record<Tab | "edit" | "plus" | "out", string> = {
+const ICON: Record<Tab | "edit" | "plus" | "ask" | "out", string> = {
   home: "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z",
   list: "M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01",
   visit: "M8 2v4M16 2v4M3 9h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z",
@@ -98,6 +98,7 @@ const ICON: Record<Tab | "edit" | "plus" | "out", string> = {
   review: "m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z",
   edit: "M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z",
   plus: "M12 5v14M5 12h14",
+  ask: "M4 5h16v11H8l-4 3zM9 9h6M9 12h4",
   out: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",
 };
 const Icon = ({ k }: { k: keyof typeof ICON }) => (
@@ -355,6 +356,9 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
         <div className="dash-side__foot">
           <Link href="/quote" className="dash-side__new">
             <Icon k="plus" /> 새 견적 신청
+          </Link>
+          <Link href="/contact" className="dash-side__out">
+            <Icon k="ask" /> 문의하기
           </Link>
           <button type="button" className="dash-side__out" onClick={onLogout}>
             <Icon k="out" /> 로그아웃
