@@ -220,7 +220,7 @@ export function RequestIntro() {
                         </li>
                       ))}
                     </ol>
-                    <span className="ri-done__note">방문 실측 일정은 문자로 안내해요.</span>
+                    <span className="ri-done__note">신청 내역과 진행 단계는 내 신청에서 확인할 수 있어요.</span>
                   </div>
 
                   <div className="ri-input">
