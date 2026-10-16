@@ -711,3 +711,5 @@
 /* 안내 알약: 글자 한 덩어리로 (flex 간격이 문장 사이에 끼지 않게) */
 .ys-actions .ys-hint { justify-content: center; line-height: 1.4; }
 .ys-actions .ys-hint > span { white-space: nowrap; }
+/* 안내 알약은 모든 화면에서 CTA 가운데에 */
+.ys-actions .ys-hint { align-self: center; }
