@@ -431,3 +431,34 @@
   .my-auth-links { display: flex; justify-content: center; gap: 16px; }
   .my-auth-links .btn { width: auto; }
 }
+
+/* 14단계: 도움말 띠 · 응답 결과 카드 */
+.help { display: flex; justify-content: space-between; align-items: center; gap: 12px 20px; flex-wrap: wrap; padding: 14px 16px 14px 20px; border-radius: 16px; border: 1px solid #e8ebe8; background: #fff; }
+.help-text { display: grid; gap: 2px; }
+.help-text strong { font-size: 15px; font-weight: 800; }
+.help-text small { color: var(--muted); font-size: 13px; }
+.help-links { display: flex; gap: 8px; }
+.help-link { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid #dfe4e0; background: #fff; color: #1d2420; font-size: 14px; font-weight: 700; text-decoration: none; transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), border-color 150ms ease, background-color 150ms ease; }
+.help-link svg { width: 16px; height: 16px; flex: none; }
+.help-link--kakao { border-color: #fee500; background: #fee500; color: #191600; }
+.help-link:active { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) {
+  .help-link:hover { border-color: #1d2420; }
+  .help-link--kakao:hover { border-color: #e6cf00; background: #f7de00; }
+}
+@media (max-width: 599px) {
+  .help { padding: 14px 16px; }
+  .help-links { width: 100%; }
+  .help-link { flex: 1; justify-content: center; }
+}
+
+/* 응답 결과: 체크 아이콘 + 문장, 상자 하나로 단정하게 */
+.resp--done { grid-template-columns: auto minmax(0, 1fr); column-gap: 14px; row-gap: 4px; align-items: start; padding: 20px 22px; border-radius: 18px; background: #f3f9f5; border: 1px solid #cfe8d8; }
+.resp--done::before { content: "✓"; grid-row: 1 / span 3; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: #1da049; color: #fff; font-size: 16px; font-weight: 800; }
+.resp--done.is-adjust { background: #fff8ec; border-color: #f2dcb3; }
+.resp--done.is-adjust::before { content: "↺"; background: #e08a00; }
+.resp--done.is-hold { background: #f6f5f2; border-color: #e3e0d8; }
+.resp--done.is-hold::before { content: "∥"; background: #8a8274; }
+.resp--done .resp-kicker { font-size: 12px; }
+.resp--done .resp-title { font-size: 17px; }
+.resp--done .resp-result { font-size: 14px; line-height: 1.65; }

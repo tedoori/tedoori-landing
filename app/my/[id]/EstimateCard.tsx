@@ -245,17 +245,6 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
         </footer>
       </div>
 
-      <div className="est-next">
-        <p>궁금한 점은 편하게 물어보세요.</p>
-        <div className="est-next__links">
-          <a href="http://pf.kakao.com/_HeKBX" target="_blank" rel="noopener noreferrer" className="est-next__kakao">
-            카카오톡 채널 @테두리
-          </a>
-          <a href="/contact" className="est-next__contact">
-            문의하기
-          </a>
-        </div>
-      </div>
     </section>
   );
 }
@@ -280,4 +269,30 @@ export function estimateParts(e: Estimate) {
     delivery: withVat(sum("delivery_cost")),
     labor: withVat(sum("labor_cost") + extra),
   };
+}
+
+/** 견적서 아래 도움말 띠: 카카오 채널 · 문의하기 */
+export function HelpStrip() {
+  return (
+    <aside className="help" aria-label="문의 바로가기">
+      <span className="help-text">
+        <strong>견적 내용이 궁금하신가요?</strong>
+        <small>담당자가 바로 답해드려요</small>
+      </span>
+      <span className="help-links">
+        <a href="http://pf.kakao.com/_HeKBX" target="_blank" rel="noopener noreferrer" className="help-link help-link--kakao">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="currentColor" d="M12 4C6.9 4 3 7.2 3 11.1c0 2.5 1.6 4.6 4.1 5.9l-.9 3.3c-.1.3.3.6.6.4l3.9-2.6c.4 0 .9.1 1.3.1 5.1 0 9-3.2 9-7.1S17.1 4 12 4Z" />
+          </svg>
+          카카오톡 문의
+        </a>
+        <a href="/contact" className="help-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4 5h16v11H8l-4 3z" />
+          </svg>
+          문의하기
+        </a>
+      </span>
+    </aside>
+  );
 }
