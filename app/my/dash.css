@@ -464,3 +464,6 @@
 .resp--done .resp-result { font-size: 14px; line-height: 1.65; }
 .dash-all ul button { padding: 7px 12px; }
 .dash-all .dash-all__more { justify-content: center; gap: 4px; padding: 10px 12px; font-size: 13px; font-weight: 700; color: #137a37; }
+/* 달력 그림자 색을 카드 종류에 맞춤 (기본 보라는 실측용) */
+.visit.is-build .visit-cal { box-shadow: 0 8px 20px -10px rgba(29, 160, 73, 0.55); }
+.visit.is-pending .visit-cal { box-shadow: 0 8px 20px -10px rgba(60, 70, 64, 0.35); }
