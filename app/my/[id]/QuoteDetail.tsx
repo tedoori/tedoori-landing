@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Callout, EmptyState, StatusBadge, type QuoteStatus } from "../../_components/ui";
 import { QuoteApiError, quoteApi } from "../../../lib/quote-api";
-import { EstimateCard, estimateGrand, type Estimate } from "./EstimateCard";
+import { EstimateCard, estimateGrand, estimateParts, type Estimate } from "./EstimateCard";
 import { VisitCard } from "./VisitCard";
 import { AddressCard } from "./AddressCard";
 import { RespondPanel } from "./RespondPanel";
@@ -504,7 +504,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
             {d.estimate ? (
               <>
                 <EstimateCard estimate={d.estimate} receiptNo={d.receipt_no} customer={d.name} />
-                <RespondPanel id={d.id} status={d.status} response={d.customer_response} onDone={() => (void load(), void onListChange(), void loadHome())} />
+                <RespondPanel id={d.id} status={d.status} response={d.customer_response} parts={estimateParts(d.estimate)} onDone={() => (void load(), void onListChange(), void loadHome())} />
               </>
             ) : (
               <EmptyState icon="info" title="견적서는 실측 후에 도착해요." desc="현장을 확인한 뒤 자재비·배송비·시공비를 나눈 견적서를 보내드려요. 도착하면 메일로 알려드려요." />

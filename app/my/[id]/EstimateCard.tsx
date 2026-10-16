@@ -259,3 +259,15 @@ export function estimateGrand(e: Estimate) {
     (e.extra_labor_cost ?? 0);
   return e.vat_included ? t : t + Math.round(t * 0.1);
 }
+
+/** 진행 범위 고르기용: 자재·배송·시공 묶음별 금액 (추가 비용은 시공에 포함) */
+export function estimateParts(e: Estimate) {
+  const sum = (k: "material_cost" | "delivery_cost" | "labor_cost") => e.items.reduce((a, i) => a + i[k], 0);
+  const extra = (e.equipment_cost ?? 0) + (e.waste_cost ?? 0) + (e.extra_labor_cost ?? 0);
+  const withVat = (n: number) => (e.vat_included ? n : n + Math.round(n * 0.1));
+  return {
+    material: withVat(sum("material_cost")),
+    delivery: withVat(sum("delivery_cost")),
+    labor: withVat(sum("labor_cost") + extra),
+  };
+}

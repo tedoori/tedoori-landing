@@ -374,3 +374,19 @@
 .resp-memo > span { font-size: 13px; font-weight: 700; color: rgba(255, 255, 255, 0.85); }
 .resp-memo small { margin-left: 4px; color: rgba(255, 255, 255, 0.5); font-weight: 600; }
 .resp-memo .q-req { color: #ff8a7a; }
+
+/* 11단계: 진행 범위 고르기 */
+.resp-scope { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.resp-scope button { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 2px solid rgba(255, 255, 255, 0.18); border-radius: 14px; background: transparent; color: #fff; font: inherit; text-align: left; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.resp-scope button.is-on { border-color: #1da049; background: rgba(29, 160, 73, 0.18); }
+.resp-scope button > span:last-child { display: grid; gap: 2px; }
+.resp-scope strong { font-size: 15px; }
+.resp-scope small { color: rgba(255, 255, 255, 0.65); font-size: 12px; }
+.resp-scope__check { display: grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 6px; border: 2px solid rgba(255, 255, 255, 0.35); font-size: 13px; font-weight: 800; }
+.resp-scope button.is-on .resp-scope__check { background: #1da049; border-color: #1da049; }
+.resp-sum { font-size: 14px; color: rgba(255, 255, 255, 0.8); }
+.resp-sum strong { margin-left: 4px; color: #8fe0a8; font-size: 18px; }
+.resp-sum small { display: block; margin-top: 2px; color: rgba(255, 255, 255, 0.5); font-size: 12px; }
+@media (max-width: 599px) {
+  .resp-scope { grid-template-columns: minmax(0, 1fr); }
+}

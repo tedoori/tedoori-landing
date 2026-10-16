@@ -52,7 +52,17 @@ const CALL: Record<Choice, string> = {
 };
 
 /** 견적서 아래: 진행 여부 고르기. 이미 답했으면 결과만 */
-export function RespondPanel({ id, status, response, onDone }: { id: string; status: string; response: string | null; onDone: () => void }) {
+type Parts = { material: number; delivery: number; labor: number };
+const PART_LABEL: [keyof Parts, string, string][] = [
+  ["material", "자재", "자재비"],
+  ["delivery", "배송", "배송비"],
+  ["labor", "시공", "시공비·추가 비용"],
+];
+
+export function RespondPanel({ id, status, response, parts, onDone }: { id: string; status: string; response: string | null; parts: Parts; onDone: () => void }) {
+  // 진행 범위: 견적서에 금액이 있는 묶음만, 처음엔 모두 선택
+  const available = PART_LABEL.filter(([k]) => parts[k] > 0);
+  const [scope, setScope] = useState<(keyof Parts)[]>(available.map(([k]) => k));
   const [pick, setPick] = useState<Choice | null>(null);
   const [chips, setChips] = useState<string[]>([]);
   const [date, setDate] = useState("");
@@ -83,14 +93,19 @@ export function RespondPanel({ id, status, response, onDone }: { id: string; sta
   };
   const toggleChip = (c: string) => setChips((p) => (p.includes(c) ? p.filter((x) => x !== c) : [...p, c]));
   const wantsDate = pick === "go" && chips.includes("날짜를 정해둘게요");
+  const hasLabor = scope.includes("labor");
+  const scopeTotal = scope.reduce((a, k) => a + parts[k], 0);
+  const toggleScope = (k: keyof Parts) => setScope((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]));
 
   const send = async () => {
     if (!pick || busy) return;
+    if (pick === "go" && scope.length === 0) return setError("진행할 범위를 하나 이상 골라주세요.");
     if (wantsDate && !date) return setError("희망 날짜를 골라주세요.");
     if (chips.includes("기타") && !message.trim()) return setError("기타 내용을 메모에 적어주세요.");
     setBusy(true);
     setError("");
     const lines = [
+      pick === "go" ? `진행 범위: ${PART_LABEL.filter(([k]) => scope.includes(k)).map(([, l]) => l).join("·")} (${scopeTotal.toLocaleString("ko-KR")}원, 부가세 포함)` : "",
       chips.length ? `${pick === "go" ? "희망 시기" : pick === "adjust" ? "조정할 부분" : "보류 이유"}: ${chips.filter((c) => c !== "날짜를 정해둘게요").concat(wantsDate ? [`희망일 ${date}`] : []).join(", ")}` : "",
       message.trim(),
     ].filter(Boolean);
@@ -126,7 +141,30 @@ export function RespondPanel({ id, status, response, onDone }: { id: string; sta
 
       {f && (
         <div className="resp-follow">
-          <p className="resp-q">{f.q}</p>
+          {pick === "go" && available.length > 1 && (
+            <>
+              <p className="resp-q">어디까지 맡기실 건가요?</p>
+              <div className="resp-scope">
+                {available.map(([k, l, sub]) => (
+                  <button key={k} type="button" className={scope.includes(k) ? "is-on" : ""} aria-pressed={scope.includes(k)} onClick={() => toggleScope(k)}>
+                    <span className="resp-scope__check" aria-hidden="true">
+                      {scope.includes(k) ? "✓" : ""}
+                    </span>
+                    <span>
+                      <strong>{l}</strong>
+                      <small>
+                        {sub} {parts[k].toLocaleString("ko-KR")}원
+                      </small>
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <p className="resp-sum">
+                선택한 범위 합계 <strong>{scopeTotal.toLocaleString("ko-KR")}원</strong> <small>부가세 포함 · 범위를 바꾸면 담당자가 확인 후 견적을 다시 맞춰드려요</small>
+              </p>
+            </>
+          )}
+          <p className="resp-q">{pick === "go" ? (hasLabor ? "언제쯤 시공하면 좋을까요?" : "언제쯤 받으면 좋을까요?") : f.q}</p>
           <div className="resp-chips">
             {f.chips.map((c) => (
               <button key={c} type="button" className={chips.includes(c) ? "is-on" : ""} aria-pressed={chips.includes(c)} onClick={() => toggleChip(c)}>
@@ -136,7 +174,7 @@ export function RespondPanel({ id, status, response, onDone }: { id: string; sta
           </div>
           {wantsDate && (
             <label className="resp-date">
-              <span>희망 시공일</span>
+              <span>{hasLabor ? "희망 시공일" : "희망 수령일"}</span>
               <input type="date" className="ui-input" min={today} value={date} onChange={(e) => setDate(e.target.value)} />
             </label>
           )}
