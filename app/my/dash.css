@@ -467,3 +467,32 @@
 /* 달력 그림자 색을 카드 종류에 맞춤 (기본 보라는 실측용) */
 .visit.is-build .visit-cal { box-shadow: 0 8px 20px -10px rgba(29, 160, 73, 0.55); }
 .visit.is-pending .visit-cal { box-shadow: 0 8px 20px -10px rgba(60, 70, 64, 0.35); }
+
+/* 15단계: 시공 후기 */
+.rv { display: grid; gap: 12px; padding: clamp(20px, 3vw, 28px); border-radius: 22px; background: #fff; border: 1px solid #e8ebe8; box-shadow: 0 10px 30px -18px rgba(20, 40, 28, 0.25); }
+.rv-kicker { color: #137a37; font-size: 13px; font-weight: 800; }
+.rv-title { font-size: clamp(20px, 3vw, 24px); font-weight: 800; }
+.rv-desc { color: var(--muted); font-size: 14px; }
+.rv-stars { display: flex; align-items: center; gap: 4px; }
+.rv-stars button { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 12px; background: transparent; color: #dfe3e0; font-size: 32px; line-height: 1; cursor: pointer; transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), color 150ms ease; }
+.rv-stars button.is-on { color: #f5b301; }
+.rv-stars button:active { transform: scale(0.9); }
+@media (hover: hover) and (pointer: fine) {
+  .rv-stars button:hover { transform: scale(1.08); }
+}
+.rv-stars__label { margin-left: 8px; color: #4b524d; font-size: 14px; font-weight: 700; }
+.rv-stars.is-static span { color: #dfe3e0; font-size: 20px; }
+.rv-stars.is-static span.is-on { color: #f5b301; }
+.rv-text { min-height: 110px; }
+.rv-public { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; background: #f6f8f6; cursor: pointer; }
+.rv-public input { flex: none; width: 18px; height: 18px; margin-top: 2px; accent-color: #1da049; }
+.rv-public span { display: grid; gap: 2px; }
+.rv-public strong { font-size: 14px; }
+.rv-public small { color: var(--muted); font-size: 12px; line-height: 1.6; }
+.rv-actions { display: flex; justify-content: center; }
+.rv-actions .btn { min-width: 200px; transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1); }
+.rv-actions .btn:active { transform: scale(0.97); }
+.rv--done { gap: 6px; background: #fffbef; border-color: #f3e5b5; box-shadow: none; }
+.rv--done .rv-kicker { color: #9a6b00; }
+.rv-body { font-size: 16px; font-weight: 600; line-height: 1.6; white-space: pre-line; }
+.rv-meta { color: var(--muted); font-size: 12px; }

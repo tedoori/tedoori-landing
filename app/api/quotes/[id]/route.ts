@@ -40,7 +40,10 @@ export async function GET(req: Request, { params }: Ctx) {
       }
     : null;
 
-  return Response.json({ ...data, photos, estimate });
+  // 남긴 후기 (표가 없거나 없으면 null)
+  const { data: review } = await auth.supabase.from("quote_reviews").select("rating, body, allow_public, created_at").eq("quote_id", id).maybeSingle();
+
+  return Response.json({ ...data, photos, estimate, review: review ?? null });
 }
 
 export async function PATCH(req: Request, { params }: Ctx) {

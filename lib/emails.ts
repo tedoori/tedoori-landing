@@ -345,3 +345,21 @@ export function operatorResponseEmail(q: QuoteRow, choice: keyof typeof RESPONSE
     html: shell({ preheader: `${q.name ?? ""} · ${label}`, body, footer: "테두리 운영 알림" }),
   };
 }
+
+/** 고객이 시공 후기를 남겼을 때 운영자에게 */
+export function operatorReviewEmail(q: QuoteRow, rating: number, text: string, allowPublic: boolean) {
+  const stars = "★★★★★".slice(0, rating) + "☆☆☆☆☆".slice(0, 5 - rating);
+  const body = `
+    ${section(`
+      <h1 style="margin:0;font-family:${FONT};font-size:20px;line-height:1.4;font-weight:800;color:#16231B;">새 시공 후기 · ${esc(q.receipt_no)}</h1>
+      <p style="margin:10px 0 0 0;font-family:${FONT};font-size:22px;color:#E0A100;letter-spacing:2px;">${stars}</p>
+      <p style="margin:12px 0 0 0;padding:14px 16px;border-radius:12px;background-color:#f4f1ea;font-family:${FONT};font-size:15px;line-height:1.7;color:#16231B;">${esc(text)}</p>
+      <p style="margin:10px 0 0 0;font-family:${FONT};font-size:13px;color:#4E5A53;">사이트 공개 동의: <strong>${allowPublic ? "동의함" : "동의 안 함"}</strong>${allowPublic ? " · 공개하려면 Supabase quote_reviews 에서 approved 를 true 로 바꿔주세요." : ""}</p>
+    `, "28px 32px 0 32px")}
+    ${section(`${heading("신청 내용")}${rowsTable([["이름", q.name ?? "-"], ...summaryRows(q)])}`, "24px 32px 28px 32px")}
+  `;
+  return {
+    subject: `[테두리 운영] 새 시공 후기 ${q.receipt_no} · ${stars}`,
+    html: shell({ preheader: text.slice(0, 60), body, footer: "테두리 운영 알림" }),
+  };
+}

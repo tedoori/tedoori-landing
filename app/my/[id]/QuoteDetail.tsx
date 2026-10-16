@@ -8,6 +8,7 @@ import { EstimateCard, HelpStrip, estimateGrand, estimateParts, type Estimate } 
 import { VisitCard } from "./VisitCard";
 import { AddressCard } from "./AddressCard";
 import { RespondPanel } from "./RespondPanel";
+import { ReviewCard, type Review } from "./ReviewCard";
 
 export type QuoteDetailData = {
   id: string;
@@ -35,6 +36,7 @@ export type QuoteDetailData = {
   build_at: string | null;
   build_note: string | null;
   estimate: Estimate | null;
+  review?: Review | null;
   created_at: string;
   updated_at: string;
   photos: { path: string; url: string | null }[];
@@ -71,6 +73,8 @@ const ADDRESS_OPEN = ["received", "checking", "visit", "needs"];
 const ACTIVE = ["received", "checking", "visit", "needs", "quoted"];
 const STEPS = ["접수", "확인", "실측", "견적", "결정"];
 const STEP_OF: Record<string, number> = { received: 0, checking: 1, needs: 1, visit: 2, quoted: 3, done: 4, hold: 4, canceled: 0 };
+
+const canReview = (x: { status: string; build_at: string | null }) => x.status === "done" && !!x.build_at && new Date(x.build_at).getTime() <= Date.now();
 
 type Tab = "home" | "list" | "visit" | "estimate";
 
@@ -113,6 +117,7 @@ function nextAction(d: QuoteDetailData): { title: string; desc: string; cta?: st
   if (d.status === "visit" && d.visit_at)
     return { title: `${formatVisit(d.visit_at)} 실측 방문`, desc: "담당자가 방문해 크기와 바닥 상태를 확인해요.", cta: "방문 일정 보기", tab: "visit" };
   if (d.status === "needs") return { title: "보완이 필요해요", desc: "안내 메일을 확인하고 신청서를 수정하거나 사진을 추가해주세요." };
+  if (canReview(d) && !d.review) return { title: "시공이 끝났어요", desc: "새 정원은 마음에 드세요? 짧은 후기를 남겨주세요." };
   if (d.status === "done")
     return d.build_at
       ? { title: `${formatVisit(d.build_at)} 시공 예정`, desc: "견적서 내용대로 시공해요.", cta: "일정 보기", tab: "visit" }
@@ -382,6 +387,8 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
               })()}
             </section>
 
+            {canReview(h) && <ReviewCard id={h.id} review={h.review ?? null} onDone={() => (void loadHome(), void load())} />}
+
             {ADDRESS_OPEN.includes(h.status) && !h.visit_address && (
               <AddressCard
                 id={h.id}
@@ -490,6 +497,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
           <>
             <TabHead title={d.status === "done" ? "시공·방문 일정" : "방문 일정"} rows={rows} selId={selId} onPick={(id) => pick(id, "visit")} />
             {d.status === "done" && <VisitCard kind="build" at={d.build_at} note={d.build_note} />}
+            {canReview(d) && <ReviewCard id={d.id} review={d.review ?? null} onDone={() => (void load(), void loadHome())} />}
             {canAddress && (
               <AddressCard
                 id={d.id}
