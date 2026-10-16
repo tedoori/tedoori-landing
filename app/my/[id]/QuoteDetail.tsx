@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Callout, EmptyState, StatusBadge, type QuoteStatus } from "../../_components/ui";
 import { QuoteApiError, quoteApi } from "../../../lib/quote-api";
 import { useIdleSignOut } from "../../../lib/idle";
+import { EstimateCard, type Estimate } from "./EstimateCard";
 
 export type QuoteDetailData = {
   id: string;
@@ -24,6 +25,9 @@ export type QuoteDetailData = {
   name: string | null;
   phone: string | null;
   status: QuoteStatus;
+  visit_at: string | null;
+  visit_note: string | null;
+  estimate: Estimate | null;
   created_at: string;
   updated_at: string;
   photos: { path: string; url: string | null }[];
@@ -38,6 +42,9 @@ type State =
 
 const formatDateTime = (v: string) =>
   new Intl.DateTimeFormat("ko-KR", { dateStyle: "long", timeStyle: "short" }).format(new Date(v));
+
+const formatVisit = (v: string) =>
+  new Intl.DateTimeFormat("ko-KR", { month: "long", day: "numeric", weekday: "short", hour: "numeric", minute: "2-digit" }).format(new Date(v));
 
 /** 등록 때 요청사항 맨 앞 줄에 붙인 "방문: …" 을 따로 꺼냄 */
 export function splitWish(wish: string | null) {
@@ -187,6 +194,14 @@ export function QuoteDetail({ id }: { id: string }) {
         </div>
         <StatusBadge status={d.status} />
       </header>
+
+      {d.status === "visit" && d.visit_at && (
+        <Callout tone="info" title={`실측 방문 · ${formatVisit(d.visit_at)}`}>
+          {d.visit_note || "담당자가 방문해 작업할 곳의 크기와 상태를 확인해요. 일정 변경은 문의하기로 알려주세요."}
+        </Callout>
+      )}
+
+      {d.estimate && <EstimateCard estimate={d.estimate} />}
 
       <section className="my-card" aria-labelledby="detail-req">
         <h2 id="detail-req" className="my-card__title">

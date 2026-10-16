@@ -8,7 +8,9 @@ import { authorize, fail, isUuid, notFound, PHOTO_BUCKET, signPhotos, validateQu
 type Ctx = { params: Promise<{ id: string }> };
 
 const DETAIL_COLUMNS =
-  "id, receipt_no, email, region, district, housing, works, works_unknown, scope, photo_paths, size_note, wish, timing, budget, name, phone, status, created_at, updated_at";
+  "id, receipt_no, email, region, district, housing, works, works_unknown, scope, photo_paths, size_note, wish, timing, budget, name, phone, status, visit_at, visit_note, created_at, updated_at";
+const ESTIMATE_COLUMNS =
+  "id, issued_at, valid_until, vat_included, measure_note, schedule_note, exclusions, photo_paths, items:quote_estimate_items(id, sort, work, material, quantity, material_cost, delivery_cost, labor_cost, note)";
 
 export async function GET(req: Request, { params }: Ctx) {
   const { id } = await params;
@@ -21,7 +23,24 @@ export async function GET(req: Request, { params }: Ctx) {
   if (!data) return notFound();
 
   const photos = await signPhotos(auth.supabase, data.photo_paths ?? []);
-  return Response.json({ ...data, photos });
+
+  // 공개된 견적서 중 가장 최근 것. 견적서 표가 아직 없거나 못 읽으면 견적서 없이 보여줌
+  const { data: est } = await auth.supabase
+    .from("quote_estimates")
+    .select(ESTIMATE_COLUMNS)
+    .eq("quote_id", id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const estimate = est
+    ? {
+        ...est,
+        items: [...(est.items ?? [])].sort((a, b) => a.sort - b.sort),
+        photos: await signPhotos(auth.supabase, est.photo_paths ?? []),
+      }
+    : null;
+
+  return Response.json({ ...data, photos, estimate });
 }
 
 export async function PATCH(req: Request, { params }: Ctx) {
