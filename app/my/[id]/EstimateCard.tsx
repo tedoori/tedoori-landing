@@ -272,7 +272,8 @@ export function estimateParts(e: Estimate) {
 }
 
 /** 견적서 아래 도움말 띠: 카카오 채널 · 문의하기 */
-export function HelpStrip() {
+/** onAsk: 내 신청 안에서는 대시보드 문의하기 탭으로 이동 */
+export function HelpStrip({ onAsk }: { onAsk?: () => void } = {}) {
   return (
     <aside className="help" aria-label="문의 바로가기">
       <span className="help-text">
@@ -286,7 +287,15 @@ export function HelpStrip() {
           </svg>
           카카오톡 문의
         </a>
-        <a href="/contact" className="help-link">
+        <a
+          href="/contact"
+          className="help-link"
+          onClick={(e) => {
+            if (!onAsk) return;
+            e.preventDefault();
+            onAsk();
+          }}
+        >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M4 5h16v11H8l-4 3z" />
           </svg>

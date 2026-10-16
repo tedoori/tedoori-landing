@@ -647,7 +647,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
               <>
                 <EstimateCard estimate={d.estimate} receiptNo={d.receipt_no} customer={d.name} />
                 <RespondPanel id={d.id} status={d.status} response={d.customer_response} parts={estimateParts(d.estimate)} onDone={() => (void load(), void onListChange(), void loadHome())} />
-                <HelpStrip />
+                <HelpStrip onAsk={() => goTab("ask")} />
               </>
             ) : (
               <EmptyState icon="info" title="견적서는 실측 후에 도착해요." desc="현장을 확인한 뒤 자재비·배송비·시공비를 나눈 견적서를 보내드려요. 도착하면 메일로 알려드려요." />
