@@ -11,6 +11,8 @@ import { ScopeStack } from "./_components/home/ScopeStack";
 import { StepsRail } from "./_components/home/StepsRail";
 import { ReceiptCost } from "./_components/home/ReceiptCost";
 import { Closing } from "./_components/home/Closing";
+import { HomeBlog } from "./_components/home/HomeBlog";
+import { getPosts } from "../lib/blog";
 import { HomeMotion } from "./_components/home/HomeMotion";
 import "./_components/home/motion.css";
 import "./home.css";
@@ -22,7 +24,11 @@ export const metadata: Metadata = {
   description: "전원주택의 마당 조경이 필요한 분을 위한 조경 사이트예요. 필요한 곳부터 맞춤 견적을 받아보세요.",
 };
 
-export default function Home() {
+// 블로그 최근 글은 1분마다 새로 확인
+export const revalidate = 60;
+
+export default async function Home() {
+  const posts = await getPosts();
   return (
     <>
       <a className="skip-link" href="#main">
@@ -70,7 +76,10 @@ export default function Home() {
           <ReceiptCost />
         </section>
 
-        {/* 08 · 신청 전 확인 (숲색 카드 + 대화형 FAQ + 거대한 '테두리') */}
+        {/* 08 · 조경 블로그 (최근 글 3개) */}
+        <HomeBlog posts={posts} />
+
+        {/* 09 · 신청 전 확인 (숲색 카드 + 대화형 FAQ + 거대한 '테두리') */}
         <Closing />
       </main>
 
