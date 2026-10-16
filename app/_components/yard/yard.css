@@ -681,3 +681,64 @@
     animation: none;
   }
 }
+
+/* 히어로 CTA 아래 안내: 살짝 띄우고 알약 모양 + 깜빡이는 점 */
+.ys-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  align-self: flex-start;
+  padding: 7px 14px 7px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(47, 93, 70, 0.18);
+  backdrop-filter: blur(6px);
+  font-size: 13px;
+  color: #3d4a43;
+}
+.ys-hint strong {
+  color: var(--primary);
+  font-weight: 700;
+}
+.ys-hint__dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: #3fae6a;
+}
+.ys-hint__dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #3fae6a;
+  animation: ys-ping 1.8s ease-out infinite;
+}
+@keyframes ys-ping {
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ys-hint__dot::after {
+    animation: none;
+  }
+}
+/* 사진 위라서 어두운 유리 알약으로 */
+.ys-actions .ys-hint {
+  background: rgba(16, 36, 26, 0.6);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.92);
+}
+.ys-actions .ys-hint strong {
+  color: #b9f2cb;
+}
+@media (max-width: 899px) {
+  .ys-actions .ys-hint {
+    align-self: center;
+  }
+}

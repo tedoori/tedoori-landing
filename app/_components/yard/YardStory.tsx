@@ -162,7 +162,12 @@ export function YardStory() {
             <Link href={isOutro ? `/quote?work=${encodeURIComponent([...activeWorks].join(","))}` : "/quote"} className="btn btn--primary">
               {isOutro ? "이 조합으로 무료 견적 요청" : "무료 견적 시작하기"}
             </Link>
-            {step === 0 && <p className="ys-hint">서울·경기·인천 · 견적 요청 별도 비용 없음</p>}
+            {step === 0 && (
+              <p className="ys-hint">
+                <span className="ys-hint__dot" aria-hidden="true" />
+                서울·경기·인천 · <strong>견적 요청 별도 비용 없음</strong>
+              </p>
+            )}
           </div>
         </div>
       </div>

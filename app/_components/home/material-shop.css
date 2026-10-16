@@ -499,3 +499,15 @@
     text-align: center;
   }
 }
+
+/* PC: 선택 초기화는 작업 목록 바로 아래 오른쪽 끝, 연출 예시 문구는 무대 아래 설명처럼 오른쪽 */
+@media (min-width: 1000px) {
+  .ms-actions {
+    justify-content: flex-end;
+    margin-top: 12px;
+  }
+  .ms-demo {
+    margin-top: 12px;
+    text-align: right;
+  }
+}

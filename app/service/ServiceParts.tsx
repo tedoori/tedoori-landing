@@ -179,7 +179,7 @@ export function PrepFan() {
             </div>
           ))}
         </div>
-        <p className="note pf-note">사람 얼굴과 차량 번호처럼 필요 없는 정보는 가리고 올려주세요.</p>
+        <p className="note pf-note">사진 업로드 시, 사람 얼굴과 차량 번호처럼 필요 없는 정보는 가리고 올려주세요.</p>
       </div>
     </div>
   );
@@ -203,7 +203,7 @@ export function EtcSticker() {
           가능한 범위부터 확인해요.
         </h2>
         <p className="lead es-lead">
-          울타리나 데크처럼 기본 작업에 없는 요청도 적어주세요. 지원 범위가 제한적이어서 검토 후 가능 여부를 안내해요.
+          울타리나 데크처럼 기본 작업에 없는 요청도 적어주세요.<br />지원 범위가 제한적이어서 검토 후 가능 여부를 안내해요.
         </p>
       </div>
       {/* 울타리·데크 사진 두 장에 각각 기타 스티커가 찍힘 */}

@@ -83,7 +83,6 @@ export function NoteExample() {
               손보고 싶어요.”
             </h2>
             <p className="lead">자재 이름 대신, 바라는 모습을 적어주세요.</p>
-            <p className="note">실제 고객 후기가 아닌 요청 작성 예시예요.</p>
           </div>
 
           <div className="ne-desk">

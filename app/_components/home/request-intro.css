@@ -730,3 +730,9 @@
     background: linear-gradient(180deg, transparent 50%, var(--mint) 50%);
   }
 }
+
+/* 안내 문장을 더 굵고 진하게 */
+.ri-lead {
+  font-weight: 700;
+  color: var(--text);
+}

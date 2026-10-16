@@ -983,3 +983,7 @@
     height: calc(100% - 54px);
   }
 }
+
+.gd-hero__note {
+  text-align: center;
+}
