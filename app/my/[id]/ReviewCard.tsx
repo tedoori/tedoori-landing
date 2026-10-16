@@ -54,7 +54,7 @@ export function ReviewCard({ id, review, onDone }: { id: string; review: Review 
   const shown = hover || rating;
   return (
     <section className="rv" aria-labelledby="rv-title">
-      <p className="rv-kicker">시공이 끝났어요</p>
+      <p className="rv-kicker">테두리가 완료됐어요</p>
       <h2 id="rv-title" className="rv-title">
         새 정원은 마음에 드세요?
       </h2>

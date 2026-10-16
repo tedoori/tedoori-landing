@@ -118,7 +118,7 @@ function nextAction(d: QuoteDetailData): { title: string; desc: string; cta?: st
   if (d.status === "visit" && d.visit_at)
     return { title: `${formatVisit(d.visit_at)} 실측 방문`, desc: "담당자가 방문해 크기와 바닥 상태를 확인해요.", cta: "방문 일정 보기", tab: "visit" };
   if (d.status === "needs") return { title: "보완이 필요해요", desc: "안내 메일을 확인하고 신청서를 수정하거나 사진을 추가해주세요." };
-  if (canReview(d) && !d.review) return { title: "시공이 끝났어요", desc: "새 정원은 마음에 드세요? 짧은 후기를 남겨주세요." };
+  if (canReview(d) && !d.review) return { title: "테두리가 완료됐어요", desc: "새 정원은 마음에 드세요? 짧은 후기를 남겨주세요." };
   if (d.status === "done")
     return d.build_at
       ? { title: `${formatVisit(d.build_at)} 시공 예정`, desc: "견적서 내용대로 시공해요.", cta: "일정 보기", tab: "visit" }
@@ -327,7 +327,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
                 <strong className={counts.quoted ? "is-hot" : ""}>{counts.quoted}</strong>
               </button>
               <button type="button" onClick={() => goTab("list")}>
-                <span>시공 완료</span>
+                <span>완료</span>
                 <strong>{counts.finished}</strong>
               </button>
             </div>
