@@ -82,7 +82,7 @@ const STEP_OF: Record<string, number> = { received: 0, checking: 1, needs: 1, vi
 
 const canReview = (x: { status: string; build_at: string | null }) => x.status === "completed";
 
-type Tab = "home" | "list" | "visit" | "estimate";
+type Tab = "home" | "list" | "visit" | "estimate" | "complete" | "review";
 
 /** 메뉴 아이콘 (선 아이콘) */
 const ICON: Record<Tab | "edit" | "plus" | "out", string> = {
@@ -90,6 +90,8 @@ const ICON: Record<Tab | "edit" | "plus" | "out", string> = {
   list: "M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01",
   visit: "M8 2v4M16 2v4M3 9h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z",
   estimate: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5",
+  complete: "M22 11.1V12a10 10 0 1 1-5.9-9.1M22 4 12 14l-3-3",
+  review: "m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z",
   edit: "M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z",
   plus: "M12 5v14M5 12h14",
   out: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",
@@ -140,7 +142,7 @@ function nextAction(d: QuoteDetailData): { title: string; desc: string; cta?: st
       ? { title: `${formatVisit(d.build_at)} ${BUILD_COPY[buildKindOf(d)].label.replace(" 일정", "")} 예정`, desc: BUILD_COPY[buildKindOf(d)].ready, cta: "일정 보기", tab: "visit" }
       : { title: "진행이 확정됐어요", desc: BUILD_COPY[buildKindOf(d)].waiting, cta: "일정 보기", tab: "visit" };
   if (d.status === "completed" && !d.review) return { title: "테두리가 완료됐어요", desc: "완료 사진을 확인하고 짧은 후기를 남겨주세요." };
-  if (d.status === "completed") return { title: "테두리가 완료됐어요", desc: "남겨주신 후기 고마워요. 관리법이 궁금하면 언제든 물어보세요.", cta: "완료 보고 보기", tab: "visit" };
+  if (d.status === "completed") return { title: "테두리가 완료됐어요", desc: "남겨주신 후기 고마워요. 관리법이 궁금하면 언제든 물어보세요.", cta: "완료 보고 보기", tab: "complete" };
   if (d.status === "hold") return { title: "보류 중이에요", desc: "다시 진행하고 싶으면 카카오톡 채널 @테두리로 알려주세요." };
   if (d.status === "canceled") return { title: "취소된 신청이에요", desc: "새로 필요하면 새 견적을 신청해주세요." };
   return { title: "신청을 확인하고 있어요", desc: "24시간 안에 담당자가 전화나 문자로 연락드려요." };
@@ -169,7 +171,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
   // 주소창 #list, #visit, #estimate 로 바로 열기 (메일 버튼 등)
   useEffect(() => {
     const h = window.location.hash.slice(1);
-    if (h === "list" || h === "visit" || h === "estimate") setTab(h);
+    if (["list", "visit", "estimate", "complete", "review"].includes(h)) setTab(h as Tab);
   }, []);
 
   const cache = useRef<Record<string, QuoteDetailData>>({});
@@ -266,6 +268,8 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
     ["list", "신청 내역", total],
     ["visit", "방문 일정", null],
     ["estimate", "견적서", counts.estimates || null],
+    ["complete", "완료", counts.finished || null],
+    ["review", "후기", null],
   ];
 
   return (
@@ -360,7 +364,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
             {rows
               .filter((r) => r.status === "completed" && r.id !== h.id)
               .map((r) => (
-                <button key={r.id} type="button" className="done-alert" onClick={() => pick(r.id, "visit")}>
+                <button key={r.id} type="button" className="done-alert" onClick={() => pick(r.id, "complete")}>
                   <span className="done-alert__badge" aria-hidden="true">✓</span>
                   <span>
                     <strong>{worksText(r)} 작업이 완료됐어요</strong>
@@ -546,9 +550,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
         {d && tab === "visit" && (
           <>
             <TabHead title={d.status === "done" || d.status === "completed" ? `${BUILD_COPY[buildKindOf(d)].label.replace(" 일정", "")}·방문 일정` : "방문 일정"} rows={rows} selId={selId} onPick={(id) => pick(id, "visit")} />
-            {d.status === "completed" && <CompletionCard note={d.completion_note ?? null} photos={d.completion_photos ?? []} at={d.completed_at ?? null} />}
             {(d.status === "done" || d.status === "completed") && <VisitCard kind="build" buildKind={buildKindOf(d)} at={d.build_at} note={d.build_note} />}
-            {canReview(d) && <ReviewCard id={d.id} review={d.review ?? null} onDone={() => (void load(), void loadHome())} />}
             {canAddress && (
               <AddressCard
                 id={d.id}
@@ -560,6 +562,40 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
               />
             )}
             <VisitCard at={d.visit_at} note={d.visit_note} address={canAddress ? undefined : d.visit_address} detail={d.visit_address_detail} memo={canAddress ? undefined : d.visit_memo} />
+          </>
+        )}
+
+        {/* ---------- 완료 ---------- */}
+        {d && tab === "complete" && (
+          <>
+            <TabHead title="완료 보고" rows={rows} selId={selId} onPick={(id) => pick(id, "complete")} />
+            {d.status === "completed" ? (
+              <>
+                <CompletionCard note={d.completion_note ?? null} photos={d.completion_photos ?? []} at={d.completed_at ?? null} />
+                <button type="button" className="dash-go dash-go--estimate" onClick={() => goTab("review")}>
+                  <Icon k="review" />
+                  <span>
+                    <strong>{d.review ? "남겨주신 후기 보기" : "후기 남기러 가기"}</strong>
+                    <small>새 정원은 마음에 드세요?</small>
+                  </span>
+                  <b aria-hidden="true">→</b>
+                </button>
+              </>
+            ) : (
+              <EmptyState icon="info" title="아직 완료 전이에요." desc="작업이 모두 끝나면 담당자가 완료 사진과 관리법 안내를 이곳에 올려드려요." />
+            )}
+          </>
+        )}
+
+        {/* ---------- 후기 ---------- */}
+        {d && tab === "review" && (
+          <>
+            <TabHead title="후기" rows={rows} selId={selId} onPick={(id) => pick(id, "review")} />
+            {canReview(d) ? (
+              <ReviewCard id={d.id} review={d.review ?? null} onDone={() => (void load(), void loadHome())} />
+            ) : (
+              <EmptyState icon="info" title="완료된 작업에 후기를 남길 수 있어요." desc="작업이 끝나 완료 보고가 올라오면 이곳에서 별점과 후기를 남길 수 있어요." />
+            )}
           </>
         )}
 

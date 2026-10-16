@@ -542,3 +542,7 @@
 .done-alert strong { font-size: 15px; }
 .done-alert small { color: var(--muted); font-size: 13px; }
 .done-alert b { color: #137a37; font-size: 18px; }
+/* 메뉴 6개: 모바일·태블릿은 3칸 × 2줄 */
+@media (max-width: 1023px) {
+  .dash-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
