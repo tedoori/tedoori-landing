@@ -156,3 +156,26 @@
 .bl-crumb a:hover { color: #0e7a33; text-decoration: underline; text-underline-offset: 4px; }
 .bl-crumb a:last-of-type { color: #0e7a33; }
 .bl-crumb__time { margin-left: 4px; padding-left: 12px; border-left: 1px solid #dfe4e0; font-weight: 500; }
+
+/* 블로그 히어로: 가운데 정렬 */
+.bl-hero__inner { justify-items: center; text-align: center; }
+.bl-hero .lead { margin-inline: auto; }
+.bl-tabs { justify-content: safe center; }
+
+/* 글 아래: 이전 글 · 다음 글 · 목록 (네이버 블로그 방식) */
+.bl-postnav { display: grid; gap: 16px; margin-top: 40px; }
+.bl-postnav ul { border-top: 2px solid var(--forest); }
+.bl-postnav li { display: grid; grid-template-columns: 72px minmax(0, 1fr); align-items: center; gap: 12px; min-height: 56px; border-bottom: 1px solid #e2e6e1; }
+.bl-postnav__label { color: #8a938d; font-size: 13px; font-weight: 800; }
+.bl-postnav li a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; padding-block: 14px; }
+.bl-postnav li a strong { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 15px; font-weight: 700; transition: color 160ms ease; }
+.bl-postnav li a:hover strong { color: #0e7a33; }
+.bl-postnav__cat { flex: none; color: #8a938d; font-size: 12px; }
+.bl-postnav__none { color: #a9b1ab; font-size: 14px; }
+.bl-postnav__actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.bl-listbtn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 20px; border-radius: 12px; border: 1px solid #d5dbd6; background: #fff; font-size: 15px; font-weight: 800; transition: border-color 160ms ease, transform 160ms ease; }
+.bl-listbtn:hover { border-color: var(--forest); }
+.bl-listbtn:active { transform: scale(0.97); }
+.bl-catmore { color: #0e7a33; font-size: 14px; font-weight: 800; }
+.bl-catmore:hover { text-decoration: underline; text-underline-offset: 4px; }
+.bl-related { margin-top: 40px; }

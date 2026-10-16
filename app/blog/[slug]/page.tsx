@@ -22,6 +22,10 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
   const article = getArticle(slug);
   if (!article) notFound();
 
+  // 네이버 블로그처럼 글 아래 이전 글·다음 글 + 목록
+  const idx = JOURNAL_ARTICLES.findIndex((a) => a.slug === article.slug);
+  const prev = JOURNAL_ARTICLES[idx + 1];
+  const next = JOURNAL_ARTICLES[idx - 1];
   const related = JOURNAL_ARTICLES.filter((a) => a.slug !== article.slug).slice(0, 2);
 
   return (
@@ -58,6 +62,35 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
               </div>
               <Link href="/quote" className="btn btn--primary">테두리 조경견적 신청하기</Link>
             </aside>
+            <nav className="bl-postnav" aria-label="다른 글">
+              <ul>
+                {[
+                  ["이전 글", prev],
+                  ["다음 글", next],
+                ].map(([label, a]) => (
+                  <li key={label as string}>
+                    <span className="bl-postnav__label">{label as string}</span>
+                    {a && typeof a !== "string" ? (
+                      <Link href={`/blog/${a.slug}`}>
+                        <strong>{a.title}</strong>
+                        <span className="bl-postnav__cat">{a.category}</span>
+                      </Link>
+                    ) : (
+                      <span className="bl-postnav__none">{label === "이전 글" ? "첫 글이에요" : "가장 최근 글이에요"}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <div className="bl-postnav__actions">
+                <Link href="/blog" className="bl-listbtn">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+                  목록
+                </Link>
+                <Link href={`/blog?cat=${encodeURIComponent(article.category)}`} className="bl-catmore">
+                  {article.category} 글 더 보기 ›
+                </Link>
+              </div>
+            </nav>
             {related.length > 0 && (
               <nav className="bl-related" aria-labelledby="related-title">
                 <h2 id="related-title">함께 읽으면 좋은 글</h2>
