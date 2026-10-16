@@ -4,6 +4,7 @@ import { SiteHeader } from "../_components/SiteHeader";
 import { MyApplications } from "./MyApplications";
 import "./my.css";
 import "./dash.css";
+import "../quote/quote.css";
 
 export const metadata: Metadata = {
   title: "조경견적 신청내역 확인 | 테두리",

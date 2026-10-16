@@ -620,3 +620,5 @@
 @media (max-width: 1023px) {
   .dash-side__foot { flex-wrap: wrap; justify-content: flex-start; gap: 4px 12px; }
 }
+.dash-ask { padding: clamp(18px, 3vw, 28px); border-radius: 22px; background: #fff; border: 1px solid #e8ebe8; }
+.dash-side__out.is-on { background: #eaf6ee; color: #137a37; font-weight: 800; }

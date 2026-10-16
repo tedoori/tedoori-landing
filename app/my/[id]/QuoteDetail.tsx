@@ -10,6 +10,7 @@ import { AddressCard } from "./AddressCard";
 import { RespondPanel } from "./RespondPanel";
 import { ReviewCard, type Review } from "./ReviewCard";
 import { CompletionCard } from "./CompletionCard";
+import { ContactForm } from "../../contact/ContactForm";
 
 export type QuoteDetailData = {
   id: string;
@@ -86,10 +87,10 @@ const STEP_OF: Record<string, number> = { received: 0, checking: 1, needs: 1, vi
 
 const canReview = (x: { status: string; build_at: string | null }) => x.status === "completed";
 
-type Tab = "home" | "list" | "visit" | "estimate" | "complete" | "review";
+type Tab = "home" | "list" | "visit" | "estimate" | "complete" | "review" | "ask";
 
 /** 메뉴 아이콘 (선 아이콘) */
-const ICON: Record<Tab | "edit" | "plus" | "ask" | "out", string> = {
+const ICON: Record<Tab | "edit" | "plus" | "out", string> = {
   home: "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z",
   list: "M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01",
   visit: "M8 2v4M16 2v4M3 9h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z",
@@ -181,7 +182,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
   // 주소창 #list, #visit, #estimate 로 바로 열기 (메일 버튼 등)
   useEffect(() => {
     const h = window.location.hash.slice(1);
-    if (["list", "visit", "estimate", "complete", "review"].includes(h)) setTab(h as Tab);
+    if (["list", "visit", "estimate", "complete", "review", "ask"].includes(h)) setTab(h as Tab);
   }, []);
 
   const cache = useRef<Record<string, QuoteDetailData>>({});
@@ -357,9 +358,9 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
           <Link href="/quote" className="dash-side__new">
             <Icon k="plus" /> 새 견적 신청
           </Link>
-          <Link href="/contact" className="dash-side__out">
+          <button type="button" className={`dash-side__out${tab === "ask" ? " is-on" : ""}`} onClick={() => goTab("ask")}>
             <Icon k="ask" /> 문의하기
-          </Link>
+          </button>
           <button type="button" className="dash-side__out" onClick={onLogout}>
             <Icon k="out" /> 로그아웃
           </button>
@@ -587,6 +588,17 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
             {canAddress && d.visit_address && (
               <AddressCard id={d.id} address={d.visit_address} detail={d.visit_address_detail} memo={d.visit_memo} onSaved={() => void load()} />
             )}
+          </>
+        )}
+
+        {/* ---------- 문의하기 ---------- */}
+        {d && tab === "ask" && (
+          <>
+            <TabHead title="문의하기" rows={rows} selId={selId} onPick={(id) => pick(id, "ask")} />
+            <p className="dash-muted">고른 신청의 접수번호와 연락처를 미리 채워뒀어요. 답변은 이메일로 드려요.</p>
+            <div className="dash-ask">
+              <ContactForm key={d.id} prefill={{ receiptNo: d.receipt_no, email: d.email, phone: d.phone }} />
+            </div>
           </>
         )}
 

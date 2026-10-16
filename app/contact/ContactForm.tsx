@@ -6,12 +6,13 @@ import { useEffect, useRef, useState } from "react";
 const TYPES = ["서비스", "자료 보완", "수정", "취소", "견적", "기타"] as const;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export function ContactForm() {
+/** prefill: 내 신청 안에서 열 때 접수번호·이메일·연락처를 미리 채움 */
+export function ContactForm({ prefill }: { prefill?: { receiptNo?: string | null; email?: string | null; phone?: string | null } } = {}) {
   const [type, setType] = useState<string>("서비스");
-  const [receiptNo, setReceiptNo] = useState("");
+  const [receiptNo, setReceiptNo] = useState(prefill?.receiptNo ?? "");
   const [message, setMessage] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState(prefill?.email ?? "");
+  const [phone, setPhone] = useState(prefill?.phone ?? "");
   const [agree, setAgree] = useState(false);
   const [openDoc, setOpenDoc] = useState(false);
   const [busy, setBusy] = useState(false);
