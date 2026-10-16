@@ -179,3 +179,10 @@
 .bl-catmore { color: #0e7a33; font-size: 14px; font-weight: 800; }
 .bl-catmore:hover { text-decoration: underline; text-underline-offset: 4px; }
 .bl-related { margin-top: 40px; }
+
+/* 휴대폰: 분류 탭을 옆으로 숨기지 않고 두 줄로 모두 보여줌 */
+@media (max-width: 700px) {
+  .bl-tabs { flex-wrap: wrap; justify-content: center; gap: 0 2px; overflow: visible; margin-inline: 0; padding-inline: 0; }
+  .bl-tab { padding: 10px 10px 12px; font-size: 14.5px; }
+  .bl-tab::after { left: 10px; right: 10px; }
+}
