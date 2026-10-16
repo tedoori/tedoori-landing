@@ -72,8 +72,10 @@ export function RespondPanel({ id, status, response, parts, onDone }: { id: stri
   const [sent, setSent] = useState<Choice | null>(null);
 
   // 담당자가 해피콜(전화)로 확인하고 상태만 바꾼 경우도 결과로 보여줌
-  const byCall = !response && !sent && (status === "done" || status === "completed" || status === "hold");
-  const shown = (sent ?? (status !== "quoted" ? (response ?? (status === "done" || status === "completed" ? "go" : status === "hold" ? "hold" : null)) : null)) as Choice | null;
+  // 문구는 지금 상태 기준 (관리자가 상태를 되돌리면 그에 맞게 바뀜). 고객 응답 기록은 "직접 골랐는지" 판단에만 씀
+  const statusChoice: Choice | null = status === "done" || status === "completed" ? "go" : status === "hold" ? "hold" : null;
+  const byCall = !sent && !!statusChoice && response !== statusChoice;
+  const shown = (sent ?? statusChoice) as Choice | null;
   if (shown && shown in DONE) {
     return (
       <section className={`resp resp--done is-${shown}`}>
@@ -83,6 +85,19 @@ export function RespondPanel({ id, status, response, parts, onDone }: { id: stri
       </section>
     );
   }
+  // 견적을 다시 살피는 중이거나 취소된 경우 안내만
+  if (status === "needs" || status === "canceled")
+    return (
+      <section className={`resp resp--done is-${status === "needs" ? "adjust" : "hold"}`}>
+        <p className="resp-kicker">{status === "needs" ? "견적을 다시 살피고 있어요" : "취소된 견적이에요"}</p>
+        <p className="resp-title">{status === "needs" ? "조금만 기다려주세요" : "이 견적은 더 이상 진행하지 않아요"}</p>
+        <p className="resp-result">
+          {status === "needs"
+            ? "보완할 내용을 확인한 뒤 담당자가 연락드리고, 새 견적을 다시 보내드릴게요."
+            : "다시 필요하시면 새 견적을 신청하거나 카카오톡 채널 @테두리로 이야기해주세요."}
+        </p>
+      </section>
+    );
   if (status !== "quoted") return null;
 
   const choose = (k: Choice) => {
