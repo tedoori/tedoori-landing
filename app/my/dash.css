@@ -535,3 +535,10 @@
 /* 진행 단계 칸 수가 바뀌어도 한 줄 */
 .dash-steps { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
 .addr-loading, .my-checking { padding: 40px 0; text-align: center; }
+.done-alert { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 18px; border: 2px solid #1da049; border-radius: 18px; background: #f3f9f5; font: inherit; text-align: left; cursor: pointer; transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1); }
+.done-alert:active { transform: scale(0.98); }
+.done-alert__badge { display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 50%; background: #1da049; color: #fff; font-weight: 800; }
+.done-alert > span:nth-child(2) { display: grid; flex: 1; gap: 2px; }
+.done-alert strong { font-size: 15px; }
+.done-alert small { color: var(--muted); font-size: 13px; }
+.done-alert b { color: #137a37; font-size: 18px; }

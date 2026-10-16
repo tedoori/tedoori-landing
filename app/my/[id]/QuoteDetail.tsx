@@ -356,6 +356,19 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
               </button>
             </div>
 
+            {/* 가장 최근 신청이 아니어도, 완료된 신청이 있으면 알림 */}
+            {rows
+              .filter((r) => r.status === "completed" && r.id !== h.id)
+              .map((r) => (
+                <button key={r.id} type="button" className="done-alert" onClick={() => pick(r.id, "visit")}>
+                  <span className="done-alert__badge" aria-hidden="true">✓</span>
+                  <span>
+                    <strong>{worksText(r)} 작업이 완료됐어요</strong>
+                    <small>{r.receipt_no} · 완료 사진과 담당자가 남긴 말 보기</small>
+                  </span>
+                  <b aria-hidden="true">→</b>
+                </button>
+              ))}
             {h.status === "completed" && <CompletionCard note={h.completion_note ?? null} photos={h.completion_photos ?? []} at={h.completed_at ?? null} />}
             {/* 시공이 끝났으면 후기 요청을 맨 위에 */}
             {canReview(h) && (
