@@ -7,6 +7,7 @@ import { QuoteApiError, quoteApi } from "../../../lib/quote-api";
 import { EstimateCard, estimateGrand, type Estimate } from "./EstimateCard";
 import { VisitCard } from "./VisitCard";
 import { AddressCard } from "./AddressCard";
+import { RespondPanel } from "./RespondPanel";
 
 export type QuoteDetailData = {
   id: string;
@@ -30,6 +31,9 @@ export type QuoteDetailData = {
   visit_address: string | null;
   visit_address_detail: string | null;
   visit_memo: string | null;
+  customer_response: string | null;
+  build_at: string | null;
+  build_note: string | null;
   estimate: Estimate | null;
   created_at: string;
   updated_at: string;
@@ -109,7 +113,10 @@ function nextAction(d: QuoteDetailData): { title: string; desc: string; cta?: st
   if (d.status === "visit" && d.visit_at)
     return { title: `${formatVisit(d.visit_at)} 실측 방문`, desc: "담당자가 방문해 크기와 바닥 상태를 확인해요.", cta: "방문 일정 보기", tab: "visit" };
   if (d.status === "needs") return { title: "보완이 필요해요", desc: "안내 메일을 확인하고 신청서를 수정하거나 사진을 추가해주세요." };
-  if (d.status === "done") return { title: "진행이 확정됐어요", desc: "업체 연결과 시공 일정은 따로 연락드려요." };
+  if (d.status === "done")
+    return d.build_at
+      ? { title: `${formatVisit(d.build_at)} 시공 예정`, desc: "견적서 내용대로 시공해요.", cta: "일정 보기", tab: "visit" }
+      : { title: "진행이 확정됐어요", desc: "담당자가 시공 날짜를 정해 연락드려요.", cta: "일정 보기", tab: "visit" };
   if (d.status === "hold") return { title: "보류 중이에요", desc: "다시 진행하고 싶으면 카카오톡 채널 @테두리로 알려주세요." };
   if (d.status === "canceled") return { title: "취소된 신청이에요", desc: "새로 필요하면 새 견적을 신청해주세요." };
   return { title: "신청을 확인하고 있어요", desc: "24시간 안에 담당자가 전화나 문자로 연락드려요." };
@@ -127,6 +134,7 @@ type Props = {
 /** 내 신청 대시보드: 홈 · 신청 내역 · 방문 일정 · 견적서 */
 export function MyDashboard({ email, rows, total, initialId, onLogout, onListChange }: Props) {
   const [tab, setTab] = useState<Tab>("home");
+  const [openId, setOpenId] = useState<string | null>(null);
   const [selId, setSelId] = useState<string | null>(initialId && rows.some((r) => r.id === initialId) ? initialId : (rows[0]?.id ?? null));
   const [d, setD] = useState<QuoteDetailData | null>(null);
   const [loadError, setLoadError] = useState("");
@@ -179,6 +187,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
   };
   const pick = (id: string, t: Tab = "list") => {
     setSelId(id);
+    if (t === "list") setOpenId(id);
     goTab(t);
   };
 
@@ -285,7 +294,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
         {h && tab === "home" && (
           <>
             <header className="dash-hello">
-              <p className="my-eyebrow">MY GARDEN</p>
+              <p className="my-eyebrow">MY TEDOORI</p>
               <h1 className="dash-hello__title">{name ? `${name} 님, 안녕하세요` : "안녕하세요"}</h1>
             </header>
 
@@ -313,7 +322,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
                   {rows.map((r) => (
                     <li key={r.id}>
                       <button type="button" onClick={() => pick(r.id)}>
-                        <span>
+                        <span className="dash-all__txt">
                           <strong>{worksText(r)}</strong>
                           <small>
                             {r.receipt_no} · {formatDate(r.created_at)}
@@ -410,14 +419,28 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
         {/* ---------- 신청 내역 ---------- */}
         {tab === "list" && total > 0 && (
           <>
-            <header className="dash-hello">
-              <p className="my-eyebrow">신청 내역</p>
-              <h1 className="dash-hello__title">총 {total}건</h1>
+            <header className="dash-tabhead dash-tabhead--row">
+              <h1 className="dash-tabhead__title">신청 내역</h1>
+              <p className="dash-tabhead__count">
+                총 <strong>{total}</strong>건
+              </p>
             </header>
             <ul className="dash-list">
-              {rows.map((r) => (
-                <li key={r.id} className={`dash-row${r.id === selId ? " is-on" : ""}`}>
-                  <button type="button" className="dash-row__pick" onClick={() => pick(r.id)} aria-pressed={r.id === selId}>
+              {rows.map((r) => {
+                const open = openId === r.id;
+                return (
+                <li key={r.id} className={`dash-acc${open ? " is-open" : ""}`}>
+                <div className={`dash-row${open ? " is-on" : ""}`}>
+                  <button
+                    type="button"
+                    className="dash-row__pick"
+                    aria-expanded={open}
+                    onClick={() => {
+                      if (open) return setOpenId(null);
+                      setSelId(r.id);
+                      setOpenId(r.id);
+                    }}
+                  >
                     <span className="dash-row__main">
                       <strong>{worksText(r)}</strong>
                       <span>
@@ -425,22 +448,33 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
                       </span>
                     </span>
                     <StatusBadge status={r.status} />
+                    <span className="dash-row__chev" aria-hidden="true">⌄</span>
                   </button>
                   <Link href={`/my/${r.id}/edit`} className="addr-edit dash-row__edit">
                     <Icon k="edit" /> 수정
                   </Link>
+                </div>
+                {open &&
+                  (d && d.id === r.id ? (
+                    <RequestDetail d={d} onDelete={() => (setDeleteError(""), setConfirmOpen(true))} onGo={(t) => pick(r.id, t)} />
+                  ) : (
+                    <div className="my-skeleton" aria-busy="true">
+                      <span />
+                      <span />
+                    </div>
+                  ))}
                 </li>
-              ))}
+                );
+              })}
             </ul>
-
-            {d && <RequestDetail d={d} onDelete={() => (setDeleteError(""), setConfirmOpen(true))} />}
           </>
         )}
 
         {/* ---------- 방문 일정 ---------- */}
         {d && tab === "visit" && (
           <>
-            <TabHead title="방문 일정" rows={rows} selId={selId} onPick={(id) => pick(id, "visit")} />
+            <TabHead title={d.status === "done" ? "시공·방문 일정" : "방문 일정"} rows={rows} selId={selId} onPick={(id) => pick(id, "visit")} />
+            {d.status === "done" && <VisitCard kind="build" at={d.build_at} note={d.build_note} />}
             {canAddress && (
               <AddressCard
                 id={d.id}
@@ -460,7 +494,10 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
           <>
             <TabHead title="견적서" rows={rows} selId={selId} onPick={(id) => pick(id, "estimate")} />
             {d.estimate ? (
-              <EstimateCard estimate={d.estimate} receiptNo={d.receipt_no} customer={d.name} />
+              <>
+                <EstimateCard estimate={d.estimate} receiptNo={d.receipt_no} customer={d.name} />
+                <RespondPanel id={d.id} status={d.status} response={d.customer_response} onDone={() => (void load(), void onListChange(), void loadHome())} />
+              </>
             ) : (
               <EmptyState icon="info" title="견적서는 실측 후에 도착해요." desc="현장을 확인한 뒤 자재비·배송비·시공비를 나눈 견적서를 보내드려요. 도착하면 메일로 알려드려요." />
             )}
@@ -522,7 +559,7 @@ function TabHead({ title, rows, selId, onPick }: { title: string; rows: ListRow[
 }
 
 /** 신청 내역에서 고른 신청의 자세한 내용 */
-function RequestDetail({ d, onDelete }: { d: QuoteDetailData; onDelete: () => void }) {
+function RequestDetail({ d, onDelete, onGo }: { d: QuoteDetailData; onDelete: () => void; onGo: (t: Tab) => void }) {
   const { visit, wish } = splitWish(d.wish);
   const rows: [string, string][] = [
     ["지역", `${d.region} ${d.district}`],
@@ -549,6 +586,27 @@ function RequestDetail({ d, onDelete }: { d: QuoteDetailData; onDelete: () => vo
         </div>
         <StatusBadge status={d.status} />
       </div>
+
+      {d.status === "visit" && (
+        <button type="button" className="dash-go dash-go--visit" onClick={() => onGo("visit")}>
+          <Icon k="visit" />
+          <span>
+            <strong>실측 방문 {d.visit_at ? formatVisit(d.visit_at) : "일정 조율 중"}</strong>
+            <small>방문 일정 바로가기</small>
+          </span>
+          <b aria-hidden="true">→</b>
+        </button>
+      )}
+      {d.status === "quoted" && d.estimate && (
+        <button type="button" className="dash-go dash-go--estimate" onClick={() => onGo("estimate")}>
+          <Icon k="estimate" />
+          <span>
+            <strong>견적서가 도착했어요 · {estimateGrand(d.estimate).toLocaleString("ko-KR")}원</strong>
+            <small>견적서 바로가기</small>
+          </span>
+          <b aria-hidden="true">→</b>
+        </button>
+      )}
 
       <dl className="my-dl">
         {rows.map(([k, v]) => (

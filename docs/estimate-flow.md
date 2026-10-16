@@ -31,3 +31,9 @@
 - 상태가 `checking`·`visit`·`needs` 일 때 '내 신청'에 "방문 주소를 알려주세요" 카드
 - 주소 검색(다음 우편번호) + 상세 주소 + 방문 메모 → `visit_address` / `visit_address_detail` / `visit_memo`
 - 저장하면 운영자에게 메일. 주소 확인 후 `visit` 으로 바꾸면 실측 안내 메일
+
+## 3. 고객 응답 · 시공 일정 (추가)
+- 견적서 아래 [진행할게요 / 조정 상담 / 이번엔 보류] → DB 함수 `respond_estimate` (본인·quoted 일 때만)
+  - go → `done`, hold → `hold`, adjust → 상태 유지 + 운영자 메일
+- 운영자가 `build_at`·`build_note` 입력 → 방문 일정 탭 맨 위에 '시공 일정' 카드
+- SQL: supabase/estimate-5.sql (주소 동의 시각), estimate-6.sql (응답·시공 일정)

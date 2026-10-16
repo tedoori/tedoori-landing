@@ -245,7 +245,7 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
         </footer>
       </div>
 
-      <p className="est-next">견적을 보고 진행 여부를 문의하기나 카카오톡 채널 @테두리로 알려주세요.</p>
+      <p className="est-next">궁금한 점은 카카오톡 채널 @테두리나 문의하기로 물어보세요.</p>
     </section>
   );
 }

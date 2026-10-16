@@ -3,7 +3,7 @@
 .my-auth-links { margin-top: 18px; }
 .my-applications.is-dash { margin-inline: auto; max-width: 1120px; }
 
-.dash { display: grid; grid-template-columns: 248px minmax(0, 1fr); gap: clamp(20px, 3vw, 40px); align-items: start; }
+.dash { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(20px, 3vw, 40px); align-items: start; }
 
 /* 왼쪽 */
 .dash-side { position: sticky; top: 96px; display: grid; gap: 14px; padding: 16px; border-radius: 22px; background: #fff; border: 1px solid #e8ebe8; box-shadow: 0 1px 2px rgba(20, 30, 24, 0.04); }
@@ -107,7 +107,7 @@
 .addr-edit svg { width: 14px; height: 14px; }
 .addr-edit:hover { border-color: #1da049; color: #137a37; }
 
-@media (max-width: 899px) {
+@media (max-width: 1023px) {
   .dash { grid-template-columns: minmax(0, 1fr); }
   .dash-side { position: static; padding: 12px; gap: 10px; }
   .dash-nav { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
@@ -130,7 +130,7 @@
 .dash-row.is-on { padding: 0 13px 0 0; }
 .dash-row__pick { display: flex; flex: 1; min-width: 0; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 0 16px 18px; border: 0; background: transparent; font: inherit; text-align: left; cursor: pointer; }
 .dash-row__edit { flex: none; text-decoration: none; }
-@media (max-width: 899px) {
+@media (max-width: 1023px) {
   .dash-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; overflow: visible; }
   .dash-nav button { position: relative; flex-direction: column; justify-content: center; gap: 4px; width: 100%; padding: 10px 4px; border-radius: 14px; font-size: 13px; }
   .dash-nav button span { flex: none; }
@@ -198,7 +198,7 @@
 /* 4단계: PC 폭 넓히기 · 전체 신청 현황 · 움직임 */
 .my-page:has(.is-dash) { max-width: calc(1240px + var(--gutter) * 2); }
 .my-applications.is-dash { max-width: none; }
-.dash { grid-template-columns: 260px minmax(0, 1fr); }
+@media (min-width: 1024px) { .dash { grid-template-columns: 260px minmax(0, 1fr); } }
 @media (min-width: 1200px) {
   .dash-widgets { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
@@ -251,4 +251,101 @@
   .ui-status--checking::before,
   .dash-nav__dot,
   .dash-focus__next .btn::after { animation: none; }
+}
+
+/* 5단계: 현황 줄 · 태블릿 메뉴 · 주소 강조 · 동의 */
+.dash-all__txt { display: grid; min-width: 0; }
+@media (max-width: 1023px) {
+  .dash-side { grid-template-columns: minmax(0, 1fr); }
+  .dash-me { border-bottom: 0; padding-bottom: 4px; }
+  .dash-nav button { flex-direction: row; gap: 6px; padding: 12px 6px; font-size: 14px; }
+  .dash-nav button span { white-space: nowrap; }
+}
+@media (max-width: 599px) {
+  .dash-nav button { flex-direction: column; gap: 4px; padding: 10px 2px; font-size: 12px; }
+  .dash-me__text small { max-width: 60vw; }
+  .dash-stats span { font-size: 12px; white-space: nowrap; }
+  .dash-focus__no { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+}
+.addr-search.is-empty { border: 2px solid #1da049; animation: addr-glow 1.6s ease-in-out infinite; }
+@keyframes addr-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(29, 160, 73, 0.45); border-color: #1da049; }
+  50% { box-shadow: 0 0 0 6px rgba(29, 160, 73, 0); border-color: #7fd39b; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .addr-search.is-empty { animation: none; }
+}
+.addr-agree { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; background: #f6f8f6; cursor: pointer; }
+.addr-agree input { flex: none; width: 18px; height: 18px; margin-top: 2px; accent-color: #1da049; }
+.addr-agree span { display: grid; gap: 4px; }
+.addr-agree strong { font-size: 14px; }
+.addr-agree small { color: var(--muted); font-size: 12px; line-height: 1.6; }
+
+/* 6단계: 필수 표시 · 주소 보기 · 최근 신청 머리 정렬 */
+.q-req { margin-left: 4px; font-style: normal; font-size: 0.85em; font-weight: 700; color: #d93a2b; }
+.addr--done { gap: 14px; padding: 20px 22px; }
+.addr-head { gap: 12px; }
+.addr-show { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: start; }
+.addr-pin { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; background: #eaf6ee; color: #137a37; }
+.addr-pin svg { width: 18px; height: 18px; }
+.addr-value { font-size: 17px; font-weight: 800; line-height: 1.45; word-break: keep-all; }
+.addr-detail { margin-top: 2px; font-size: 15px; font-weight: 600; color: #3d4741; }
+.addr-memo { margin-top: 8px; font-size: 13px; color: var(--muted); }
+.addr-memo span { margin-right: 4px; padding: 2px 6px; border-radius: 6px; background: #f1f3f1; font-weight: 700; font-size: 11px; }
+.dash-focus__no { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; line-height: 1; }
+.dash-focus__tag { margin: 0; padding: 5px 8px; line-height: 1; vertical-align: middle; }
+.dash-focus__top .ui-status { margin-top: -2px; }
+
+/* 7단계: 신청 내역 아코디언 · 머리말 · 바로가기 */
+.dash-tabhead--row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.dash-tabhead__count { color: var(--muted); font-size: 15px; font-weight: 600; }
+.dash-tabhead__count strong { color: #1da049; font-size: 20px; font-weight: 800; }
+.dash-acc { display: grid; gap: 10px; }
+.dash-acc.is-open { padding-bottom: 8px; }
+.dash-acc .dash-detail { margin-left: 14px; border-left: 3px solid #1da049; border-radius: 0 22px 22px 0; animation: acc-in 0.25s ease-out; }
+@keyframes acc-in {
+  from { opacity: 0; transform: translateY(-6px); }
+}
+.dash-row__chev { flex: none; color: #9aa39d; font-size: 18px; line-height: 1; transition: transform 0.2s; }
+.dash-row.is-on .dash-row__chev { transform: rotate(180deg); color: #1da049; }
+.dash-go { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border: 0; border-radius: 16px; font: inherit; text-align: left; cursor: pointer; transition: transform 0.15s; }
+.dash-go:hover { transform: translateY(-2px); }
+.dash-go svg { width: 22px; height: 22px; flex: none; }
+.dash-go span { display: grid; flex: 1; gap: 2px; }
+.dash-go strong { font-size: 15px; }
+.dash-go small { font-size: 13px; opacity: 0.75; }
+.dash-go b { font-size: 18px; }
+.dash-go--visit { background: #f3effd; color: #4a2f9e; }
+.dash-go--estimate { background: #eaf6ee; color: #137a37; }
+@media (max-width: 599px) {
+  .dash-acc .dash-detail { margin-left: 0; border-left-width: 3px; }
+}
+
+/* 8단계: 견적 응답 · 시공 일정 */
+.resp { display: grid; gap: 12px; padding: clamp(20px, 3vw, 28px); border-radius: 22px; background: #16231b; color: #fff; }
+.resp-kicker { color: #8fe0a8; font-size: 13px; font-weight: 800; }
+.resp-title { font-size: clamp(20px, 3vw, 24px); font-weight: 800; }
+.resp-note { color: #ffd38a; font-size: 14px; }
+.resp-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.resp-opt { display: grid; gap: 4px; padding: 16px; border: 2px solid rgba(255, 255, 255, 0.14); border-radius: 16px; background: rgba(255, 255, 255, 0.04); color: #fff; font: inherit; text-align: left; cursor: pointer; transition: border-color 0.15s, background 0.15s, transform 0.15s; }
+.resp-opt:hover { transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.4); }
+.resp-opt strong { font-size: 16px; }
+.resp-opt span { color: rgba(255, 255, 255, 0.65); font-size: 13px; }
+.resp-opt.is-on.is-go { border-color: #1da049; background: rgba(29, 160, 73, 0.22); }
+.resp-opt.is-on.is-adjust { border-color: #e0a100; background: rgba(224, 161, 0, 0.18); }
+.resp-opt.is-on.is-hold { border-color: #b8b2a6; background: rgba(184, 178, 166, 0.16); }
+.resp-msg { background: #fff; color: #1d2420; }
+.resp-actions { display: flex; justify-content: center; }
+.resp-actions .btn { min-width: 200px; }
+.resp--done { gap: 4px; background: #f5f7f5; color: #1d2420; border: 1px solid #e8ebe8; }
+.resp--done .resp-kicker { color: #137a37; }
+.resp-result { font-size: 16px; font-weight: 700; }
+.resp--done.is-hold .resp-kicker { color: #6b6355; }
+.visit.is-build .visit-cal__month,
+.visit.is-build .visit-dday { background: #1da049; }
+.visit.is-build .visit-cal__week,
+.visit.is-build .visit-kicker { color: #137a37; }
+.dash-main .visit.is-build { border: 2px solid #bfe3cb; }
+@media (max-width: 599px) {
+  .resp-options { grid-template-columns: minmax(0, 1fr); }
 }

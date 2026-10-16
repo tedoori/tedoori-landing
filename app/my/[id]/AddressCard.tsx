@@ -40,6 +40,7 @@ export function AddressCard({ id, address, detail, memo, onSaved, intro }: Props
   const [det, setDet] = useState(detail ?? "");
   const [note, setNote] = useState(memo ?? "");
   const [searching, setSearching] = useState(false);
+  const [agree, setAgree] = useState(Boolean(address));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const box = useRef<HTMLDivElement>(null);
@@ -74,10 +75,11 @@ export function AddressCard({ id, address, detail, memo, onSaved, intro }: Props
   const save = async () => {
     if (busy) return;
     if (!addr) return setError("주소 검색으로 주소를 골라주세요.");
+    if (!agree) return setError("방문 주소 수집·이용에 동의해주세요.");
     setBusy(true);
     setError("");
     try {
-      await quoteApi(`/${encodeURIComponent(id)}/address`, { method: "PUT", body: JSON.stringify({ address: addr, detail: det, memo: note }) });
+      await quoteApi(`/${encodeURIComponent(id)}/address`, { method: "PUT", body: JSON.stringify({ address: addr, detail: det, memo: note, agree }) });
       setEditing(false);
       onSaved();
     } catch (e) {
@@ -99,10 +101,25 @@ export function AddressCard({ id, address, detail, memo, onSaved, intro }: Props
             주소 변경
           </button>
         </div>
-        <h2 id="addr-title" className="addr-value">
-          {address} {detail}
-        </h2>
-        {memo && <p className="addr-memo">{memo}</p>}
+        <div className="addr-show">
+          <span className="addr-pin" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" />
+              <circle cx="12" cy="9.5" r="2.5" />
+            </svg>
+          </span>
+          <div>
+            <h2 id="addr-title" className="addr-value">
+              {address}
+            </h2>
+            {detail && <p className="addr-detail">{detail}</p>}
+            {memo && (
+              <p className="addr-memo">
+                <span>메모</span> {memo}
+              </p>
+            )}
+          </div>
+        </div>
       </section>
     );
   }
@@ -113,13 +130,13 @@ export function AddressCard({ id, address, detail, memo, onSaved, intro }: Props
       <h2 id="addr-title" className="addr-title">
         방문 주소를 알려주세요
       </h2>
-      <p className="addr-desc">{intro ?? "담당자가 실측하러 갈 주소예요."} 실측과 견적 안내에만 쓰고, 업체에는 동의를 받은 뒤에만 전달해요.</p>
+      <p className="addr-desc">{intro ?? "담당자가 실측하러 갈 주소예요."}</p>
 
       <div className="addr-field">
         <span className="addr-label">
           주소 <em className="q-req">*필수</em>
         </span>
-        <button type="button" className={`addr-search${addr ? " has-value" : ""}`} onClick={() => setSearching(true)}>
+        <button type="button" className={`addr-search${addr ? " has-value" : " is-empty"}`} onClick={() => setSearching(true)}>
           {addr || "도로명·건물명·지번으로 주소 검색"}
           <span aria-hidden="true">{addr ? "다시 검색" : "검색"}</span>
         </button>
@@ -150,6 +167,16 @@ export function AddressCard({ id, address, detail, memo, onSaved, intro }: Props
           placeholder="예: 대문 비밀번호, 주차 가능 위치, 반려견 있음"
           onChange={(e) => setNote(e.target.value)}
         />
+      </label>
+
+      <label className="addr-agree">
+        <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
+        <span>
+          <strong>
+            방문 주소 수집·이용 동의 <em className="q-req">*필수</em>
+          </strong>
+          <small>테두리 담당자가 실측 방문과 견적 안내에만 쓰고, 신청 처리가 끝나고 1년 뒤 지워요.</small>
+        </span>
       </label>
 
       {error && (

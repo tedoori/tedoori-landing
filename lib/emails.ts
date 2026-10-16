@@ -324,3 +324,24 @@ export function operatorAddressEmail(q: QuoteRow, a: { address: string; detail: 
     html: shell({ preheader: `${a.address} ${a.detail}`, body, footer: "테두리 운영 알림" }),
   };
 }
+
+const RESPONSE_LABEL = { go: "진행할게요", adjust: "조정 상담을 원해요", hold: "이번엔 보류할게요" } as const;
+
+/** 고객이 견적서에 응답했을 때 운영자에게 */
+export function operatorResponseEmail(q: QuoteRow, choice: keyof typeof RESPONSE_LABEL, message: string) {
+  const label = RESPONSE_LABEL[choice];
+  const color = choice === "go" ? "#1DA049" : choice === "adjust" ? "#E08A00" : "#6B6355";
+  const body = `
+    ${section(`
+      <h1 style="margin:0;font-family:${FONT};font-size:20px;line-height:1.4;font-weight:800;color:#16231B;">견적 응답 · ${esc(q.receipt_no)}</h1>
+      <p style="margin:12px 0 0 0;display:inline-block;padding:8px 14px;border-radius:999px;background-color:${color};font-family:${FONT};font-size:15px;font-weight:800;color:#ffffff;">${esc(label)}</p>
+      ${message ? `<p style="margin:14px 0 0 0;font-family:${FONT};font-size:14px;line-height:1.7;color:#16231B;">고객 메모 · ${esc(message)}</p>` : ""}
+    `, "28px 32px 0 32px")}
+    ${section(`${heading("연락처")}${rowsTable([["이름", q.name ?? "-"], ["휴대전화", q.phone ?? "-"], ["이메일", q.email]])}`)}
+    ${section(`${heading("신청 내용")}${rowsTable(summaryRows(q))}`, "24px 32px 28px 32px")}
+  `;
+  return {
+    subject: `[테두리 운영] 견적 응답 ${q.receipt_no} · ${label}`,
+    html: shell({ preheader: `${q.name ?? ""} · ${label}`, body, footer: "테두리 운영 알림" }),
+  };
+}
