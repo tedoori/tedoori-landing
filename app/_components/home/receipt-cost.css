@@ -197,3 +197,63 @@
     display: none;
   }
 }
+
+/* ---------- 범위 바꾸기 · 금액 · 짚어주는 말 ---------- */
+.rc-right { display: grid; justify-items: center; gap: 16px; }
+.rc-scope { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: min(100%, 360px); padding: 4px; border-radius: 14px; background: rgba(22, 35, 27, 0.08); }
+.rc-scope button { position: relative; z-index: 1; height: 40px; border: 0; background: none; color: #4e5a53; font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; transition: color 200ms ease; }
+.rc-scope button[aria-pressed="true"] { color: #fff; }
+.rc-scope button:active { transform: scale(0.97); }
+.rc-scope__thumb { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 8px) / 3); border-radius: 10px; background: var(--forest-900, #16231b); box-shadow: 0 6px 14px -8px rgba(22, 35, 27, 0.6); transform: translateX(calc(var(--s) * 100%)); transition: transform 360ms cubic-bezier(0.23, 1, 0.32, 1); }
+
+.rc-paper__head small { color: #8a857b; font-size: 12px; font-weight: 600; letter-spacing: 0; }
+.rc-row { position: relative; grid-template-columns: 56px minmax(0, 1fr); }
+.rc-row dd { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.rc-row__desc { font-size: 13px; color: #6b675e; }
+.rc-row__won { display: inline-flex; align-items: baseline; gap: 6px; flex: none; }
+.rc-row__won b { font-size: 16px; font-weight: 800; color: #2a2a28; transition: color 240ms ease; }
+.rc-row__won em { padding: 1px 7px; border-radius: 999px; background: #efe9de; color: #8a6d3b; font-size: 11px; font-style: normal; font-weight: 800; animation: rc-pop 260ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+.rc-row dt, .rc-row__desc { transition: opacity 240ms ease; }
+.rc-row.is-out dt, .rc-row.is-out .rc-row__desc { opacity: 0.4; }
+.rc-row.is-out .rc-row__won b { color: #b3ada2; text-decoration: line-through; text-decoration-thickness: 2px; }
+@keyframes rc-pop { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: none; } }
+
+.rc-total { position: relative; display: flex; justify-content: space-between; align-items: baseline; margin-top: 14px; padding: 14px 12px; border-radius: 12px; background: #f1f6ef; }
+.rc-total span { font-size: 15px; font-weight: 800; }
+.rc-total small { margin-left: 4px; color: #6b675e; font-size: 12px; font-weight: 600; }
+.rc-total strong { color: #0e7a33; font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+.rc-paper__foot { position: relative; }
+.rc-valid { color: #8a857b; font-size: 12px; }
+
+/* 번호 표시: 견적서 위 ● 와 말풍선이 짝 */
+.rc-pin { display: inline-grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 50%; background: #c9d1cb; color: #fff; font-size: 12px; font-weight: 800; font-style: normal; transition: background-color 240ms ease, transform 240ms ease; }
+.rc-pin--on { position: absolute; background: var(--primary); box-shadow: 0 0 0 4px rgba(29, 160, 73, 0.18); }
+/* 견적서 안 번호: 줄 안쪽에 작게 (찍히는 효과에 잘리지 않게) */
+.rc-pin--on { position: static; width: 18px; height: 18px; margin-inline: 2px; font-size: 10.5px; letter-spacing: 0; vertical-align: 2px; box-shadow: 0 0 0 3px rgba(29, 160, 73, 0.16); }
+
+
+.rc-notes { display: grid; gap: 8px; }
+.rc-notes li { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 14px; background: #fffefb; color: #3d4842; font-size: 14.5px; line-height: 1.55; box-shadow: 0 10px 22px -18px rgba(60, 45, 30, 0.5); opacity: 0; transform: translateY(8px); transition: opacity 360ms ease, transform 420ms cubic-bezier(0.23, 1, 0.32, 1); }
+.rc-notes li.is-on { opacity: 1; transform: none; }
+.rc-notes li.is-on .rc-pin { background: var(--primary); }
+.rc-notes--side { margin-top: 12px; max-width: 420px; }
+.rc-notes--below { display: none; width: min(100%, 440px); }
+.rc-sample { color: #8a857b; font-size: 12px; text-align: center; }
+@media (max-width: 899px) {
+  .rc-notes--side { display: none; }
+  .rc-notes--below { display: grid; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rc-notes li { opacity: 1; transform: none; transition: none; }
+  .rc-scope__thumb { transition: none; }
+}
+.rc-stamp { top: auto; bottom: 30px; right: 10px; }
+@media (max-width: 599px) {
+  .rc-row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name won" "desc desc"; row-gap: 2px; padding: 12px 0; }
+  .rc-row dt { grid-area: name; }
+  .rc-row dd { display: contents; }
+  .rc-row__won { grid-area: won; }
+  .rc-row__desc { grid-area: desc; font-size: 12.5px; }
+  .rc-total { flex-wrap: wrap; gap: 4px; }
+  .rc-total strong { font-size: 20px; }
+}
