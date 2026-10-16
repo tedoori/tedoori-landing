@@ -496,3 +496,15 @@
 .rv--done .rv-kicker { color: #9a6b00; }
 .rv-body { font-size: 16px; font-weight: 600; line-height: 1.6; white-space: pre-line; }
 .rv-meta { color: var(--muted); font-size: 12px; }
+
+/* 후기 요청 강조: 초록 테두리가 은은하게 빛남 */
+.rv-spot { position: relative; border-radius: 24px; padding: 2px; background: linear-gradient(135deg, #1da049, #8fe0a8 50%, #1da049); }
+.rv-spot .rv { border: 0; box-shadow: none; border-radius: 22px; }
+.rv-spot::after { content: ""; position: absolute; inset: 0; border-radius: 24px; box-shadow: 0 0 0 0 rgba(29, 160, 73, 0.45); animation: rv-glow 2.4s ease-out infinite; pointer-events: none; }
+.rv-spot .rv-kicker::before { content: "NEW"; margin-right: 6px; padding: 2px 6px; border-radius: 6px; background: #e5484d; color: #fff; font-size: 10px; letter-spacing: 0.04em; }
+@keyframes rv-glow {
+  70%, 100% { box-shadow: 0 0 0 10px rgba(29, 160, 73, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rv-spot::after { animation: none; }
+}

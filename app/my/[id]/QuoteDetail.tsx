@@ -325,6 +325,13 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
               </button>
             </div>
 
+            {/* 시공이 끝났으면 후기 요청을 맨 위에 */}
+            {canReview(h) && (
+              <div className={h.review ? "" : "rv-spot"}>
+                <ReviewCard id={h.id} review={h.review ?? null} onDone={() => (void loadHome(), void load())} />
+              </div>
+            )}
+
             {rows.length > 1 && (
               <section className="dash-all" aria-label="전체 신청 현황">
                 <p className="dash-all__head">
@@ -386,8 +393,6 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
                 );
               })()}
             </section>
-
-            {canReview(h) && <ReviewCard id={h.id} review={h.review ?? null} onDone={() => (void loadHome(), void load())} />}
 
             {ADDRESS_OPEN.includes(h.status) && !h.visit_address && (
               <AddressCard
