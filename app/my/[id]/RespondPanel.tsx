@@ -19,12 +19,12 @@ const FOLLOW: Record<Choice, { q: string; chips: string[]; placeholder: string }
   },
   adjust: {
     q: "어떤 부분을 다시 보고 싶으세요?",
-    chips: ["금액", "작업 범위", "자재", "일정"],
+    chips: ["금액", "작업 범위", "자재", "일정", "기타"],
     placeholder: "고민되는 부분을 편하게 적어주세요 (선택)",
   },
   hold: {
     q: "보류하시는 이유를 알려주시면 다음에 더 잘 도와드릴게요",
-    chips: ["예산", "시기", "다른 곳과 비교 중", "가족과 상의 중"],
+    chips: ["예산", "시기", "다른 곳과 비교 중", "가족과 상의 중", "기타"],
     placeholder: "남기고 싶은 말이 있으면 적어주세요 (선택)",
   },
 };
@@ -87,6 +87,7 @@ export function RespondPanel({ id, status, response, onDone }: { id: string; sta
   const send = async () => {
     if (!pick || busy) return;
     if (wantsDate && !date) return setError("희망 날짜를 골라주세요.");
+    if (chips.includes("기타") && !message.trim()) return setError("기타 내용을 메모에 적어주세요.");
     setBusy(true);
     setError("");
     const lines = [
@@ -139,7 +140,19 @@ export function RespondPanel({ id, status, response, onDone }: { id: string; sta
               <input type="date" className="ui-input" min={today} value={date} onChange={(e) => setDate(e.target.value)} />
             </label>
           )}
-          <textarea className="ui-input resp-msg" rows={2} maxLength={400} placeholder={f.placeholder} value={message} onChange={(e) => setMessage(e.target.value)} />
+          <label className="resp-memo">
+            <span>
+              전달하고 싶은 메모 {chips.includes("기타") ? <em className="q-req">*기타 내용을 적어주세요</em> : <small>선택</small>}
+            </span>
+            <textarea
+              className="ui-input resp-msg"
+              rows={3}
+              maxLength={400}
+              placeholder={chips.includes("기타") ? "기타로 고른 내용을 자세히 적어주세요" : f.placeholder.replace(" (선택)", "")}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+          </label>
         </div>
       )}
 

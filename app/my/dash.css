@@ -370,3 +370,7 @@
 .resp-date input { background: #fff; color: #1d2420; max-width: 240px; }
 .resp--done .resp-title { font-size: 18px; color: #1d2420; }
 .resp--done .resp-result { font-size: 15px; font-weight: 500; color: #3d4741; line-height: 1.7; }
+.resp-memo { display: grid; gap: 6px; }
+.resp-memo > span { font-size: 13px; font-weight: 700; color: rgba(255, 255, 255, 0.85); }
+.resp-memo small { margin-left: 4px; color: rgba(255, 255, 255, 0.5); font-weight: 600; }
+.resp-memo .q-req { color: #ff8a7a; }
