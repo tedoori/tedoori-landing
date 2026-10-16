@@ -410,3 +410,24 @@
 }
 .dash-all__more { display: flex; justify-content: center; align-items: center; gap: 6px; width: 100%; margin-top: 2px; padding: 12px; border: 0; border-top: 1px solid #eef0ee; border-radius: 0 0 14px 14px; background: transparent; color: #137a37; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
 .dash-all__more:hover { background: #f5f7f5; }
+
+/* 13단계: 문의 바로가기 · 인증 화면 폭 통일 */
+.est-next { display: grid; justify-items: center; gap: 10px; }
+.est-next__links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.est-next__links a { display: inline-flex; align-items: center; justify-content: center; min-width: 168px; min-height: 44px; padding: 10px 18px; border-radius: 12px; font-size: 14px; font-weight: 800; text-decoration: none; }
+.est-next__kakao { background: #fee500; color: #191600; }
+.est-next__contact { background: #fff; border: 1px solid #d5dbd7; color: #1d2420; }
+
+/* 인증 화면: 제목·입력·버튼·링크 모두 같은 폭, 가운데 정렬 */
+.my-applications:not(.is-dash) { --auth-w: 440px; justify-items: center; }
+.my-applications:not(.is-dash) > * { width: 100%; }
+.my-intro { justify-items: center; text-align: center; }
+.my-panel .my-form { width: 100%; max-width: var(--auth-w); margin-inline: auto; }
+.my-panel .my-form .btn,
+.my-panel .my-form input { width: 100%; max-width: none; }
+.my-auth-links { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; width: 100%; max-width: var(--auth-w); margin-inline: auto; }
+.my-auth-links .btn { width: 100%; max-width: none; }
+@media (max-width: 599px) {
+  .my-auth-links { display: flex; justify-content: center; gap: 16px; }
+  .my-auth-links .btn { width: auto; }
+}
