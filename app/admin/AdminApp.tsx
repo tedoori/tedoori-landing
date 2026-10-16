@@ -196,7 +196,55 @@ export function AdminApp() {
   );
 }
 
-function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> }) {
+// 관리자가 할 일을 단계별로 묶음 (상태 → 단계)
+type Stage = "intake" | "visit" | "quote" | "build" | "complete";
+const STAGES: [Stage, string, string][] = [
+  ["intake", "접수·확인", "연락해서 신청 내용과 방문 주소를 확인해요"],
+  ["visit", "실측", "실측 날짜를 정해 고객에게 알려요"],
+  ["quote", "견적", "견적서를 작성해 고객에게 보내요"],
+  ["build", "진행", "작업 종류·날짜를 정해 고객에게 알려요"],
+  ["complete", "완료", "완료 사진과 남길 말을 올려 거래를 마무리해요"],
+];
+const STAGE_OF: Record<string, Stage> = { received: "intake", checking: "intake", needs: "intake", hold: "quote", canceled: "intake", visit: "visit", quoted: "quote", done: "build", completed: "complete" };
+// 각 단계에서 고르는 상태
+const STAGE_STATUS: Record<Stage, string[]> = {
+  intake: ["received", "checking", "needs", "canceled"],
+  visit: ["visit"],
+  quote: ["quoted", "hold"],
+  build: ["done"],
+  complete: ["completed"],
+};
+
+// 짧은 날짜 (예: 11월 3일 (월) 오전 9:00)
+const fmtShort = (local: string) =>
+  new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "long", day: "numeric", weekday: "short", hour: "numeric", minute: "2-digit" }).format(new Date(`${local}:00+09:00`));
+
+/** 고객에게 보이는 문구 칸: 직접 입력 + 자주 쓰는 문구 고르기 + 어디에 보이는지 */
+function CopyField({ label, path, value, onChange, presets, fallback }: { label: string; path?: string; value: string; onChange: (v: string) => void; presets: string[]; fallback?: string }) {
+  return (
+    <div className="adm-copy">
+      <label>
+        <span>{label}</span>
+        <input className="ui-input" value={value} onChange={(e) => onChange(e.target.value)} placeholder={fallback ?? "직접 입력하거나 아래에서 골라주세요"} />
+      </label>
+      <div className="adm-copy__chips">
+        {presets.map((p) => (
+          <button key={p} type="button" className={value === p ? "is-on" : ""} onClick={() => onChange(value === p ? "" : p)}>
+            {p}
+          </button>
+        ))}
+        {value && (
+          <button type="button" className="adm-copy__clear" onClick={() => onChange("")}>
+            지우고 자동 문구 쓰기
+          </button>
+        )}
+      </div>
+      {path && <small className="adm-path">{path}</small>}
+    </div>
+  );
+}
+
+export function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> }) {
   const sb = getAdminSupabase();
   const [status, setStatus] = useState(r.status);
   const [visitAt, setVisitAt] = useState(toLocal(r.visit_at));
@@ -206,11 +254,13 @@ function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> }) {
   const [kind, setKind] = useState<string>(r.build_scope?.includes("labor") ? "labor" : r.build_scope?.includes("delivery") ? "delivery" : r.build_scope?.length ? "material" : "");
   const [nextTitle, setNextTitle] = useState(r.next_title ?? "");
   const [nextDesc, setNextDesc] = useState(r.next_desc ?? "");
+  const kindLabel = kind === "delivery" ? "배송" : kind === "material" ? "자재 준비" : "시공";
   const [doneNote, setDoneNote] = useState(r.completion_note ?? "");
   const [donePaths, setDonePaths] = useState<string[]>(r.completion_photos ?? []);
   const [doneUrls, setDoneUrls] = useState<Record<string, string>>({});
   const [uploading, setUploading] = useState(false);
   const [donePreview, setDonePreview] = useState(false);
+  const [stage, setStage] = useState<Stage>(STAGE_OF[r.status] ?? "intake");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
@@ -308,57 +358,137 @@ function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> }) {
       </header>
 
       <div className="adm-card">
-        <h3>진행 관리</h3>
+        <h3>
+          진행 관리 <small>지금 상태 · {LABEL[status]}</small>
+        </h3>
+        <ol className="adm-stages">
+          {STAGES.map(([k, l], i) => {
+            const cur = STAGE_OF[status] === k;
+            const passed = STAGES.findIndex(([x]) => x === STAGE_OF[status]) > i;
+            return (
+              <li key={k}>
+                <button className={`${stage === k ? "is-on" : ""}${cur ? " is-cur" : ""}${passed ? " is-done" : ""}`} onClick={() => setStage(k)}>
+                  <b>{passed ? "✓" : i + 1}</b>
+                  {l}
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+        <p className="adm-stage-desc">{STAGES.find(([k]) => k === stage)![2]}</p>
         <div className="adm-status">
-          {STATUS.map(([k, l]) => (
+          <span className="adm-status__k">이 단계 상태로 바꾸기</span>
+          {STATUS.filter(([k]) => STAGE_STATUS[stage].includes(k)).map(([k, l]) => (
             <button key={k} className={`adm-st adm-st--${k}${status === k ? " is-on" : ""}`} onClick={() => setStatus(k)}>
               {l}
             </button>
           ))}
         </div>
-        <div className="adm-grid">
-          <label>
-            <span>실측 방문 일시</span>
-            <input className="ui-input" type="datetime-local" value={visitAt} onChange={(e) => setVisitAt(e.target.value)} />
-          </label>
-          <label>
-            <span>실측 안내 메모 (고객에게 보임)</span>
-            <input className="ui-input" value={visitNote} onChange={(e) => setVisitNote(e.target.value)} placeholder="예: 담당 김OO, 30분 정도 걸려요" />
-          </label>
-          <label>
-            <span>작업 종류 (고객 화면의 '시공/배송/자재 준비' 문구)</span>
-            <select className="ui-input" value={kind} onChange={(e) => setKind(e.target.value)}>
-              <option value="">자동 (고객이 고른 범위·신청 범위)</option>
-              <option value="labor">시공</option>
-              <option value="delivery">배송</option>
-              <option value="material">자재 준비</option>
-            </select>
-          </label>
-          <label>
-            <span>{kind === "delivery" ? "배송" : kind === "material" ? "자재 준비" : "시공"} 일시</span>
-            <input className="ui-input" type="datetime-local" value={buildAt} onChange={(e) => setBuildAt(e.target.value)} />
-          </label>
-          <label>
-            <span>작업 안내 메모 (일정 카드 설명을 이 문구로 바꿔요)</span>
-            <input className="ui-input" value={buildNote} onChange={(e) => setBuildNote(e.target.value)} placeholder="예: 오전 9시 도착, 하루 작업" />
-          </label>
-        </div>
+        {stage === "intake" && (
+          <dl className="adm-dl adm-check">
+            <div>
+              <dt>연락처</dt>
+              <dd>
+                {r.name} {r.phone}
+              </dd>
+            </div>
+            <div>
+              <dt>방문 주소</dt>
+              <dd>{r.visit_address ? `✓ ${r.visit_address} ${r.visit_address_detail ?? ""}` : "아직 없음 · 고객이 내 신청에서 입력하거나 통화로 받아주세요"}</dd>
+            </div>
+            <div>
+              <dt>다음 할 일</dt>
+              <dd>내용 확인이 끝나면 &lsquo;실측&rsquo; 단계에서 날짜를 정해요.</dd>
+            </div>
+          </dl>
+        )}
+
+        {stage === "visit" && (
+          <>
+            <label className="adm-one">
+              <span>실측 방문 일시</span>
+              <input className="ui-input" type="datetime-local" value={visitAt} onChange={(e) => setVisitAt(e.target.value)} />
+            </label>
+            <CopyField
+              label="실측 안내 메모"
+              path="고객 화면 › 방문 일정 › 실측 방문 카드 설명 · 실측 안내 메일"
+              value={visitNote}
+              onChange={setVisitNote}
+              presets={["담당자가 방문해 30분 정도 크기와 바닥 상태를 확인해요.", "도착 10분 전에 전화드려요.", "주차할 곳이 있으면 미리 알려주세요."]}
+              fallback="담당자가 방문해 작업할 곳의 크기와 바닥 상태를 확인해요."
+            />
+          </>
+        )}
+
+        {stage === "quote" && <p className="adm-note">아래 &lsquo;견적서&rsquo;에서 작성하고 [고객에게 보내기]를 누르면 상태가 견적 도착으로 바뀌어요. 고객이 보류를 고르면 보류가 돼요.</p>}
+
+        {stage === "build" && (
+          <>
+            <div className="adm-grid">
+              <label>
+                <span>작업 종류</span>
+                <select className="ui-input" value={kind} onChange={(e) => setKind(e.target.value)}>
+                  <option value="">자동 (고객이 고른 범위·신청 범위)</option>
+                  <option value="labor">시공</option>
+                  <option value="delivery">배송</option>
+                  <option value="material">자재 준비</option>
+                </select>
+                <small className="adm-path">고객 화면 › 방문 일정 › &lsquo;{kindLabel} 일정&rsquo; 카드 제목 · 홈 &lsquo;○월 ○일 {kindLabel} 예정&rsquo;</small>
+              </label>
+              <label>
+                <span>{kindLabel} 일시</span>
+                <input className="ui-input" type="datetime-local" value={buildAt} onChange={(e) => setBuildAt(e.target.value)} />
+              </label>
+            </div>
+            <CopyField
+              label={`${kindLabel} 안내 메모`}
+              path={`고객 화면 › 방문 일정 › ${kindLabel} 일정 카드 설명 · 홈 '지금 할 일' 설명 · 일정 안내 메일`}
+              value={buildNote}
+              onChange={setBuildNote}
+              presets={
+                kind === "delivery"
+                  ? ["도착 30분 전에 기사님이 전화드려요.", "대문 앞에 내려드려요. 받으실 분이 없으면 미리 알려주세요.", "오전 중 도착 예정이에요."]
+                  : kind === "material"
+                    ? ["자재가 준비되면 받으실 방법을 안내드려요.", "준비된 자재는 사진으로 먼저 보여드려요."]
+                    : ["오전 9시에 도착해 하루 동안 작업해요.", "작업 전날 시간을 다시 알려드려요.", "비가 오면 일정을 다시 맞춰 연락드려요."]
+              }
+              fallback="비우면 작업 종류에 맞는 기본 안내가 보여요."
+            />
+          </>
+        )}
+
         <div className="adm-custom">
           <h4>
-            고객 홈 '지금 할 일' 문구 <small>비우면 상태에 맞는 자동 문구가 보여요</small>
+            고객 홈 &lsquo;지금 할 일&rsquo; <small>비우면 상태에 맞는 자동 문구가 보여요</small>
           </h4>
-          <div className="adm-grid">
-            <label>
-              <span>제목</span>
-              <input className="ui-input" value={nextTitle} onChange={(e) => setNextTitle(e.target.value)} placeholder="예: 11월 3일 오전에 배송돼요" />
-            </label>
-            <label>
-              <span>설명</span>
-              <input className="ui-input" value={nextDesc} onChange={(e) => setNextDesc(e.target.value)} placeholder="예: 도착 30분 전에 기사님이 전화드려요" />
-            </label>
+          <p className="adm-path">고객 화면 › 홈 › 가장 최근 신청 카드 아래 검은 띠</p>
+          <CopyField
+            label="제목"
+            value={nextTitle}
+            onChange={setNextTitle}
+            presets={[
+              buildAt ? `${fmtShort(buildAt)} ${kindLabel} 예정이에요` : `${kindLabel} 날짜를 정하고 있어요`,
+              "담당자가 곧 연락드릴게요",
+              kind === "delivery" ? "자재를 준비해 배송을 기다리고 있어요" : "작업을 준비하고 있어요",
+            ]}
+          />
+          <CopyField
+            label="설명"
+            value={nextDesc}
+            onChange={setNextDesc}
+            presets={["궁금한 점은 카카오톡 채널 @테두리로 물어보세요.", "일정이 바뀌면 바로 알려드릴게요.", buildNote || "견적서 내용대로 준비해요."]}
+          />
+          <div className="adm-live">
+            <p className="adm-live__head">미리보기 · 고객 홈</p>
+            <div className="dash-focus__next">
+              <div>
+                <strong>{nextTitle || "(자동 문구)"}</strong>
+                <span>{nextTitle ? nextDesc : "상태에 맞는 안내가 보여요"}</span>
+              </div>
+            </div>
           </div>
         </div>
-        {(status === "done" || status === "completed") && (
+        {stage === "complete" && (
           <div className="adm-done">
             <h4>완료 보고 <small>고객의 내 신청에 보여요</small></h4>
             <label>
@@ -410,7 +540,7 @@ function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> }) {
         </div>
       </div>
 
-      <EstimateEditor quoteId={r.id} status={status} onSent={async () => (setStatus("quoted"), await onSaved())} />
+      {stage === "quote" && <EstimateEditor quoteId={r.id} status={status} onSent={async () => (setStatus("quoted"), await onSaved())} />}
 
       <div className="adm-card">
         <h3>신청 내용</h3>
