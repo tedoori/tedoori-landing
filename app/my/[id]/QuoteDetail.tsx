@@ -60,6 +60,8 @@ export type ListRow = {
   works_unknown: boolean;
   status: QuoteStatus;
   build_at?: string | null;
+  visit_at?: string | null;
+  reviews?: { rating: number }[];
   created_at: string;
 };
 
@@ -222,6 +224,17 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
   }, [load]);
 
   const goTab = (t: Tab) => {
+    const fit: Partial<Record<Tab, (r: ListRow) => boolean>> = {
+      estimate: (r) => HAS_ESTIMATE.includes(r.status),
+      complete: (r) => r.status === "completed",
+      review: (r) => r.status === "completed",
+    };
+    const want = fit[t];
+    const cur = rows.find((r) => r.id === selId);
+    if (want && cur && !want(cur)) {
+      const better = rows.find(want);
+      if (better) setSelId(better.id);
+    }
     setTab(t);
     const url = new URL(window.location.href);
     if (selId) url.searchParams.set("id", selId);
@@ -562,7 +575,8 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
         {/* ---------- 방문 일정 ---------- */}
         {d && tab === "visit" && (
           <>
-            <TabHead title={d.status === "done" || d.status === "completed" ? `${BUILD_COPY[buildKindOf(d)].label.replace(" 일정", "")}·방문 일정` : "방문 일정"} rows={rows} selId={selId} onPick={(id) => pick(id, "visit")} />
+            <TabHead badge={(r) => (r.build_at ? "작업일 확정" : r.visit_at ? "실측일 확정" : null)} title={d.status === "done" || d.status === "completed" ? `${BUILD_COPY[buildKindOf(d)].label.replace(" 일정", "")}·방문 일정` : "방문 일정"} rows={rows} selId={selId} onPick={(id) => pick(id, "visit")} />
+            <ScheduleLine d={d} kindLabel={BUILD_COPY[buildKindOf(d)].label.replace(" 일정", "")} />
             {(d.status === "done" || d.status === "completed") && <VisitCard kind="build" buildKind={buildKindOf(d)} at={d.build_at} note={d.build_note} />}
             {canAddress && (
               <AddressCard
@@ -581,11 +595,11 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
         {/* ---------- 완료 ---------- */}
         {d && tab === "complete" && (
           <>
-            <TabHead title="완료 보고" rows={rows} selId={selId} onPick={(id) => pick(id, "complete")} />
+            <TabHead title="완료 보고" badge={(r) => (r.status === "completed" ? "완료" : null)} rows={sortFirst(rows, (r) => r.status === "completed")} selId={selId} onPick={(id) => pick(id, "complete")} />
             {d.status === "completed" ? (
               <>
                 <CompletionCard note={d.completion_note ?? null} photos={d.completion_photos ?? []} at={d.completed_at ?? null} />
-                <button type="button" className="dash-go dash-go--estimate" onClick={() => goTab("review")}>
+                <button type="button" className={`dash-go dash-go--estimate${d.review ? "" : " dash-go--shine"}`} onClick={() => goTab("review")}>
                   <Icon k="review" />
                   <span>
                     <strong>{d.review ? "남겨주신 후기 보기" : "후기 남기러 가기"}</strong>
@@ -603,7 +617,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
         {/* ---------- 후기 ---------- */}
         {d && tab === "review" && (
           <>
-            <TabHead title="후기" rows={rows} selId={selId} onPick={(id) => pick(id, "review")} />
+            <TabHead title="후기" badge={(r) => (r.reviews?.length ? "작성 완료" : "작성 전")} rows={rows.filter((r) => r.status === "completed")} selId={selId} onPick={(id) => pick(id, "review")} />
             {canReview(d) ? (
               <ReviewCard id={d.id} review={d.review ?? null} onDone={() => (void load(), void loadHome())} />
             ) : (
@@ -615,7 +629,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
         {/* ---------- 견적서 ---------- */}
         {d && tab === "estimate" && (
           <>
-            <TabHead title="견적서" rows={rows} selId={selId} onPick={(id) => pick(id, "estimate")} />
+            <TabHead title="견적서" badge={(r) => (r.status === "quoted" ? "응답 필요" : HAS_ESTIMATE.includes(r.status) ? "견적 있음" : null)} rows={sortFirst(rows, (r) => HAS_ESTIMATE.includes(r.status))} selId={selId} onPick={(id) => pick(id, "estimate")} />
             {d.estimate ? (
               <>
                 <EstimateCard estimate={d.estimate} receiptNo={d.receipt_no} customer={d.name} />
@@ -656,8 +670,42 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
   );
 }
 
+const HAS_ESTIMATE = ["quoted", "done", "completed", "hold"];
+/** 조건에 맞는 신청을 앞으로 (나머지는 최신순 그대로) */
+const sortFirst = (rows: ListRow[], first: (r: ListRow) => boolean) => [...rows.filter(first), ...rows.filter((r) => !first(r))];
+
+/** 방문 일정 맨 위: 실측 → 견적 → 작업 → 완료 를 날짜와 함께 한 줄로 */
+function ScheduleLine({ d, kindLabel }: { d: QuoteDetailData; kindLabel: string }) {
+  const dayOf = (v: string) => new Date(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" }).format(new Date(v))).getTime();
+  const today = dayOf(new Date().toISOString());
+  const items: { k: string; at: string | null; done: boolean }[] = [
+    { k: "실측 방문", at: d.visit_at, done: !!d.visit_at && dayOf(d.visit_at) < today },
+    { k: "견적서", at: d.estimate?.issued_at ?? null, done: !!d.estimate },
+    { k: kindLabel, at: d.build_at, done: d.status === "completed" || (!!d.build_at && dayOf(d.build_at) < today) },
+    { k: "완료", at: d.completed_at ?? null, done: d.status === "completed" },
+  ];
+  const next = items.findIndex((i) => !i.done);
+  return (
+    <ol className="sched" aria-label="일정 한눈에 보기">
+      {items.map((i, n) => {
+        const left = i.at ? Math.round((dayOf(i.at) - today) / 86400000) : null;
+        return (
+          <li key={i.k} className={i.done ? "is-done" : n === next ? "is-next" : ""}>
+            <span className="sched__dot" aria-hidden="true">{i.done ? "✓" : n + 1}</span>
+            <strong>{i.k}</strong>
+            <span className="sched__at">{i.at ? shortDay(i.at) : "정해지면 알려드려요"}</span>
+            {n === next && left !== null && left >= 0 && <em className="sched__dday">{left === 0 ? "오늘" : `D-${left}`}</em>}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
 /** 탭 머리말: 제목 + 어떤 신청을 보고 있는지 (여러 건이면 골라 바꾸기) */
-function TabHead({ title, rows, selId, onPick }: { title: string; rows: ListRow[]; selId: string | null; onPick: (id: string) => void }) {
+const shortDay = (v: string) => new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "long", day: "numeric" }).format(new Date(v));
+
+function TabHead({ title, rows, selId, onPick, badge }: { title: string; rows: ListRow[]; selId: string | null; onPick: (id: string) => void; badge?: (r: ListRow) => string | null }) {
   const cur = rows.find((r) => r.id === selId);
   return (
     <header className="dash-tabhead">
@@ -667,14 +715,17 @@ function TabHead({ title, rows, selId, onPick }: { title: string; rows: ListRow[
           {rows.map((r) => (
             <button key={r.id} type="button" className={r.id === selId ? "is-on" : ""} aria-pressed={r.id === selId} onClick={() => onPick(r.id)}>
               <strong>{worksText(r)}</strong>
-              <span>{r.receipt_no}</span>
+              <span>
+                {shortDay(r.created_at)} 신청
+                {badge?.(r) && <em className="dash-pick__badge">{badge(r)}</em>}
+              </span>
             </button>
           ))}
         </div>
       ) : (
         cur && (
           <p className="dash-tabhead__sub">
-            {cur.receipt_no} · {worksText(cur)}
+            {shortDay(cur.created_at)} 신청 · {worksText(cur)}
           </p>
         )
       )}

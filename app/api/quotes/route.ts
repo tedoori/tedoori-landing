@@ -3,7 +3,7 @@ import { authorize, fail, PAGE_SIZE, validateQuote } from "../../../lib/quote-se
 // 견적 신청 목록(GET) · 등록(POST)
 // 이메일 인증 토큰을 Authorization 헤더로 받아, 그 사용자 권한(RLS)으로만 처리
 
-const LIST_COLUMNS = "id, receipt_no, region, district, housing, works, works_unknown, status, build_at, created_at, updated_at";
+const LIST_COLUMNS = "id, receipt_no, region, district, housing, works, works_unknown, status, visit_at, build_at, created_at, updated_at, reviews:quote_reviews(rating)";
 
 export async function GET(req: Request) {
   const auth = await authorize(req);

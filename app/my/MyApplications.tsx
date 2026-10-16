@@ -18,6 +18,8 @@ type QuoteRow = {
   works_unknown: boolean;
   status: QuoteStatus;
   build_at?: string | null;
+  visit_at?: string | null;
+  reviews?: { rating: number }[];
   created_at: string;
 };
 
