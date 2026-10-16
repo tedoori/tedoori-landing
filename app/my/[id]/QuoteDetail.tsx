@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Callout, EmptyState, StatusBadge, type QuoteStatus } from "../../_components/ui";
 import { QuoteApiError, quoteApi } from "../../../lib/quote-api";
 import { EstimateCard, HelpStrip, estimateGrand, estimateParts, type Estimate } from "./EstimateCard";
-import { VisitCard } from "./VisitCard";
+import { BUILD_COPY, VisitCard, type BuildKind } from "./VisitCard";
 import { AddressCard } from "./AddressCard";
 import { RespondPanel } from "./RespondPanel";
 import { ReviewCard, type Review } from "./ReviewCard";
@@ -35,6 +35,7 @@ export type QuoteDetailData = {
   customer_response: string | null;
   build_at: string | null;
   build_note: string | null;
+  build_scope: string[] | null;
   estimate: Estimate | null;
   review?: Review | null;
   created_at: string;
@@ -111,6 +112,17 @@ function Steps({ status }: { status: QuoteStatus }) {
   );
 }
 
+/** 진행 범위 → 일정 종류. 고객이 고른 범위 > 신청 때 고른 '맡길 범위' > 견적서에 시공비가 있는지 */
+function buildKindOf(d: QuoteDetailData): BuildKind {
+  const s = d.build_scope;
+  if (s?.length) return s.includes("labor") ? "labor" : s.includes("delivery") ? "delivery" : "material";
+  if (d.scope === "자재만") return "material";
+  if (d.scope === "배송까지") return "delivery";
+  if (d.scope === "시공까지") return "labor";
+  const labor = d.estimate ? d.estimate.items.reduce((a, i) => a + i.labor_cost, 0) : 1;
+  return labor > 0 ? "labor" : "delivery";
+}
+
 /** 지금 할 일 한 줄 */
 function nextAction(d: QuoteDetailData): { title: string; desc: string; cta?: string; tab?: Tab } {
   if (d.status === "quoted" && d.estimate)
@@ -121,8 +133,8 @@ function nextAction(d: QuoteDetailData): { title: string; desc: string; cta?: st
   if (canReview(d) && !d.review) return { title: "테두리가 완료됐어요", desc: "새 정원은 마음에 드세요? 짧은 후기를 남겨주세요." };
   if (d.status === "done")
     return d.build_at
-      ? { title: `${formatVisit(d.build_at)} 시공 예정`, desc: "견적서 내용대로 시공해요.", cta: "일정 보기", tab: "visit" }
-      : { title: "진행이 확정됐어요", desc: "담당자가 시공 날짜를 정해 연락드려요.", cta: "일정 보기", tab: "visit" };
+      ? { title: `${formatVisit(d.build_at)} ${BUILD_COPY[buildKindOf(d)].label.replace(" 일정", "")} 예정`, desc: BUILD_COPY[buildKindOf(d)].ready, cta: "일정 보기", tab: "visit" }
+      : { title: "진행이 확정됐어요", desc: BUILD_COPY[buildKindOf(d)].waiting, cta: "일정 보기", tab: "visit" };
   if (d.status === "hold") return { title: "보류 중이에요", desc: "다시 진행하고 싶으면 카카오톡 채널 @테두리로 알려주세요." };
   if (d.status === "canceled") return { title: "취소된 신청이에요", desc: "새로 필요하면 새 견적을 신청해주세요." };
   return { title: "신청을 확인하고 있어요", desc: "24시간 안에 담당자가 전화나 문자로 연락드려요." };
@@ -507,8 +519,8 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
         {/* ---------- 방문 일정 ---------- */}
         {d && tab === "visit" && (
           <>
-            <TabHead title={d.status === "done" ? "시공·방문 일정" : "방문 일정"} rows={rows} selId={selId} onPick={(id) => pick(id, "visit")} />
-            {d.status === "done" && <VisitCard kind="build" at={d.build_at} note={d.build_note} />}
+            <TabHead title={d.status === "done" ? `${BUILD_COPY[buildKindOf(d)].label.replace(" 일정", "")}·방문 일정` : "방문 일정"} rows={rows} selId={selId} onPick={(id) => pick(id, "visit")} />
+            {d.status === "done" && <VisitCard kind="build" buildKind={buildKindOf(d)} at={d.build_at} note={d.build_note} />}
             {canReview(d) && <ReviewCard id={d.id} review={d.review ?? null} onDone={() => (void load(), void loadHome())} />}
             {canAddress && (
               <AddressCard

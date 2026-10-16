@@ -110,7 +110,7 @@ export function RespondPanel({ id, status, response, parts, onDone }: { id: stri
       message.trim(),
     ].filter(Boolean);
     try {
-      await quoteApi(`/${encodeURIComponent(id)}/respond`, { method: "POST", body: JSON.stringify({ choice: pick, message: lines.join("\n") }) });
+      await quoteApi(`/${encodeURIComponent(id)}/respond`, { method: "POST", body: JSON.stringify({ choice: pick, message: lines.join("\n"), scope: pick === "go" ? scope : undefined }) });
       setSent(pick);
       onDone();
     } catch (e) {

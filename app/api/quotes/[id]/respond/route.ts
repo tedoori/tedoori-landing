@@ -13,12 +13,14 @@ export async function POST(req: Request, { params }: Ctx) {
   const auth = await authorize(req);
   if (auth instanceof Response) return auth;
 
-  const body = (await req.json().catch(() => ({}))) as { choice?: string; message?: string };
+  const body = (await req.json().catch(() => ({}))) as { choice?: string; message?: string; scope?: unknown };
   const choice = CHOICES.find((c) => c === body.choice);
   if (!choice) return fail(400, "invalid", "응답을 골라주세요.");
   const message = typeof body.message === "string" ? body.message.trim().slice(0, 500) : "";
 
-  const { error } = await auth.supabase.rpc("respond_estimate", { qid: id, choice });
+  const PARTS = ["material", "delivery", "labor"];
+  const scope = choice === "go" && Array.isArray(body.scope) ? body.scope.filter((p): p is string => typeof p === "string" && PARTS.includes(p)) : null;
+  const { error } = await auth.supabase.rpc("respond_estimate", { qid: id, choice, scope: scope?.length ? scope : null });
   if (error) {
     if (/not quoted/.test(error.message)) return fail(409, "closed", "이미 응답했거나 견적 도착 상태가 아니에요.");
     if (/not found/.test(error.message)) return notFound();
