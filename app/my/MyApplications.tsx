@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Callout, StatusBadge, type QuoteStatus } from "../_components/ui";
+import { MyDashboard } from "./[id]/QuoteDetail";
+import { useCallback, useEffect, useState } from "react";
+import { Callout, type QuoteStatus } from "../_components/ui";
 import { isSupabaseConfigured, getSupabase } from "../../lib/supabase";
 import { QuoteApiError, quoteApi } from "../../lib/quote-api";
 import { touchActivity, useIdleSignOut } from "../../lib/idle";
@@ -28,12 +28,8 @@ function safeStatus(value: string): QuoteStatus {
   return STATUS_VALUES.has(value as QuoteStatus) ? (value as QuoteStatus) : "received";
 }
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "long", day: "numeric" }).format(new Date(value));
-}
 
 export function MyApplications() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [verifiedEmail, setVerifiedEmail] = useState("");
@@ -53,8 +49,6 @@ export function MyApplications() {
     window.history.replaceState(null, "", "/my");
   }, []);
 
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const hasNext = page < totalPages;
 
   const loadList = async (nextPage = 1) => {
     const supabase = getSupabase();
@@ -69,11 +63,6 @@ export function MyApplications() {
       setRows(data.items.map((row) => ({ ...row, status: safeStatus(row.status) })));
       setTotal(data.total);
       setPage(data.page);
-      // 신청이 1건이면 목록 대신 바로 그 신청의 대시보드로 (/my?list=1 이면 목록 유지)
-      if (data.total === 1 && data.items[0] && !new URLSearchParams(window.location.search).has("list")) {
-        router.replace(`/my/${data.items[0].id}`);
-        return;
-      }
       setPhase("list");
     } catch (e) {
       if (e instanceof QuoteApiError && e.status === 401) {
@@ -168,13 +157,16 @@ export function MyApplications() {
   }, []);
   useIdleSignOut(onIdle);
 
-  const summary = useMemo(() => {
-    if (total === 0) return "아직 접수한 신청이 없어요.";
-    return `총 ${total}건의 신청이 있어요.`;
-  }, [total]);
 
   return (
-    <div className="my-applications">
+    <div className={`my-applications${phase === "list" ? " is-dash" : ""}`}>
+      {phase !== "list" && (
+        <header className="my-intro">
+          <h1 className="title-l">신청 내용은<br />안전하게 확인해요.</h1>
+          <p className="lead">신청 이메일로 확인 코드를 받은 뒤, 내 견적 신청을 확인할 수 있어요.</p>
+        </header>
+      )}
+
       {phase === "email" && (
         <section className="my-panel" aria-labelledby="my-auth-title">
           <p className="my-eyebrow">MY APPLICATIONS</p>
@@ -211,51 +203,33 @@ export function MyApplications() {
       )}
 
       {phase === "list" && (
-        <section aria-labelledby="my-list-title">
-          <div className="my-list-head">
-            <div>
-              <p className="my-eyebrow">MY APPLICATIONS</p>
-              <h2 id="my-list-title" className="my-panel__title">내 신청 목록</h2>
-              <p className="my-panel__text">{verifiedEmail} · {summary}</p>
-            </div>
-            <button className="my-link" type="button" onClick={() => void reset()}>로그아웃</button>
-          </div>
+        <>
           {deleted !== null && (
             <Callout tone="success" title="신청을 삭제했어요">
               {deleted ? `${deleted} 신청과 올린 사진을 지웠어요.` : "신청과 올린 사진을 지웠어요."}
             </Callout>
           )}
           {error && <Callout tone="danger" title="조회할 수 없어요">{error}</Callout>}
-          {total === 0 ? (
-            <div className="my-empty">
-              <strong>아직 접수한 신청이 없어요.</strong>
-              <p>필요한 공간부터 무료 견적을 신청해보세요.</p>
-              <Link href="/quote" className="btn btn--primary">새 견적 신청하기</Link>
-            </div>
-          ) : (
-            <>
-              <ul className="my-list" aria-label="내 견적 신청 목록">
-                {rows.map((row) => (
-                  <li key={row.id} className="my-list__item">
-                    <Link href={`/my/${row.id}`} className="my-list__link">
-                      <span className="my-list__main">
-                        <strong>{row.receipt_no || "접수번호 준비 중"}</strong>
-                        <span>{row.region} {row.district} · {row.works_unknown ? "작업 상담" : row.works.join(" · ")}</span>
-                        <small>{formatDate(row.created_at)} · {row.housing}</small>
-                      </span>
-                      <span className="my-list__side"><StatusBadge status={row.status} /><span aria-hidden="true">→</span></span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-              <nav className="my-pagination" aria-label="신청 목록 페이지 이동">
-                <button className="btn btn--secondary" type="button" onClick={() => void loadList(page - 1)} disabled={busy || page <= 1}>이전</button>
-                <span>{page} / {totalPages}</span>
-                <button className="btn btn--secondary" type="button" onClick={() => void loadList(page + 1)} disabled={busy || !hasNext}>다음</button>
-              </nav>
-            </>
-          )}
-        </section>
+          <MyDashboard
+            email={verifiedEmail}
+            rows={rows}
+            total={total}
+            initialId={typeof window === "undefined" ? null : new URLSearchParams(window.location.search).get("id")}
+            onLogout={() => void reset()}
+            onListChange={() => loadList(1)}
+          />
+        </>
+      )}
+
+      {phase !== "list" && (
+        <div className="btn-row my-auth-links">
+          <Link href="/contact" className="btn btn--secondary">
+            신청 이메일을 찾기 어려워요
+          </Link>
+          <Link href="/quote" className="btn btn--primary">
+            새 견적 신청하기
+          </Link>
+        </div>
       )}
     </div>
   );
