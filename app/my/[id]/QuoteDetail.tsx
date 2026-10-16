@@ -9,6 +9,7 @@ import { BUILD_COPY, VisitCard, type BuildKind } from "./VisitCard";
 import { AddressCard } from "./AddressCard";
 import { RespondPanel } from "./RespondPanel";
 import { ReviewCard, type Review } from "./ReviewCard";
+import { CompletionCard } from "./CompletionCard";
 
 export type QuoteDetailData = {
   id: string;
@@ -36,6 +37,9 @@ export type QuoteDetailData = {
   build_at: string | null;
   build_note: string | null;
   build_scope: string[] | null;
+  completed_at?: string | null;
+  completion_note?: string | null;
+  completion_photos?: { path: string; url: string | null }[];
   estimate: Estimate | null;
   review?: Review | null;
   created_at: string;
@@ -73,10 +77,11 @@ export function splitWish(wish: string | null) {
 // 방문 주소는 끝나지 않은 신청이면 언제든 미리 넣을 수 있음
 const ADDRESS_OPEN = ["received", "checking", "visit", "needs"];
 const ACTIVE = ["received", "checking", "visit", "needs", "quoted"];
-const STEPS = ["접수", "확인", "실측", "견적", "결정"];
-const STEP_OF: Record<string, number> = { received: 0, checking: 1, needs: 1, visit: 2, quoted: 3, done: 4, hold: 4, canceled: 0 };
+const STEPS = ["접수", "확인", "실측", "견적", "결정", "완료"];
+const STEP_OF: Record<string, number> = { received: 0, checking: 1, needs: 1, visit: 2, quoted: 3, done: 4, hold: 4, completed: 5, canceled: 0 };
 
-const canReview = (x: { status: string; build_at: string | null }) => x.status === "done" && !!x.build_at && new Date(x.build_at).getTime() <= Date.now();
+const canReview = (x: { status: string; build_at: string | null }) =>
+  x.status === "completed" || (x.status === "done" && !!x.build_at && new Date(x.build_at).getTime() <= Date.now());
 
 type Tab = "home" | "list" | "visit" | "estimate";
 
@@ -135,6 +140,8 @@ function nextAction(d: QuoteDetailData): { title: string; desc: string; cta?: st
     return d.build_at
       ? { title: `${formatVisit(d.build_at)} ${BUILD_COPY[buildKindOf(d)].label.replace(" 일정", "")} 예정`, desc: BUILD_COPY[buildKindOf(d)].ready, cta: "일정 보기", tab: "visit" }
       : { title: "진행이 확정됐어요", desc: BUILD_COPY[buildKindOf(d)].waiting, cta: "일정 보기", tab: "visit" };
+  if (d.status === "completed" && !d.review) return { title: "테두리가 완료됐어요", desc: "완료 사진을 확인하고 짧은 후기를 남겨주세요." };
+  if (d.status === "completed") return { title: "테두리가 완료됐어요", desc: "남겨주신 후기 고마워요. 관리법이 궁금하면 언제든 물어보세요.", cta: "완료 보고 보기", tab: "visit" };
   if (d.status === "hold") return { title: "보류 중이에요", desc: "다시 진행하고 싶으면 카카오톡 채널 @테두리로 알려주세요." };
   if (d.status === "canceled") return { title: "취소된 신청이에요", desc: "새로 필요하면 새 견적을 신청해주세요." };
   return { title: "신청을 확인하고 있어요", desc: "24시간 안에 담당자가 전화나 문자로 연락드려요." };
@@ -244,8 +251,8 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
     quoted: rows.filter((r) => r.status === "quoted").length,
     // 견적서를 받은 신청 (견적 도착 뒤 진행 확정·보류 포함)
     // 시공까지 끝난 신청
-    finished: rows.filter((r) => r.status === "done" && !!r.build_at && new Date(r.build_at).getTime() <= Date.now()).length,
-    estimates: rows.filter((r) => ["quoted", "done", "hold"].includes(r.status)).length,
+    finished: rows.filter((r) => r.status === "completed").length,
+    estimates: rows.filter((r) => ["quoted", "done", "completed", "hold"].includes(r.status)).length,
   };
   const name = h?.name ?? d?.name;
   const canAddress = d ? ADDRESS_OPEN.includes(d.status) : false;
@@ -344,6 +351,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
               </button>
             </div>
 
+            {h.status === "completed" && <CompletionCard note={h.completion_note ?? null} photos={h.completion_photos ?? []} at={h.completed_at ?? null} />}
             {/* 시공이 끝났으면 후기 요청을 맨 위에 */}
             {canReview(h) && (
               <div className={h.review ? "" : "rv-spot"}>
@@ -519,8 +527,9 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
         {/* ---------- 방문 일정 ---------- */}
         {d && tab === "visit" && (
           <>
-            <TabHead title={d.status === "done" ? `${BUILD_COPY[buildKindOf(d)].label.replace(" 일정", "")}·방문 일정` : "방문 일정"} rows={rows} selId={selId} onPick={(id) => pick(id, "visit")} />
-            {d.status === "done" && <VisitCard kind="build" buildKind={buildKindOf(d)} at={d.build_at} note={d.build_note} />}
+            <TabHead title={d.status === "done" || d.status === "completed" ? `${BUILD_COPY[buildKindOf(d)].label.replace(" 일정", "")}·방문 일정` : "방문 일정"} rows={rows} selId={selId} onPick={(id) => pick(id, "visit")} />
+            {d.status === "completed" && <CompletionCard note={d.completion_note ?? null} photos={d.completion_photos ?? []} at={d.completed_at ?? null} />}
+            {(d.status === "done" || d.status === "completed") && <VisitCard kind="build" buildKind={buildKindOf(d)} at={d.build_at} note={d.build_note} />}
             {canReview(d) && <ReviewCard id={d.id} review={d.review ?? null} onDone={() => (void load(), void loadHome())} />}
             {canAddress && (
               <AddressCard

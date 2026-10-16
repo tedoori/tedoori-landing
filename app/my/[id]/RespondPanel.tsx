@@ -72,8 +72,8 @@ export function RespondPanel({ id, status, response, parts, onDone }: { id: stri
   const [sent, setSent] = useState<Choice | null>(null);
 
   // 담당자가 해피콜(전화)로 확인하고 상태만 바꾼 경우도 결과로 보여줌
-  const byCall = !response && !sent && (status === "done" || status === "hold");
-  const shown = (sent ?? (status !== "quoted" ? (response ?? (status === "done" ? "go" : status === "hold" ? "hold" : null)) : null)) as Choice | null;
+  const byCall = !response && !sent && (status === "done" || status === "completed" || status === "hold");
+  const shown = (sent ?? (status !== "quoted" ? (response ?? (status === "done" || status === "completed" ? "go" : status === "hold" ? "hold" : null)) : null)) as Choice | null;
   if (shown && shown in DONE) {
     return (
       <section className={`resp resp--done is-${shown}`}>

@@ -23,7 +23,7 @@ type QuoteRow = {
 
 const PAGE_SIZE = 10;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const STATUS_VALUES = new Set<QuoteStatus>(["received", "checking", "visit", "needs", "quoted", "done", "hold", "canceled"]);
+const STATUS_VALUES = new Set<QuoteStatus>(["received", "checking", "visit", "needs", "quoted", "done", "completed", "hold", "canceled"]);
 
 function safeStatus(value: string): QuoteStatus {
   return STATUS_VALUES.has(value as QuoteStatus) ? (value as QuoteStatus) : "received";

@@ -95,3 +95,19 @@
 @media (max-width: 479px) {
   .adm-grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* 완료 보고 · 견적서 미리보기 */
+.adm-done { display: grid; gap: 10px; padding: 14px; border-radius: 14px; background: #f3f9f5; border: 1px solid #cfe8d8; }
+.adm-done h4 small { margin-left: 6px; color: var(--muted); font-size: 12px; font-weight: 600; }
+.adm-done label { display: grid; gap: 4px; }
+.adm-done label > span { color: #4b524d; font-size: 12px; font-weight: 700; }
+.adm-done__photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+.adm-done__photos figure { display: grid; gap: 4px; margin: 0; }
+.adm-done__photos img,
+.adm-done__photos figure > span { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; background: #e3e7e4; }
+.adm-done__photos figure > span { display: grid; place-items: center; color: var(--muted); font-size: 12px; }
+.adm-done__add { display: grid; place-items: center; aspect-ratio: 4 / 3; border: 2px dashed #9fd3b0; border-radius: 10px; color: #137a37; font-size: 13px; font-weight: 800; cursor: pointer; }
+.adm-preview { display: grid; gap: 10px; padding: 14px; border-radius: 16px; background: #eef1ef; animation: acc-in 0.2s ease-out; }
+.adm-preview__head { font-size: 14px; font-weight: 800; }
+.adm-preview__head small { margin-left: 6px; color: var(--muted); font-size: 12px; font-weight: 600; }
+.adm-preview__foot { display: flex; justify-content: center; }

@@ -399,7 +399,7 @@ export function Select({
 
 // ---------- 상태 · 안내 ----------
 
-export type QuoteStatus = "received" | "checking" | "visit" | "needs" | "quoted" | "done" | "hold" | "canceled";
+export type QuoteStatus = "received" | "checking" | "visit" | "needs" | "quoted" | "done" | "completed" | "hold" | "canceled";
 const STATUS_LABEL: Record<QuoteStatus, string> = {
   received: "접수됨",
   checking: "확인 중",
@@ -407,6 +407,7 @@ const STATUS_LABEL: Record<QuoteStatus, string> = {
   needs: "보완 필요",
   quoted: "견적 도착",
   done: "진행 확정",
+  completed: "완료",
   hold: "보류",
   canceled: "취소됨",
 };

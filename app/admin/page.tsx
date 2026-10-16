@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AdminApp } from "./AdminApp";
 import "../my/my.css";
+import "../my/dash.css";
 import "./admin.css";
 
 // 운영자 전용. 검색에 노출하지 않음

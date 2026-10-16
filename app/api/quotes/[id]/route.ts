@@ -8,7 +8,7 @@ import { authorize, fail, isUuid, notFound, PHOTO_BUCKET, signPhotos, validateQu
 type Ctx = { params: Promise<{ id: string }> };
 
 const DETAIL_COLUMNS =
-  "id, receipt_no, email, region, district, housing, works, works_unknown, scope, photo_paths, size_note, wish, timing, budget, name, phone, status, visit_at, visit_note, visit_address, visit_address_detail, visit_memo, customer_response, responded_at, build_at, build_note, build_scope, created_at, updated_at";
+  "id, receipt_no, email, region, district, housing, works, works_unknown, scope, photo_paths, size_note, wish, timing, budget, name, phone, status, visit_at, visit_note, visit_address, visit_address_detail, visit_memo, customer_response, responded_at, build_at, build_note, build_scope, completed_at, completion_note, completion_photos, created_at, updated_at";
 const ESTIMATE_COLUMNS =
   "id, issued_at, valid_until, vat_included, measure_note, schedule_note, exclusions, site_issues, equipment_cost, waste_cost, extra_labor_cost, extra_note, meals_included, photo_paths, items:quote_estimate_items(id, sort, work, material, spec, quantity, material_cost, delivery_cost, labor_cost, note)";
 
@@ -43,7 +43,9 @@ export async function GET(req: Request, { params }: Ctx) {
   // 남긴 후기 (표가 없거나 없으면 null)
   const { data: review } = await auth.supabase.from("quote_reviews").select("rating, body, allow_public, created_at").eq("quote_id", id).maybeSingle();
 
-  return Response.json({ ...data, photos, estimate, review: review ?? null });
+  const completionPhotos = await signPhotos(auth.supabase, data.completion_photos ?? []);
+
+  return Response.json({ ...data, photos, estimate, review: review ?? null, completion_photos: completionPhotos });
 }
 
 export async function PATCH(req: Request, { params }: Ctx) {

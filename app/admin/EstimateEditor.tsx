@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getAdminSupabase } from "../../lib/supabase";
+import { EstimateCard } from "../my/[id]/EstimateCard";
 
 type Item = { work: string; material: string; spec: string; quantity: string; material_cost: number; delivery_cost: number; labor_cost: number; note: string };
 type Est = {
@@ -47,6 +48,7 @@ export function EstimateEditor({ quoteId, status, onSent }: { quoteId: string; s
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
+  const [preview, setPreview] = useState(false);
 
   const load = useCallback(async () => {
     if (!sb) return;
@@ -245,8 +247,45 @@ export function EstimateEditor({ quoteId, status, onSent }: { quoteId: string; s
         합계 <strong>{won(grand)}원</strong> <small>{est.vat_included ? "부가세 포함" : `부가세 10% 더한 금액 (입력 ${won(total)}원)`}</small>
       </div>
 
+      {preview && (
+        <div className="adm-preview">
+          <p className="adm-preview__head">
+            고객에게 이렇게 보여요 <small>저장 전 내용 기준</small>
+          </p>
+          <EstimateCard
+            receiptNo="미리보기"
+            customer="고객"
+            estimate={{
+              id: "preview",
+              issued_at: new Date().toISOString(),
+              valid_until: est.valid_until || null,
+              vat_included: est.vat_included,
+              measure_note: est.measure_note || null,
+              schedule_note: est.schedule_note || null,
+              exclusions: est.exclusions || null,
+              site_issues: est.site_issues || null,
+              equipment_cost: est.equipment_cost,
+              waste_cost: est.waste_cost,
+              extra_labor_cost: est.extra_labor_cost,
+              extra_note: est.extra_note || null,
+              meals_included: est.meals_included,
+              items: items.filter((i) => i.work.trim()).map((i, n) => ({ ...i, id: String(n), sort: n, material: i.material || null, spec: i.spec || null, quantity: i.quantity || null, note: i.note || null })),
+              photos: [],
+            }}
+          />
+          <div className="adm-preview__foot">
+            <button className="adm-btn" onClick={() => setPreview(false)}>
+              미리보기 닫기
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="adm-save">
         {msg && <span>{msg}</span>}
+        <button className="btn btn--secondary" onClick={() => setPreview((p) => !p)}>
+          {preview ? "미리보기 닫기" : "미리보기"}
+        </button>
         <button className="btn btn--secondary" disabled={busy} onClick={() => void save(false)}>
           임시 저장
         </button>

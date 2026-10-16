@@ -6,6 +6,7 @@ import { EstimateEditor } from "./EstimateEditor";
 
 type Row = {
   id: string;
+  user_id: string;
   receipt_no: string;
   email: string;
   name: string | null;
@@ -30,10 +31,13 @@ type Row = {
   customer_response: string | null;
   build_at: string | null;
   build_note: string | null;
+  completed_at: string | null;
+  completion_note: string | null;
+  completion_photos: string[] | null;
   created_at: string;
 };
 
-// 진행 순서대로. done(진행 확정)은 관리자 화면에서 "완료"로 표시
+// 진행 순서대로. done = 진행 확정(고객이 진행하기로 함), completed = 완료(시공·배송·자재 모두 끝나 거래 종료)
 const STATUS: [string, string][] = [
   ["received", "접수됨"],
   ["checking", "확인 중"],
@@ -42,8 +46,10 @@ const STATUS: [string, string][] = [
   ["needs", "보완 필요"],
   ["hold", "보류"],
   ["canceled", "취소됨"],
-  ["done", "완료"],
+  ["done", "진행 확정"],
+  ["completed", "완료"],
 ];
+const CLOSED = ["completed", "hold", "canceled"];
 const LABEL = Object.fromEntries(STATUS);
 const RESP: Record<string, string> = { go: "진행할게요", adjust: "조정 상담", hold: "보류" };
 
@@ -102,7 +108,7 @@ export function AdminApp() {
   const shown = useMemo(() => {
     const k = q.trim().toLowerCase();
     return rows.filter((r) => {
-      if (filter === "open" && ["done", "hold", "canceled"].includes(r.status)) return false;
+      if (filter === "open" && CLOSED.includes(r.status)) return false;
       if (filter !== "open" && filter !== "all" && r.status !== filter) return false;
       if (!k) return true;
       return [r.receipt_no, r.name, r.phone, r.email, r.district, r.visit_address].some((v) => (v ?? "").toLowerCase().includes(k));
@@ -150,7 +156,7 @@ export function AdminApp() {
       </header>
 
       <nav className="adm-filters" aria-label="상태 거르기">
-        {[["all", `전체 ${rows.length}`], ["open", `진행 중 ${rows.filter((r) => !["done", "hold", "canceled"].includes(r.status)).length}`], ...STATUS.map(([k, l]) => [k, `${l} ${count(k)}`])].map(([k, l]) => (
+        {[["all", `전체 ${rows.length}`], ["open", `진행 중 ${rows.filter((r) => !CLOSED.includes(r.status)).length}`], ...STATUS.map(([k, l]) => [k, `${l} ${count(k)}`])].map(([k, l]) => (
           <button key={k} className={filter === k ? "is-on" : ""} onClick={() => setFilter(k)}>
             {l}
           </button>
@@ -193,6 +199,10 @@ function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> }) {
   const [visitNote, setVisitNote] = useState(r.visit_note ?? "");
   const [buildAt, setBuildAt] = useState(toLocal(r.build_at));
   const [buildNote, setBuildNote] = useState(r.build_note ?? "");
+  const [doneNote, setDoneNote] = useState(r.completion_note ?? "");
+  const [donePaths, setDonePaths] = useState<string[]>(r.completion_photos ?? []);
+  const [doneUrls, setDoneUrls] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState(false);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
@@ -205,17 +215,51 @@ function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> }) {
       .then(({ data }) => setPhotos((data ?? []).map((d) => d.signedUrl).filter(Boolean) as string[]));
   }, [sb, r.photo_paths]);
 
+  // 완료 사진 미리보기 주소
+  useEffect(() => {
+    if (!sb || !donePaths.length) return;
+    void sb.storage
+      .from("quote-photos")
+      .createSignedUrls(donePaths, 3600)
+      .then(({ data }) => setDoneUrls(Object.fromEntries((data ?? []).filter((d) => d.signedUrl).map((d) => [d.path, d.signedUrl]))));
+  }, [sb, donePaths]);
+
+  // 완료 사진 올리기: 고객 폴더 아래 complete/ (고객도 내 신청에서 볼 수 있음)
+  const upload = async (files: FileList | null) => {
+    if (!sb || !files?.length) return;
+    setUploading(true);
+    const added: string[] = [];
+    for (const f of Array.from(files).slice(0, 10)) {
+      const ext = (f.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const path = `${r.user_id}/complete/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error } = await sb.storage.from("quote-photos").upload(path, f, { contentType: f.type });
+      if (!error) added.push(path);
+    }
+    setDonePaths((p) => [...p, ...added]);
+    setUploading(false);
+    if (added.length < files.length) setDone("일부 사진을 올리지 못했어요 (jpg·png·webp, 10MB 이하).");
+  };
+
   const save = async () => {
     if (!sb || busy) return;
     setBusy(true);
     setDone("");
     const { error } = await sb
       .from("quote_requests")
-      .update({ status, visit_at: fromLocal(visitAt), visit_note: visitNote || null, build_at: fromLocal(buildAt), build_note: buildNote || null })
+      .update({
+        status,
+        visit_at: fromLocal(visitAt),
+        visit_note: visitNote || null,
+        build_at: fromLocal(buildAt),
+        build_note: buildNote || null,
+        completion_note: doneNote || null,
+        completion_photos: donePaths,
+        completed_at: status === "completed" ? (r.completed_at ?? new Date().toISOString()) : r.completed_at,
+      })
       .eq("id", r.id);
     setBusy(false);
     if (error) return setDone("저장하지 못했어요: " + error.message);
-    setDone(status !== r.status && (status === "visit" || status === "quoted") ? "저장했어요. 고객에게 안내 메일이 가요." : "저장했어요.");
+    setDone(status !== r.status && ["visit", "quoted", "completed"].includes(status) ? "저장했어요. 고객에게 안내 메일이 가요." : "저장했어요.");
     await onSaved();
   };
 
@@ -279,9 +323,33 @@ function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> }) {
             <input className="ui-input" value={buildNote} onChange={(e) => setBuildNote(e.target.value)} placeholder="예: 오전 9시 도착, 하루 작업" />
           </label>
         </div>
+        {(status === "done" || status === "completed") && (
+          <div className="adm-done">
+            <h4>완료 보고 <small>고객의 내 신청에 보여요</small></h4>
+            <label>
+              <span>남길 말 (관리법 안내 등)</span>
+              <textarea className="ui-input" rows={3} value={doneNote} onChange={(e) => setDoneNote(e.target.value)} placeholder="예: 잔디는 첫 2주 동안 아침마다 물을 흠뻑 주세요." />
+            </label>
+            <div className="adm-done__photos">
+              {donePaths.map((p) => (
+                <figure key={p}>
+                  {doneUrls[p] ? <img src={doneUrls[p]} alt="" /> : <span>불러오는 중</span>}
+                  <button className="adm-btn adm-btn--danger" onClick={() => setDonePaths((x) => x.filter((y) => y !== p))}>
+                    빼기
+                  </button>
+                </figure>
+              ))}
+              <label className="adm-done__add">
+                <input type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={(e) => void upload(e.target.files)} />
+                {uploading ? "올리는 중…" : "+ 완료 사진"}
+              </label>
+            </div>
+            <p className="adm-note">사진과 말을 넣고 상태를 '완료'로 바꿔 저장하면 고객에게 완료 안내 메일이 가요.</p>
+          </div>
+        )}
         <div className="adm-save">
           {done && <span>{done}</span>}
-          <button className="btn btn--primary" disabled={busy} onClick={() => void save()}>
+          <button className="btn btn--primary" disabled={busy || uploading} onClick={() => void save()}>
             {busy ? "저장 중…" : "저장"}
           </button>
         </div>

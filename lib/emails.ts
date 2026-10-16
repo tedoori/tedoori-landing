@@ -285,6 +285,20 @@ export function statusEmail(q: StatusRow) {
       html: shell({ preheader: `방문 일시 ${when}`, body, footer: "테두리 · 서울·경기·인천 부분조경 견적<br>이 메일에 회신하시면 테두리 운영자에게 전달돼요." }),
     };
   }
+  if (q.status === "completed") {
+    const body = `
+      ${section(`
+        <h1 style="margin:0;font-family:${FONT};font-size:22px;line-height:1.4;font-weight:800;color:#16231B;">새 정원이 완성됐어요</h1>
+        <p style="margin:10px 0 0 0;font-family:${FONT};font-size:15px;line-height:1.6;color:#4E5A53;">${who}함께해주셔서 고마워요. 작업 완료 사진과 관리법 안내를 내 신청에 올려두었어요.</p>
+      `, "28px 32px 0 32px")}
+      ${section(button(`${SITE}/my/${q.id}#visit`, "완료 보고 보기"), "24px 32px 0 32px")}
+      ${section(`<p style="margin:0;padding:14px 16px;border-radius:12px;background-color:#f4f1ea;font-family:${FONT};font-size:13px;line-height:1.7;color:#4E5A53;">새 정원이 마음에 드셨다면 짧은 후기를 남겨주세요. 다음 정원을 더 잘 만드는 데 큰 힘이 돼요.</p>`, "24px 32px 28px 32px")}
+    `;
+    return {
+      subject: `[테두리] 새 정원이 완성됐어요 (${q.receipt_no})`,
+      html: shell({ preheader: "작업 완료 사진과 관리법 안내를 확인해보세요.", body, footer: "테두리 · 서울·경기·인천 부분조경 견적<br>이 메일에 회신하시면 테두리 운영자에게 전달돼요." }),
+    };
+  }
   if (q.status === "quoted") {
     const body = `
       ${section(`
