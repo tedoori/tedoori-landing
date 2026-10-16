@@ -390,3 +390,21 @@
 @media (max-width: 599px) {
   .resp-scope { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* 12단계: 인증 화면을 한 화면에 (특히 휴대폰) */
+.section:has(> .my-page) { padding-top: clamp(16px, 3vw, 40px); padding-bottom: clamp(32px, 5vw, 64px); }
+.my-intro { gap: 6px; margin-bottom: 4px; }
+.my-applications:not(.is-dash) { gap: 16px; }
+.my-auth-links { margin-top: 0; }
+@media (max-width: 599px) {
+  .my-intro .title-l { font-size: 24px; line-height: 1.3; }
+  .my-intro .lead { font-size: 14px; }
+  .my-panel { gap: 10px; padding: 18px 16px; }
+  .my-panel .my-eyebrow { display: none; }
+  .my-panel__title { font-size: 20px; }
+  .my-panel__text { font-size: 13px; }
+  .my-panel__hint { font-size: 12px; }
+  .my-form { gap: 8px; }
+  .my-auth-links { display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center; gap: 16px; }
+  .my-auth-links .btn { width: auto; min-height: 0; padding: 4px 0; border: 0; background: none; color: #137a37; font-size: 13px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; box-shadow: none; }
+}
