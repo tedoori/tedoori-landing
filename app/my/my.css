@@ -124,38 +124,128 @@
 .my-confirm { max-width: 420px; text-align: left; }
 .my-confirm .ui-dialog__actions .btn { flex: 1; width: auto; min-height: 48px; }
 
-/* ---------- 견적서 ---------- */
-.est { border-color: var(--green-600, #1f8a4c); box-shadow: 0 10px 30px rgba(31, 90, 60, 0.08); }
-.est-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-.est-total { margin: 4px 0 2px; font-size: clamp(28px, 4vw, 36px); font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-.est-meta { color: var(--muted); font-size: 14px; }
-.est-valid { padding: 6px 12px; border-radius: 999px; background: var(--green-50, #eaf6ee); color: var(--green-600, #1f8a4c); font-size: 13px; font-weight: 700; }
-.est-valid.is-expired { background: #fdecea; color: #c0392b; }
-.est-sum { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.est-sum li { position: relative; display: grid; gap: 2px; padding: 12px 14px 16px; border-radius: 14px; background: #f5f7f5; overflow: hidden; }
-.est-sum span { color: var(--muted); font-size: 13px; }
-.est-sum strong { font-size: 16px; font-variant-numeric: tabular-nums; }
-.est-sum i { position: absolute; left: 0; bottom: 0; height: 4px; background: var(--green-600, #1f8a4c); }
-.est-sub { margin-bottom: 8px; font-size: 15px; font-weight: 800; }
-.est-items ol { display: grid; gap: 0; }
-.est-item { padding: 14px 0; border-top: 1px solid var(--line); }
-.est-item:first-child { border-top: 0; padding-top: 0; }
-.est-item__head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: baseline; gap: 10px; }
-.est-item__head strong { font-size: 16px; }
-.est-item__head span { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
-.est-item__head b { font-size: 16px; font-variant-numeric: tabular-nums; }
-.est-item__costs { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 6px; }
-.est-item__costs div { display: flex; gap: 6px; font-size: 13px; }
-.est-item__costs dt { color: var(--muted); }
-.est-item__costs dd { margin: 0; font-variant-numeric: tabular-nums; }
-.est-item__note { margin-top: 6px; color: var(--muted); font-size: 13px; }
-.est-next { padding: 12px 14px; border-radius: 12px; background: #f5f7f5; font-size: 14px; font-weight: 600; }
-@media (max-width: 599px) {
-  .est-sum { grid-template-columns: minmax(0, 1fr); }
-  .est-sum li { grid-template-columns: 1fr auto; align-items: center; }
-  .est-item__head { grid-template-columns: minmax(0, 1fr) auto; }
-  .est-item__head span { grid-column: 1 / -1; grid-row: 2; }
-}
-
+/* ---------- 견적서: 종이 문서처럼 ---------- */
 .ui-status--visit { background: #efeafc; color: #5b3fb0; }
 .ui-status--hold { background: #f3f1ec; color: #6b6355; }
+
+.est { display: grid; gap: 12px; }
+.est-paper {
+  position: relative;
+  display: grid;
+  gap: 22px;
+  padding: clamp(22px, 4vw, 44px);
+  background: #fffefb;
+  border: 1px solid #e4e1d8;
+  border-radius: 6px;
+  box-shadow: 0 1px 0 #ece9e0, 0 18px 40px -18px rgba(40, 50, 40, 0.25);
+  font-variant-numeric: tabular-nums;
+}
+.est-paper::before { content: ""; position: absolute; inset: 0 0 auto; height: 6px; background: var(--green-600, #1f8a4c); border-radius: 6px 6px 0 0; }
+.est-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 2px solid #1d2420; }
+.est-brand { color: var(--green-600, #1f8a4c); font-size: 13px; font-weight: 800; letter-spacing: 0.04em; }
+.est-title { margin-top: 4px; font-size: clamp(28px, 4vw, 38px); font-weight: 800; letter-spacing: 0.4em; }
+.est-info { display: grid; gap: 4px; font-size: 13px; }
+.est-info div { display: grid; grid-template-columns: 64px auto; gap: 10px; }
+.est-info dt { color: var(--muted); }
+.est-info dd { margin: 0; font-weight: 700; }
+.est-info .is-expired { color: #c0392b; }
+.est-to p { font-size: 17px; }
+.est-to strong { font-size: 20px; font-weight: 800; border-bottom: 1px solid #1d2420; padding: 0 2px; }
+.est-to__sub { margin-top: 8px; color: var(--muted); font-size: 14px !important; }
+.est-grand { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 16px 20px; background: #f1f6f2; border: 1px solid #cfe2d5; border-radius: 4px; }
+.est-grand span { font-size: 14px; font-weight: 700; color: #2f4a3a; }
+.est-grand strong { font-size: clamp(26px, 4vw, 34px); font-weight: 800; letter-spacing: -0.02em; }
+.est-grand small { margin-left: 2px; font-size: 0.55em; }
+
+.est-table { border-top: 2px solid #1d2420; border-bottom: 1px solid #1d2420; }
+.est-row { display: grid; grid-template-columns: minmax(0, 2.2fr) 0.9fr repeat(4, minmax(0, 1fr)); gap: 10px; align-items: start; padding: 12px 4px; border-top: 1px solid #e9e6de; font-size: 14px; }
+.est-row > span:not(.est-c-name):not(.est-c-qty) { text-align: right; }
+.est-row--head { border-top: 0; padding: 10px 4px; background: #f6f5f0; color: #4b524d; font-size: 12px; font-weight: 700; }
+.est-row--extra { background: #fbfaf6; }
+.est-c-name { display: grid; gap: 2px; }
+.est-c-name strong { font-size: 15px; }
+.est-c-name em { font-style: normal; color: var(--muted); font-size: 13px; }
+.est-c-name small { color: #8a6d2f; font-size: 12px; }
+.est-c-sum { font-weight: 800; }
+.est-foot-note { margin-top: -12px; color: var(--muted); font-size: 13px; }
+
+.est-totals { justify-self: end; display: grid; gap: 6px; width: min(100%, 320px); font-size: 14px; }
+.est-totals div { display: flex; justify-content: space-between; gap: 16px; }
+.est-totals dt { color: var(--muted); }
+.est-totals dd { margin: 0; font-weight: 600; }
+.est-totals__grand { margin-top: 4px; padding-top: 10px; border-top: 2px solid #1d2420; }
+.est-totals__grand dt { color: #1d2420; font-weight: 800; }
+.est-totals__grand dd { font-size: 20px; font-weight: 800; color: var(--green-600, #1f8a4c); }
+
+.est-issue { padding: 14px 16px; background: #fff6e8; border-left: 4px solid #e08a00; border-radius: 2px; }
+.est-issue strong { display: block; margin-bottom: 4px; color: #a35a00; font-size: 14px; }
+.est-issue p { white-space: pre-line; font-size: 15px; }
+.est-terms { display: grid; border-top: 1px solid #e9e6de; }
+.est-terms div { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-bottom: 1px solid #e9e6de; font-size: 14px; }
+.est-terms dt { color: var(--muted); }
+.est-terms dd { margin: 0; font-weight: 600; white-space: pre-line; }
+.est-label { margin-bottom: 8px; font-size: 13px; font-weight: 700; color: var(--muted); }
+.est-photos ul { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+.est-photos img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 4px; }
+.est-sign { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-top: 16px; border-top: 1px dashed #d5d1c6; }
+.est-sign p { color: var(--muted); font-size: 12px; line-height: 1.7; }
+.est-seal { flex: none; display: grid; place-items: center; width: 64px; height: 64px; border: 2.5px solid #c8402f; border-radius: 50%; color: #c8402f; font-size: 14px; font-weight: 800; transform: rotate(-8deg); opacity: 0.88; }
+.est-seal span { padding: 6px; border: 1px solid #c8402f; border-radius: 50%; }
+.est-next { padding: 12px 14px; border-radius: 12px; background: #f5f7f5; font-size: 14px; font-weight: 600; }
+
+/* 모바일: 표 → 항목 카드 */
+@media (max-width: 639px) {
+  .est-row--head { display: none; }
+  .est-row { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 14px 2px; }
+  .est-c-name { grid-column: 1; grid-row: 1; }
+  .est-c-sum { grid-column: 2; grid-row: 1; font-size: 15px; }
+  .est-c-qty { grid-column: 1 / -1; color: var(--muted); font-size: 13px; }
+  .est-row > span[data-k] { display: inline; grid-column: 1 / -1; text-align: left !important; color: var(--muted); font-size: 12px; }
+  .est-row > span[data-k]::before { content: attr(data-k) " "; }
+  .est-row { grid-auto-flow: row; }
+  .est-c-blank { display: none; }
+  .est-totals { width: 100%; }
+  .est-terms div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+@media print {
+  .est-next { display: none; }
+  .est-paper { box-shadow: none; }
+}
+.est-row--head > span:nth-child(-n + 2) { text-align: left !important; }
+/* 모바일: 수량·자재·배송·시공을 한 줄로 */
+@media (max-width: 639px) {
+  .est-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+  .est-c-name { flex: 1 1 60%; }
+  .est-c-sum { order: 1; margin-left: auto; }
+  .est-c-qty,
+  .est-row > span[data-k] { order: 2; flex: none; font-size: 12px; color: var(--muted); }
+  .est-c-qty { flex-basis: auto; margin-top: 4px; }
+  .est-row > span[data-k] { margin-top: 4px; }
+  .est-row--extra .est-c-qty { display: none; }
+}
+@media (max-width: 639px) {
+  .est-row.est-row--head { display: none; }
+  .est-c-name { flex: 0 0 calc(100% - 120px); }
+  .est-c-sum { flex: 0 0 110px; text-align: right; }
+}
+/* 규격 칸 추가 · 직인 대신 발행처 표기 */
+.est-row { grid-template-columns: minmax(0, 2fr) 0.9fr 0.7fr repeat(4, minmax(0, 1fr)); }
+.est-row--head > span:nth-child(-n + 3) { text-align: left !important; }
+.est-row > span.est-c-spec { text-align: left; color: #4b524d; font-size: 13px; overflow-wrap: anywhere; }
+.est-row > span.est-c-qty { text-align: left; }
+.est-issuer { flex: none; display: flex; align-items: center; gap: 10px; padding-left: 16px; border-left: 1px solid #e4e1d8; }
+.est-issuer img { width: 44px; height: auto; }
+.est-issuer span { display: grid; font-size: 12px; color: var(--muted); }
+.est-issuer strong { color: #1d2420; font-size: 15px; }
+@media (max-width: 639px) {
+  .est-row > span.est-c-spec { order: 2; flex: none; margin-top: 4px; font-size: 12px; color: var(--muted); }
+  .est-row--extra .est-c-spec { display: none; }
+  .est-sign { flex-direction: column; align-items: flex-start; }
+  .est-issuer { padding: 12px 0 0; border-left: 0; }
+}
+.est-row { grid-template-columns: minmax(0, 1.8fr) minmax(0, 1.2fr) 0.7fr repeat(4, minmax(0, 0.9fr)); }
+.est-row > span.est-c-spec,
+.est-row > span.est-c-qty { text-align: left !important; }
+@media (max-width: 639px) {
+  .est-row { grid-template-columns: none; }
+}

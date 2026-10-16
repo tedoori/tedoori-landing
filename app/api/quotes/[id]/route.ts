@@ -10,7 +10,7 @@ type Ctx = { params: Promise<{ id: string }> };
 const DETAIL_COLUMNS =
   "id, receipt_no, email, region, district, housing, works, works_unknown, scope, photo_paths, size_note, wish, timing, budget, name, phone, status, visit_at, visit_note, created_at, updated_at";
 const ESTIMATE_COLUMNS =
-  "id, issued_at, valid_until, vat_included, measure_note, schedule_note, exclusions, photo_paths, items:quote_estimate_items(id, sort, work, material, quantity, material_cost, delivery_cost, labor_cost, note)";
+  "id, issued_at, valid_until, vat_included, measure_note, schedule_note, exclusions, site_issues, equipment_cost, waste_cost, extra_labor_cost, extra_note, meals_included, photo_paths, items:quote_estimate_items(id, sort, work, material, spec, quantity, material_cost, delivery_cost, labor_cost, note)";
 
 export async function GET(req: Request, { params }: Ctx) {
   const { id } = await params;

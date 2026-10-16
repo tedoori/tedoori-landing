@@ -201,7 +201,7 @@ export function QuoteDetail({ id }: { id: string }) {
         </Callout>
       )}
 
-      {d.estimate && <EstimateCard estimate={d.estimate} />}
+      {d.estimate && <EstimateCard estimate={d.estimate} receiptNo={d.receipt_no} customer={d.name} />}
 
       <section className="my-card" aria-labelledby="detail-req">
         <h2 id="detail-req" className="my-card__title">
