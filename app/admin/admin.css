@@ -112,3 +112,5 @@
 .adm-preview__head small { margin-left: 6px; color: var(--muted); font-size: 12px; font-weight: 600; }
 .adm-preview__foot { display: flex; justify-content: center; }
 .adm-done__bar { display: flex; gap: 6px; flex-wrap: wrap; }
+.adm-custom { display: grid; gap: 8px; padding: 14px; border-radius: 14px; background: #f7f8f7; border: 1px solid #eceeec; }
+.adm-custom h4 small { margin-left: 6px; color: var(--muted); font-size: 12px; font-weight: 600; }

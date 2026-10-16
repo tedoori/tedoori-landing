@@ -37,6 +37,8 @@ export type QuoteDetailData = {
   build_at: string | null;
   build_note: string | null;
   build_scope: string[] | null;
+  next_title?: string | null;
+  next_desc?: string | null;
   completed_at?: string | null;
   completion_note?: string | null;
   completion_photos?: { path: string; url: string | null }[];
@@ -129,8 +131,13 @@ function buildKindOf(d: QuoteDetailData): BuildKind {
   return labor > 0 ? "labor" : "delivery";
 }
 
-/** 지금 할 일 한 줄 */
+/** 지금 할 일 한 줄. 관리자가 문구를 적어두면 그 문구로 */
 function nextAction(d: QuoteDetailData): { title: string; desc: string; cta?: string; tab?: Tab } {
+  const auto = autoNextAction(d);
+  return d.next_title ? { ...auto, title: d.next_title, desc: d.next_desc ?? "" } : auto;
+}
+
+function autoNextAction(d: QuoteDetailData): { title: string; desc: string; cta?: string; tab?: Tab } {
   if (d.status === "quoted" && d.estimate)
     return { title: "견적서가 도착했어요", desc: "항목별 금액을 확인하고 진행 여부를 알려주세요.", cta: "견적서 보기", tab: "estimate" };
   if (d.status === "visit" && d.visit_at)
@@ -139,7 +146,7 @@ function nextAction(d: QuoteDetailData): { title: string; desc: string; cta?: st
   if (canReview(d) && !d.review) return { title: "테두리가 완료됐어요", desc: "새 정원은 마음에 드세요? 짧은 후기를 남겨주세요." };
   if (d.status === "done")
     return d.build_at
-      ? { title: `${formatVisit(d.build_at)} ${BUILD_COPY[buildKindOf(d)].label.replace(" 일정", "")} 예정`, desc: BUILD_COPY[buildKindOf(d)].ready, cta: "일정 보기", tab: "visit" }
+      ? { title: `${formatVisit(d.build_at)} ${BUILD_COPY[buildKindOf(d)].label.replace(" 일정", "")} 예정`, desc: d.build_note || BUILD_COPY[buildKindOf(d)].ready, cta: "일정 보기", tab: "visit" }
       : { title: "진행이 확정됐어요", desc: BUILD_COPY[buildKindOf(d)].waiting, cta: "일정 보기", tab: "visit" };
   if (d.status === "completed" && !d.review) return { title: "테두리가 완료됐어요", desc: "완료 사진을 확인하고 짧은 후기를 남겨주세요." };
   if (d.status === "completed") return { title: "테두리가 완료됐어요", desc: "남겨주신 후기 고마워요. 관리법이 궁금하면 언제든 물어보세요.", cta: "완료 보고 보기", tab: "complete" };

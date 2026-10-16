@@ -32,6 +32,9 @@ type Row = {
   customer_response: string | null;
   build_at: string | null;
   build_note: string | null;
+  build_scope: string[] | null;
+  next_title: string | null;
+  next_desc: string | null;
   completed_at: string | null;
   completion_note: string | null;
   completion_photos: string[] | null;
@@ -200,6 +203,9 @@ function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> }) {
   const [visitNote, setVisitNote] = useState(r.visit_note ?? "");
   const [buildAt, setBuildAt] = useState(toLocal(r.build_at));
   const [buildNote, setBuildNote] = useState(r.build_note ?? "");
+  const [kind, setKind] = useState<string>(r.build_scope?.includes("labor") ? "labor" : r.build_scope?.includes("delivery") ? "delivery" : r.build_scope?.length ? "material" : "");
+  const [nextTitle, setNextTitle] = useState(r.next_title ?? "");
+  const [nextDesc, setNextDesc] = useState(r.next_desc ?? "");
   const [doneNote, setDoneNote] = useState(r.completion_note ?? "");
   const [donePaths, setDonePaths] = useState<string[]>(r.completion_photos ?? []);
   const [doneUrls, setDoneUrls] = useState<Record<string, string>>({});
@@ -254,6 +260,9 @@ function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> }) {
         visit_note: visitNote || null,
         build_at: fromLocal(buildAt),
         build_note: buildNote || null,
+        build_scope: kind ? (kind === "labor" ? ["material", "delivery", "labor"] : kind === "delivery" ? ["material", "delivery"] : ["material"]) : r.build_scope,
+        next_title: nextTitle.trim() || null,
+        next_desc: nextDesc.trim() || null,
         completion_note: doneNote || null,
         completion_photos: donePaths,
         completed_at: status === "completed" ? (r.completed_at ?? new Date().toISOString()) : r.completed_at,
@@ -317,13 +326,37 @@ function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> }) {
             <input className="ui-input" value={visitNote} onChange={(e) => setVisitNote(e.target.value)} placeholder="예: 담당 김OO, 30분 정도 걸려요" />
           </label>
           <label>
-            <span>시공 일시</span>
+            <span>작업 종류 (고객 화면의 '시공/배송/자재 준비' 문구)</span>
+            <select className="ui-input" value={kind} onChange={(e) => setKind(e.target.value)}>
+              <option value="">자동 (고객이 고른 범위·신청 범위)</option>
+              <option value="labor">시공</option>
+              <option value="delivery">배송</option>
+              <option value="material">자재 준비</option>
+            </select>
+          </label>
+          <label>
+            <span>{kind === "delivery" ? "배송" : kind === "material" ? "자재 준비" : "시공"} 일시</span>
             <input className="ui-input" type="datetime-local" value={buildAt} onChange={(e) => setBuildAt(e.target.value)} />
           </label>
           <label>
-            <span>시공 안내 메모 (고객에게 보임)</span>
+            <span>작업 안내 메모 (일정 카드 설명을 이 문구로 바꿔요)</span>
             <input className="ui-input" value={buildNote} onChange={(e) => setBuildNote(e.target.value)} placeholder="예: 오전 9시 도착, 하루 작업" />
           </label>
+        </div>
+        <div className="adm-custom">
+          <h4>
+            고객 홈 '지금 할 일' 문구 <small>비우면 상태에 맞는 자동 문구가 보여요</small>
+          </h4>
+          <div className="adm-grid">
+            <label>
+              <span>제목</span>
+              <input className="ui-input" value={nextTitle} onChange={(e) => setNextTitle(e.target.value)} placeholder="예: 11월 3일 오전에 배송돼요" />
+            </label>
+            <label>
+              <span>설명</span>
+              <input className="ui-input" value={nextDesc} onChange={(e) => setNextDesc(e.target.value)} placeholder="예: 도착 30분 전에 기사님이 전화드려요" />
+            </label>
+          </div>
         </div>
         {(status === "done" || status === "completed") && (
           <div className="adm-done">
