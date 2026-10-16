@@ -2,45 +2,86 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getAdminSupabase } from "../../lib/supabase";
-import { EstimateCard } from "../my/[id]/EstimateCard";
+import { EstimateCard, KIND_LABEL, estimateParts, estimateTotals, type Kind } from "../my/[id]/EstimateCard";
 
-type Item = { work: string; material: string; spec: string; quantity: string; material_cost: number; delivery_cost: number; labor_cost: number; note: string };
+// 견적서 작성: 조경업체 방식 — 공종명 · 규격 · 단위 · 수량 · 단가 → 금액(자동), 아래 계 · 공과잡비 % · 부가세
+// 예전 방식(자재비·배송비·시공비)으로 쓴 견적서는 열면 '1식 × 합계 단가' 줄로 바뀌어요
+
+type Item = { kind: Kind; work: string; spec: string; unit: string; qty: string; unit_price: number; note: string };
 type Est = {
   id?: string;
   published: boolean;
   vat_included: boolean;
+  overhead_rate: string;
   valid_until: string;
   site_issues: string;
   measure_note: string;
   schedule_note: string;
   exclusions: string;
+  meals_included: boolean;
+  // 예전 추가 비용 (새 견적서에서는 공종 줄로 적어요)
   equipment_cost: number;
   waste_cost: number;
   extra_labor_cost: number;
   extra_note: string;
-  meals_included: boolean;
 };
 
-const WORKS = ["잔디", "디딤석", "자갈", "화단", "식재", "기타"];
-const blankItem = (): Item => ({ work: "잔디", material: "", spec: "", quantity: "", material_cost: 0, delivery_cost: 0, labor_cost: 0, note: "" });
+// 자주 쓰는 공종명·단위 (직접 입력도 돼요)
+const WORK_HINTS = ["주차장판석", "디딤돌", "디딤석", "자연석", "잔디", "잔디엣지", "터밭", "화단", "수전", "왕사", "마사토", "자갈", "소나무", "에메랄드그린", "미측백", "식재", "포크레인", "인건비", "운반비"];
+const UNITS = ["식", "빠렛", "주", "일", "타", "㎡", "장", "개", "본", "대", "톤", "m"];
+const blankItem = (): Item => ({ kind: "material", work: "", spec: "", unit: "식", qty: "1", unit_price: 0, note: "" });
+// 공종명으로 구분 짐작 (바꿀 수 있어요)
+const guessKind = (w: string): Kind => (/운반|배송|운송|화물/.test(w) ? "delivery" : /포크레인|굴삭|장비|인건|인부|시공|설치|깔기|식재|정리|철거|폐기/.test(w) ? "labor" : "material");
 const blankEst = (): Est => ({
   published: false,
-  vat_included: true,
+  vat_included: false,
+  overhead_rate: "",
   valid_until: "",
   site_issues: "",
   measure_note: "",
   schedule_note: "",
   exclusions: "",
+  meals_included: true,
   equipment_cost: 0,
   waste_cost: 0,
   extra_labor_cost: 0,
   extra_note: "",
-  meals_included: true,
 });
 const won = (n: number) => n.toLocaleString("ko-KR");
 const num = (v: string) => Math.max(0, Number(v.replace(/[^\d]/g, "")) || 0);
+const qtyNum = (v: string) => Math.max(0, Number(v.replace(/[^\d.]/g, "")) || 0);
+const amountOf = (i: Item) => Math.round(qtyNum(i.qty) * i.unit_price);
 
-/** 견적서 작성: 임시 저장 / 고객에게 보내기 */
+type DbItem = {
+  sort: number;
+  work: string;
+  material: string | null;
+  spec: string | null;
+  quantity: string | null;
+  unit: string | null;
+  qty: number | null;
+  unit_price: number | null;
+  kind: Kind | null;
+  material_cost: number;
+  delivery_cost: number;
+  labor_cost: number;
+  note: string | null;
+};
+
+/** 예전 줄(자재비·배송비·시공비)은 1식 × 합계 단가로 옮김 */
+const fromDb = (i: DbItem): Item =>
+  (i.unit_price ?? 0) > 0
+    ? { kind: i.kind ?? "material", work: i.work, spec: i.spec ?? "", unit: i.unit ?? "식", qty: String(i.qty ?? 1), unit_price: i.unit_price ?? 0, note: i.note ?? "" }
+    : {
+        kind: i.labor_cost >= Math.max(i.material_cost, i.delivery_cost) ? "labor" : i.delivery_cost > i.material_cost ? "delivery" : "material",
+        work: [i.work, i.material].filter(Boolean).join(" "),
+        spec: [i.spec, i.quantity].filter(Boolean).join(" · "),
+        unit: "식",
+        qty: "1",
+        unit_price: i.material_cost + i.delivery_cost + i.labor_cost,
+        note: i.note ?? "",
+      };
+
 export function EstimateEditor({ quoteId, status, onSent }: { quoteId: string; status: string; onSent: () => Promise<void> }) {
   const sb = getAdminSupabase();
   const [est, setEst] = useState<Est>(blankEst());
@@ -56,11 +97,23 @@ export function EstimateEditor({ quoteId, status, onSent }: { quoteId: string; s
     if (!data) return;
     setEst({
       ...blankEst(),
-      ...Object.fromEntries(Object.entries(data).map(([k, v]) => [k, v ?? (typeof blankEst()[k as keyof Est] === "number" ? 0 : "")])),
+      id: data.id,
+      published: !!data.published,
+      vat_included: !!data.vat_included,
+      overhead_rate: data.overhead_rate ? String(Number(data.overhead_rate)) : "",
       valid_until: data.valid_until ?? "",
-    } as Est);
-    const its = ((data.items ?? []) as (Item & { sort: number })[]).sort((a, b) => a.sort - b.sort);
-    setItems(its.length ? its.map((i) => ({ ...blankItem(), ...Object.fromEntries(Object.entries(i).map(([k, v]) => [k, v ?? ""])) }) as Item) : [blankItem()]);
+      site_issues: data.site_issues ?? "",
+      measure_note: data.measure_note ?? "",
+      schedule_note: data.schedule_note ?? "",
+      exclusions: data.exclusions ?? "",
+      meals_included: data.meals_included !== false,
+      equipment_cost: data.equipment_cost ?? 0,
+      waste_cost: data.waste_cost ?? 0,
+      extra_labor_cost: data.extra_labor_cost ?? 0,
+      extra_note: data.extra_note ?? "",
+    });
+    const its = ((data.items ?? []) as DbItem[]).sort((a, b) => a.sort - b.sort);
+    setItems(its.length ? its.map(fromDb) : [blankItem()]);
     setOpen(true);
   }, [sb, quoteId]);
 
@@ -69,31 +122,60 @@ export function EstimateEditor({ quoteId, status, onSent }: { quoteId: string; s
   }, [load]);
 
   const setI = (i: number, patch: Partial<Item>) => setItems((p) => p.map((x, n) => (n === i ? { ...x, ...patch } : x)));
-  const itemsSum = items.reduce((a, i) => a + i.material_cost + i.delivery_cost + i.labor_cost, 0);
-  const total = itemsSum + est.equipment_cost + est.waste_cost + est.extra_labor_cost;
-  const grand = est.vat_included ? total : total + Math.round(total * 0.1);
+  const move = (i: number, d: -1 | 1) =>
+    setItems((p) => {
+      const j = i + d;
+      if (j < 0 || j >= p.length) return p;
+      const c = [...p];
+      [c[i], c[j]] = [c[j], c[i]];
+      return c;
+    });
+
+  const valid = items.filter((i) => i.work.trim());
+  // 미리보기·합계 계산은 고객 견적서와 같은 함수로
+  const preview_items = valid.map((i, n) => ({
+    id: String(n),
+    sort: n,
+    work: i.work.trim(),
+    material: null,
+    spec: i.spec || null,
+    quantity: null,
+    unit: i.unit || null,
+    qty: qtyNum(i.qty),
+    unit_price: i.unit_price,
+    kind: i.kind,
+    material_cost: 0,
+    delivery_cost: 0,
+    labor_cost: 0,
+    note: i.note || null,
+  }));
+  const rate = Math.min(50, qtyNum(est.overhead_rate));
+  const parts = estimateParts({ items: preview_items, equipment_cost: est.equipment_cost, waste_cost: est.waste_cost, extra_labor_cost: est.extra_labor_cost });
+  const t = estimateTotals({ items: preview_items, overhead_rate: rate, vat_included: est.vat_included, equipment_cost: est.equipment_cost, waste_cost: est.waste_cost, extra_labor_cost: est.extra_labor_cost });
 
   const save = async (publish: boolean) => {
     if (!sb || busy) return;
-    const valid = items.filter((i) => i.work.trim());
-    if (!valid.length) return setMsg("항목을 하나 이상 넣어주세요.");
-    if (publish && !confirm(`고객에게 ${won(grand)}원 견적서를 보낼까요? 상태가 '견적 도착'으로 바뀌고 안내 메일이 가요.`)) return;
+    if (!valid.length) return setMsg("공종을 하나 이상 넣어주세요.");
+    if (valid.some((i) => !i.unit_price)) return setMsg("단가가 비어 있는 줄이 있어요.");
+    if (publish && !confirm(`고객에게 ${won(t.grand)}원(부가세 포함) 견적서를 보낼까요? 상태가 '견적 도착'으로 바뀌고 안내 메일이 가요.`)) return;
     setBusy(true);
     setMsg("");
     const row = {
       quote_id: quoteId,
       published: publish || est.published,
       vat_included: est.vat_included,
+      overhead_rate: rate,
       valid_until: est.valid_until || null,
       site_issues: est.site_issues || null,
       measure_note: est.measure_note || null,
       schedule_note: est.schedule_note || null,
       exclusions: est.exclusions || null,
-      equipment_cost: est.equipment_cost,
-      waste_cost: est.waste_cost,
-      extra_labor_cost: est.extra_labor_cost,
-      extra_note: est.extra_note || null,
       meals_included: est.meals_included,
+      // 예전 추가 비용은 공종 줄로 옮겼으니 비움
+      equipment_cost: 0,
+      waste_cost: 0,
+      extra_labor_cost: 0,
+      extra_note: null,
     };
     const res = est.id ? await sb.from("quote_estimates").update(row).eq("id", est.id).select("id").single() : await sb.from("quote_estimates").insert(row).select("id").single();
     if (res.error || !res.data) {
@@ -101,19 +183,21 @@ export function EstimateEditor({ quoteId, status, onSent }: { quoteId: string; s
       return setMsg("저장하지 못했어요: " + (res.error?.message ?? ""));
     }
     const estimateId = res.data.id as string;
-    // 항목은 지우고 다시 넣음 (순서 = 화면 순서)
+    // 줄은 지우고 다시 넣음 (순서 = 화면 순서)
     await sb.from("quote_estimate_items").delete().eq("estimate_id", estimateId);
     const ins = await sb.from("quote_estimate_items").insert(
       valid.map((i, n) => ({
         estimate_id: estimateId,
         sort: n + 1,
-        work: i.work,
-        material: i.material || null,
+        work: i.work.trim(),
         spec: i.spec || null,
-        quantity: i.quantity || null,
-        material_cost: i.material_cost,
-        delivery_cost: i.delivery_cost,
-        labor_cost: i.labor_cost,
+        unit: i.unit || null,
+        qty: qtyNum(i.qty),
+        unit_price: i.unit_price,
+        kind: i.kind,
+        material_cost: 0,
+        delivery_cost: 0,
+        labor_cost: 0,
         note: i.note || null,
       })),
     );
@@ -124,6 +208,8 @@ export function EstimateEditor({ quoteId, status, onSent }: { quoteId: string; s
     if (publish && status !== "quoted") {
       await sb.from("quote_requests").update({ status: "quoted" }).eq("id", quoteId);
     }
+    // 예전 추가 비용을 공종 줄로 옮겼으면 화면에서도 비움
+    if (est.equipment_cost || est.waste_cost || est.extra_labor_cost) setEst((p) => ({ ...p, equipment_cost: 0, waste_cost: 0, extra_labor_cost: 0, extra_note: "" }));
     setEst((p) => ({ ...p, id: estimateId, published: publish || p.published }));
     setBusy(false);
     setMsg(publish ? "고객에게 보냈어요. 견적 도착 메일이 가요." : "임시 저장했어요. 고객에게는 아직 안 보여요.");
@@ -141,12 +227,7 @@ export function EstimateEditor({ quoteId, status, onSent }: { quoteId: string; s
       </div>
     );
 
-  const numInput = (v: number, on: (n: number) => void, label: string) => (
-    <label className="adm-num">
-      <span>{label}</span>
-      <input className="ui-input" inputMode="numeric" value={v ? won(v) : ""} placeholder="0" onChange={(e) => on(num(e.target.value))} />
-    </label>
-  );
+  const legacyExtra = est.equipment_cost + est.waste_cost + est.extra_labor_cost;
 
   return (
     <div className="adm-card">
@@ -154,64 +235,108 @@ export function EstimateEditor({ quoteId, status, onSent }: { quoteId: string; s
         견적서 <small>{est.published ? "고객에게 보이는 중" : "임시 저장 · 고객에게 안 보임"}</small>
       </h3>
 
-      <div className="adm-items">
+      <datalist id="est-works">
+        {WORK_HINTS.map((w) => (
+          <option key={w} value={w} />
+        ))}
+      </datalist>
+
+      {/* 업체 견적서와 같은 표: 공종명 · 규격 · 단위 · 수량 · 단가 · 금액 */}
+      <div className="adm-etable" role="table" aria-label="견적 내역 입력">
+        <div className="adm-etr adm-etr--head" role="row">
+          <span>구분</span>
+          <span>공종명</span>
+          <span>규격</span>
+          <span>단위</span>
+          <span>수량</span>
+          <span>단가</span>
+          <span>금액</span>
+          <span />
+        </div>
         {items.map((it, i) => (
-          <div key={i} className="adm-item">
-            <div className="adm-item__row">
-              <label>
-                <span>작업</span>
-                <select className="ui-input" value={it.work} onChange={(e) => setI(i, { work: e.target.value })}>
-                  {WORKS.map((w) => (
-                    <option key={w}>{w}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                <span>자재</span>
-                <input className="ui-input" value={it.material} placeholder="한국잔디" onChange={(e) => setI(i, { material: e.target.value })} />
-              </label>
-              <label>
-                <span>규격</span>
-                <input className="ui-input" value={it.spec} placeholder="600×300×30mm" onChange={(e) => setI(i, { spec: e.target.value })} />
-              </label>
-              <label>
-                <span>수량</span>
-                <input className="ui-input" value={it.quantity} placeholder="20㎡ · 1파레트 · 8장" onChange={(e) => setI(i, { quantity: e.target.value })} />
-              </label>
-            </div>
-            <div className="adm-item__row">
-              {numInput(it.material_cost, (n) => setI(i, { material_cost: n }), "자재비")}
-              {numInput(it.delivery_cost, (n) => setI(i, { delivery_cost: n }), "배송비")}
-              {numInput(it.labor_cost, (n) => setI(i, { labor_cost: n }), "시공비")}
-              <label>
-                <span>줄 메모</span>
-                <input className="ui-input" value={it.note} placeholder="현관까지 일자로" onChange={(e) => setI(i, { note: e.target.value })} />
-              </label>
-            </div>
-            <div className="adm-item__foot">
-              <span>소계 {won(it.material_cost + it.delivery_cost + it.labor_cost)}원</span>
-              {items.length > 1 && (
-                <button className="adm-btn adm-btn--danger" onClick={() => setItems((p) => p.filter((_, n) => n !== i))}>
-                  줄 삭제
-                </button>
-              )}
-            </div>
+          <div key={i} className="adm-etr" role="row">
+            <select className={`ui-input adm-etr__kind is-${it.kind}`} value={it.kind} aria-label={`${i + 1}번 구분`} onChange={(e) => setI(i, { kind: e.target.value as Kind })}>
+              {(Object.keys(KIND_LABEL) as Kind[]).map((k) => (
+                <option key={k} value={k}>
+                  {KIND_LABEL[k]}
+                </option>
+              ))}
+            </select>
+            <input
+              className="ui-input"
+              list="est-works"
+              value={it.work}
+              placeholder="예: 디딤돌"
+              aria-label={`${i + 1}번 공종명`}
+              onChange={(e) => setI(i, { work: e.target.value, ...(it.work ? {} : { kind: guessKind(e.target.value) }) })}
+              onBlur={(e) => !it.unit_price && setI(i, { kind: guessKind(e.target.value) })}
+            />
+            <input className="ui-input" value={it.spec} placeholder="예: 자연석 600" aria-label={`${i + 1}번 규격`} onChange={(e) => setI(i, { spec: e.target.value })} />
+            <select className="ui-input" value={UNITS.includes(it.unit) ? it.unit : "_"} aria-label={`${i + 1}번 단위`} onChange={(e) => setI(i, { unit: e.target.value === "_" ? "" : e.target.value })}>
+              {UNITS.map((u) => (
+                <option key={u}>{u}</option>
+              ))}
+              <option value="_">직접</option>
+            </select>
+            <input className="ui-input adm-etr__num" inputMode="decimal" value={it.qty} aria-label={`${i + 1}번 수량`} onChange={(e) => setI(i, { qty: e.target.value.replace(/[^\d.]/g, "") })} />
+            <input className="ui-input adm-etr__num" inputMode="numeric" value={it.unit_price ? won(it.unit_price) : ""} placeholder="0" aria-label={`${i + 1}번 단가`} onChange={(e) => setI(i, { unit_price: num(e.target.value) })} />
+            <strong className="adm-etr__amt">{won(amountOf(it))}</strong>
+            <span className="adm-etr__tools">
+              <button type="button" className="adm-btn" aria-label="위로" disabled={i === 0} onClick={() => move(i, -1)}>
+                ↑
+              </button>
+              <button type="button" className="adm-btn" aria-label="아래로" disabled={i === items.length - 1} onClick={() => move(i, 1)}>
+                ↓
+              </button>
+              <button type="button" className="adm-btn adm-btn--danger" aria-label="줄 삭제" disabled={items.length === 1} onClick={() => setItems((p) => p.filter((_, n) => n !== i))}>
+                ×
+              </button>
+            </span>
+            {!UNITS.includes(it.unit) && (
+              <input className="ui-input adm-etr__unit" value={it.unit} placeholder="단위 직접 입력" aria-label={`${i + 1}번 단위 직접 입력`} onChange={(e) => setI(i, { unit: e.target.value })} />
+            )}
+            <input className="ui-input adm-etr__note" value={it.note} placeholder="줄 메모 (선택) · 예: 현관까지 일자로" aria-label={`${i + 1}번 메모`} onChange={(e) => setI(i, { note: e.target.value })} />
           </div>
         ))}
-        <button className="adm-btn" onClick={() => setItems((p) => [...p, blankItem()])}>
-          + 항목 추가
+        <button type="button" className="adm-btn" onClick={() => setItems((p) => [...p, blankItem()])}>
+          + 줄 추가
         </button>
       </div>
 
-      <h4>추가 비용</h4>
-      <div className="adm-item__row">
-        {numInput(est.equipment_cost, (n) => setEst((p) => ({ ...p, equipment_cost: n })), "장비비")}
-        {numInput(est.waste_cost, (n) => setEst((p) => ({ ...p, waste_cost: n })), "폐기물 처리비")}
-        {numInput(est.extra_labor_cost, (n) => setEst((p) => ({ ...p, extra_labor_cost: n })), "추가 인건비")}
+      {legacyExtra > 0 && (
+        <p className="adm-note">
+          예전 방식 추가 비용 {won(legacyExtra)}원{est.extra_note ? ` (${est.extra_note})` : ""}이 있어요. 저장하면 사라지니, 필요하면 위에 공종 줄(예: 포크레인 1일)로 넣어주세요.
+        </p>
+      )}
+
+      <div className="adm-esum">
+        {(Object.keys(KIND_LABEL) as Kind[]).map((k) => (
+          <div key={k} className="adm-esum__part">
+            <span>{KIND_LABEL[k]}비</span>
+            <span>{won(parts[k])}원</span>
+          </div>
+        ))}
+        <div>
+          <span>계</span>
+          <strong>{won(t.subtotal)}원</strong>
+        </div>
         <label>
-          <span>추가 비용 설명</span>
-          <input className="ui-input" value={est.extra_note} placeholder="미니 굴삭기 반나절" onChange={(e) => setEst((p) => ({ ...p, extra_note: e.target.value }))} />
+          <span>공과잡비</span>
+          <input className="ui-input adm-etr__num" inputMode="decimal" value={est.overhead_rate} placeholder="예: 5" onChange={(e) => setEst((p) => ({ ...p, overhead_rate: e.target.value.replace(/[^\d.]/g, "") }))} />
+          <small>% → {won(t.overhead)}원</small>
         </label>
+        <div>
+          <span>공급가액</span>
+          <strong>{won(t.supply)}원</strong>
+        </div>
+        <div>
+          <span>부가세 10%</span>
+          <strong>{won(t.vat)}원</strong>
+        </div>
+        <div className="adm-esum__grand">
+          <span>합계 (고객에게 보이는 금액)</span>
+          <strong>{won(t.grand)}원</strong>
+        </div>
       </div>
 
       <h4>안내</h4>
@@ -232,19 +357,15 @@ export function EstimateEditor({ quoteId, status, onSent }: { quoteId: string; s
       </div>
       <div className="adm-checks">
         <label>
-          <input type="checkbox" checked={est.vat_included} onChange={(e) => setEst((p) => ({ ...p, vat_included: e.target.checked }))} /> 금액에 부가세 포함
+          <input type="checkbox" checked={est.vat_included} onChange={(e) => setEst((p) => ({ ...p, vat_included: e.target.checked }))} /> 단가에 부가세 포함 <small>(업체 견적이 '부가세 별도'면 끄기)</small>
         </label>
         <label>
-          <input type="checkbox" checked={est.meals_included} onChange={(e) => setEst((p) => ({ ...p, meals_included: e.target.checked }))} /> 식비 등 현장 경비 시공비에 포함
+          <input type="checkbox" checked={est.meals_included} onChange={(e) => setEst((p) => ({ ...p, meals_included: e.target.checked }))} /> 식비 등 현장 경비 견적 금액에 포함
         </label>
         <label>
           유효기간 <input className="ui-input adm-date" type="date" value={est.valid_until} onChange={(e) => setEst((p) => ({ ...p, valid_until: e.target.value }))} />
           <small>비우면 발행일 +14일</small>
         </label>
-      </div>
-
-      <div className="adm-total">
-        합계 <strong>{won(grand)}원</strong> <small>{est.vat_included ? "부가세 포함" : `부가세 10% 더한 금액 (입력 ${won(total)}원)`}</small>
       </div>
 
       {preview && (
@@ -260,6 +381,7 @@ export function EstimateEditor({ quoteId, status, onSent }: { quoteId: string; s
               issued_at: new Date().toISOString(),
               valid_until: est.valid_until || null,
               vat_included: est.vat_included,
+              overhead_rate: rate,
               measure_note: est.measure_note || null,
               schedule_note: est.schedule_note || null,
               exclusions: est.exclusions || null,
@@ -269,7 +391,7 @@ export function EstimateEditor({ quoteId, status, onSent }: { quoteId: string; s
               extra_labor_cost: est.extra_labor_cost,
               extra_note: est.extra_note || null,
               meals_included: est.meals_included,
-              items: items.filter((i) => i.work.trim()).map((i, n) => ({ ...i, id: String(n), sort: n, material: i.material || null, spec: i.spec || null, quantity: i.quantity || null, note: i.note || null })),
+              items: preview_items,
               photos: [],
             }}
           />

@@ -220,10 +220,10 @@ function Screen({ i }: { i: number }) {
       <div className="fm-card fm-in" style={D(1)}>
         <span className="fm-kicker">견적서</span>
         <dl className="fm-rows">
-          <div><dt>자재비</dt><dd>1,240,000원</dd></div>
-          <div><dt>배송비</dt><dd>150,000원</dd></div>
-          <div><dt>시공비</dt><dd>980,000원</dd></div>
-          <div className="fm-rows__sum"><dt>합계</dt><dd>2,370,000원</dd></div>
+          <div><dt>자재비</dt><dd className="fm-mask">0,000,000원</dd></div>
+          <div><dt>배송비</dt><dd className="fm-mask">000,000원</dd></div>
+          <div><dt>시공비</dt><dd className="fm-mask">000,000원</dd></div>
+          <div className="fm-rows__sum"><dt>합계</dt><dd className="fm-mask">0,000,000원</dd></div>
         </dl>
         <div className="fm-answers">
           <span className="is-on">진행할게요</span>

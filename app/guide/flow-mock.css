@@ -319,3 +319,4 @@
 @media (prefers-reduced-motion: reduce) {
   .fm-chips button.is-tap, .fm-btn.is-tap, .fm-review__go, .fm-review__go::after { animation: none; }
 }
+.fm-mask { filter: blur(4px); user-select: none; }

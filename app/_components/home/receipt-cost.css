@@ -257,3 +257,26 @@
   .rc-total { flex-wrap: wrap; gap: 4px; }
   .rc-total strong { font-size: 20px; }
 }
+
+/* 공종 줄 · 가린 금액 (실제 견적서 구조, 금액은 현장마다 달라 숨김) */
+.rc-row dd { flex-wrap: wrap; }
+.rc-lines { flex-basis: 100%; display: grid; gap: 2px; margin-top: 6px; padding-left: 10px; border-left: 2px solid #ece6da; font-size: 12.5px; color: #6b675e; }
+.rc-lines > span { display: flex; justify-content: space-between; gap: 8px; }
+.rc-lines > span > span:first-child { color: #3d3a34; font-weight: 700; }
+.rc-row.is-out .rc-lines { opacity: 0.4; }
+.rc-mask { filter: blur(5px); user-select: none; letter-spacing: 0.02em; }
+.rc-row.is-out .rc-mask { text-decoration: none; }
+.rc-total { flex-direction: column; align-items: stretch; gap: 8px; }
+.rc-total__rows { display: grid; gap: 3px; font-size: 13px; font-weight: 600; color: #4e5a53; }
+.rc-total__rows > span { display: flex; justify-content: space-between; }
+.rc-total__rows b { font-weight: 700; color: #2a2a28; }
+.rc-total__grand { display: flex; justify-content: space-between; align-items: baseline; padding-top: 8px; border-top: 1px solid #d5e3d4; }
+.rc-total__grand strong { font-size: 18px; }
+@media (max-width: 599px) {
+  .rc-row { grid-template-areas: "name won" "desc desc" "lines lines"; }
+  .rc-lines { grid-area: lines; }
+}
+@media (min-width: 600px) {
+  .rc-row dd { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; column-gap: 8px; }
+  .rc-lines { grid-column: 1 / -1; }
+}

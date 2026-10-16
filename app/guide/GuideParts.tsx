@@ -136,14 +136,12 @@ const COSTS = [
   ["배송비", "업체가 산정한 배송 조건과 금액"],
   ["시공비", "견적에 포함된 작업과 금액"],
 ];
-// 가격표 안 예시 줄 (홈 견적서 예시와 같은 금액)
+// 가격표 안: 실제 견적서처럼 공종 · 규격 · 수량 (금액은 현장마다 달라 가림)
 const COST_LINES: [string, string][][] = [
-  [["화강석 판석 600×300", "12장"], ["마사토 · 부자재", "1식"]],
-  [["1톤 화물 배송", "1회"], ["하차 · 현장 이동", "포함"]],
-  [["판석 깔기 · 수평 잡기", "2인"], ["주변 정리", "포함"]],
+  [["디딤돌 · 자연석", "1빠렛"], ["에메랄드그린 · H1.5", "10주"]],
+  [["운반비 · 1톤", "1식"]],
+  [["식재·설치", "1일"], ["포크레인 · 02급", "1일"]],
 ];
-const COST_WON = [420000, 80000, 360000];
-const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 
 export function CostTags() {
   const [ref, on] = useInView<HTMLDivElement>(0.15);
@@ -170,29 +168,29 @@ export function CostTags() {
                   </span>
                 ))}
               </span>
-              <span className="ct-tag__won">{won(COST_WON[i])}</span>
+              <span className="ct-tag__won ct-mask" aria-label="금액은 실측 후 정해져요">000,000원</span>
             </div>
           </li>
         ))}
       </ul>
       <div className="ct-sum">
         <span className="ct-sum__total">
-          <small>합계 · 부가세 포함</small>
-          <strong>{won(COST_WON.reduce((a, b) => a + b, 0))}</strong>
+          <small>계 → 공과잡비 → 부가세 10% → 합계</small>
+          <strong>실측 후 산정</strong>
         </span>
         <ul className="ct-sum__terms" aria-label="함께 적는 조건">
           <li>
-            <em>제외</em> 기존 바닥 철거·폐기물 처리
+            <em>포함되지 않음</em> 견적에 없는 작업은 따로 적어요
           </li>
           <li>
-            <em className="is-add">추가 비용</em> 장비가 들어가기 어려운 현장은 별도 협의
+            <em className="is-add">장비·운반</em> 필요하면 견적서에 줄로 금액을 적어요
           </li>
           <li>
             <em className="is-ok">유효기간</em> 발행일부터 14일
           </li>
         </ul>
       </div>
-      <p className="ct-sample">금액은 이해를 돕기 위한 예시예요. 디딤석 화강석 판석 12장, 경기 용인시 기준</p>
+      <p className="ct-sample">항목은 예시예요. 금액은 현장마다 달라 실측 후 견적서로 안내하고, 견적서는 이미지로 저장할 수 있어요.</p>
     </div>
   );
 }

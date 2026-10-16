@@ -1,11 +1,22 @@
+"use client";
+
+import { useRef, useState } from "react";
+
+export type Kind = "material" | "delivery" | "labor";
+export const KIND_LABEL: Record<Kind, string> = { material: "자재", delivery: "배송", labor: "시공" };
+
 export type EstimateItem = {
   id: string;
   sort: number;
-  work: string;
+  work: string; // 공종명
   material: string | null;
-  spec?: string | null;
-  quantity: string | null;
-  material_cost: number;
+  spec?: string | null; // 규격
+  quantity: string | null; // (예전) 수량 글자
+  unit?: string | null; // 단위
+  qty?: number | null; // 수량
+  unit_price?: number | null; // 단가
+  kind?: Kind | null; // 구분: 자재 · 배송 · 시공
+  material_cost: number; // (예전) 자재비·배송비·시공비
   delivery_cost: number;
   labor_cost: number;
   note: string | null;
@@ -20,7 +31,8 @@ export type Estimate = {
   schedule_note: string | null;
   exclusions: string | null;
   site_issues?: string | null;
-  equipment_cost?: number;
+  overhead_rate?: number | null; // 공과잡비 %
+  equipment_cost?: number; // (예전) 추가 비용
   waste_cost?: number;
   extra_labor_cost?: number;
   extra_note?: string | null;
@@ -30,6 +42,7 @@ export type Estimate = {
 };
 
 const num = (n: number) => n.toLocaleString("ko-KR");
+const qtyText = (n: number) => n.toLocaleString("ko-KR", { maximumFractionDigits: 2 });
 const day = (v: string) => new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(v));
 const plus14 = (v: string) => {
   const d = new Date(v);
@@ -37,27 +50,66 @@ const plus14 = (v: string) => {
   return d.toISOString();
 };
 
-/** 실측 후 받은 항목별 견적서. 종이 견적서처럼: 머리말 → 항목 표 → 합계 → 조건 */
-export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: Estimate; receiptNo: string | null; customer: string | null }) {
-  const sum = (k: "material_cost" | "delivery_cost" | "labor_cost") => e.items.reduce((a, i) => a + i[k], 0);
-  const extras = (
-    [
-      ["장비비", e.equipment_cost ?? 0],
-      ["폐기물 처리비", e.waste_cost ?? 0],
-      ["추가 인건비", e.extra_labor_cost ?? 0],
-    ] as [string, number][]
-  ).filter(([, v]) => v > 0);
-  const total = sum("material_cost") + sum("delivery_cost") + sum("labor_cost") + extras.reduce((a, [, v]) => a + v, 0);
-  // 부가세 포함이면 공급가액·부가세로 나눠 보여주고, 별도면 10%를 더해 합계를 냄
+/** 줄 금액: 단가가 있으면 수량 × 단가, 예전 견적서는 자재비+배송비+시공비 */
+export const itemAmount = (i: EstimateItem) =>
+  (i.unit_price ?? 0) > 0 ? Math.round(Number(i.qty ?? 1) * (i.unit_price ?? 0)) : i.material_cost + i.delivery_cost + i.labor_cost;
+
+/** 자재비·배송비·시공비 묶음 (공과잡비·부가세 전). 예전 견적서는 줄 안의 세 칸, 예전 추가 비용은 시공에 넣음 */
+export function estimateParts(e: Pick<Estimate, "items" | "equipment_cost" | "waste_cost" | "extra_labor_cost">) {
+  const p = { material: 0, delivery: 0, labor: 0 };
+  for (const i of e.items) {
+    if ((i.unit_price ?? 0) > 0) p[i.kind ?? "material"] += itemAmount(i);
+    else {
+      p.material += i.material_cost;
+      p.delivery += i.delivery_cost;
+      p.labor += i.labor_cost;
+    }
+  }
+  p.labor += (e.equipment_cost ?? 0) + (e.waste_cost ?? 0) + (e.extra_labor_cost ?? 0);
+  return p;
+}
+
+/** 계 → 공과잡비 → 공급가액 → 부가세 → 합계. 부가세 포함으로 적은 견적은 거꾸로 나눔 */
+export function estimateTotals(e: Pick<Estimate, "items" | "overhead_rate" | "vat_included" | "equipment_cost" | "waste_cost" | "extra_labor_cost">) {
+  const legacyExtra = (e.equipment_cost ?? 0) + (e.waste_cost ?? 0) + (e.extra_labor_cost ?? 0);
+  const subtotal = e.items.reduce((a, i) => a + itemAmount(i), 0) + legacyExtra;
+  const rate = Number(e.overhead_rate ?? 0);
+  const overhead = Math.round((subtotal * rate) / 100);
+  const total = subtotal + overhead;
   const supply = e.vat_included ? Math.round(total / 1.1) : total;
   const vat = e.vat_included ? total - supply : Math.round(total * 0.1);
-  const grand = supply + vat;
+  return { subtotal, rate, overhead, legacyExtra, supply, vat, grand: supply + vat };
+}
+
+/** 실측 후 받은 견적서. 조경업체 방식: 공종명 · 규격 · 단위 · 수량 · 단가 · 금액 → 계 · 공과잡비 · 공급가액 · 부가세 · 합계 */
+export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: Estimate; receiptNo: string | null; customer: string | null }) {
+  const t = estimateTotals(e);
+  const parts = estimateParts(e);
+  const paper = useRef<HTMLDivElement>(null);
+  const [saving, setSaving] = useState(false);
+  // 견적서를 그림(PNG)으로 내려받기 — 휴대폰·PC 같은 모양으로 보관
+  const download = async () => {
+    if (!paper.current || saving) return;
+    setSaving(true);
+    try {
+      const { toPng } = await import("html-to-image");
+      const url = await toPng(paper.current, { pixelRatio: 2, backgroundColor: "#fffdf8", filter: (n) => !(n instanceof HTMLElement && n.dataset.noCapture === "1") });
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `테두리-견적서-${receiptNo ?? "예시"}.png`;
+      a.click();
+    } catch {
+      window.alert("이미지를 만들지 못했어요. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setSaving(false);
+    }
+  };
   const until = e.valid_until ?? plus14(e.issued_at);
   const expired = new Date(until).getTime() + 86400000 < Date.now();
 
   return (
     <section className="est" aria-labelledby="est-title">
-      <div className="est-paper">
+      <div className="est-paper" ref={paper}>
         <header className="est-top">
           <div>
             <p className="est-brand">테두리 · 부분조경</p>
@@ -89,94 +141,115 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
         </div>
 
         <div className="est-grand">
-          <span>합계 금액 · 부가세 포함</span>
+          <span>견적 금액 · 부가세 포함</span>
           <strong>
-            {num(grand)}
+            {num(t.grand)}
             <small>원</small>
           </strong>
         </div>
 
-        {/* 항목: 웹·모바일 같은 모양. 비어 있는 값은 숨김 */}
-        <div className="est-list">
-          <p className="est-list__head">
-            <span>작업 항목</span>
-            <span>금액</span>
-          </p>
+        {/* 공종별 줄: PC는 표, 휴대폰은 줄마다 카드 */}
+        <div className="est-table" role="table" aria-label="견적 내역">
+          <div className="est-tr est-tr--head" role="row">
+            <span role="columnheader">공종명</span>
+            <span role="columnheader">규격</span>
+            <span role="columnheader">단위</span>
+            <span role="columnheader">수량</span>
+            <span role="columnheader">단가</span>
+            <span role="columnheader">금액</span>
+          </div>
           {e.items.map((i) => {
-            const facts = [
-              i.material && ["자재", i.material],
-              i.spec && ["규격", i.spec],
-              i.quantity && ["수량", i.quantity],
-            ].filter(Boolean) as [string, string][];
-            const costs = (
-              [
-                ["자재비", i.material_cost],
-                ["배송비", i.delivery_cost],
-                ["시공비", i.labor_cost],
-              ] as [string, number][]
-            ).filter(([, v]) => v > 0);
+            const priced = (i.unit_price ?? 0) > 0;
             return (
-              <article key={i.id} className="est-li">
-                <header className="est-li__top">
-                  <strong>{i.work}</strong>
-                  <b>{num(i.material_cost + i.delivery_cost + i.labor_cost)}원</b>
-                </header>
-                {facts.length > 0 && (
-                  <ul className="est-li__facts">
-                    {facts.map(([k, v]) => (
-                      <li key={k}>
-                        <span>{k}</span>
-                        {v}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {costs.length > 0 && (
-                  <dl className="est-li__costs">
-                    {costs.map(([k, v]) => (
-                      <div key={k}>
-                        <dt>{k}</dt>
-                        <dd>{num(v)}원</dd>
-                      </div>
-                    ))}
-                  </dl>
-                )}
-                {i.note && <p className="est-li__note">{i.note}</p>}
-              </article>
+              <div key={i.id} className="est-tr" role="row">
+                <span role="cell" className="est-td--name">
+                  <strong>
+                    {(i.unit_price ?? 0) > 0 && <i className={`est-kind est-kind--${i.kind ?? "material"}`}>{KIND_LABEL[i.kind ?? "material"]}</i>}
+                    {i.work}
+                  </strong>
+                  {i.material && <small>{i.material}</small>}
+                  {i.note && <em>{i.note}</em>}
+                  {/* 휴대폰: 규격 · 수량단위 × 단가 한 줄 */}
+                  <span className="est-td__meta">
+                    {[i.spec, priced ? `${qtyText(Number(i.qty ?? 1))}${i.unit ?? ""} × ${num(i.unit_price ?? 0)}원` : i.quantity].filter(Boolean).join(" · ")}
+                  </span>
+                </span>
+                <span role="cell" className="est-td--spec" data-k="규격">
+                  {i.spec || "—"}
+                </span>
+                <span role="cell" className="est-td--unit" data-k="단위">
+                  {priced ? i.unit || "—" : "—"}
+                </span>
+                <span role="cell" className="est-td--qty" data-k="수량">
+                  {priced ? qtyText(Number(i.qty ?? 1)) : i.quantity || "—"}
+                </span>
+                <span role="cell" className="est-td--price" data-k="단가">
+                  {priced ? `${num(i.unit_price ?? 0)}원` : "—"}
+                </span>
+                <span role="cell" className="est-td--amt">
+                  {num(itemAmount(i))}원
+                </span>
+              </div>
             );
           })}
-          {extras.length > 0 && (
-            <article className="est-li est-li--extra">
-              <header className="est-li__top">
+          {t.legacyExtra > 0 && (
+            <div className="est-tr" role="row">
+              <span role="cell" className="est-td--name">
                 <strong>추가 비용</strong>
-                <b>{num(extras.reduce((a, [, v]) => a + v, 0))}원</b>
-              </header>
-              <dl className="est-li__costs">
-                {extras.map(([k, v]) => (
-                  <div key={k}>
-                    <dt>{k}</dt>
-                    <dd>{num(v)}원</dd>
-                  </div>
-                ))}
-              </dl>
-              {e.extra_note && <p className="est-li__note">{e.extra_note}</p>}
-            </article>
+                {e.extra_note && <em>{e.extra_note}</em>}
+              </span>
+              <span role="cell" className="est-td--spec" data-k="규격">
+                —
+              </span>
+              <span role="cell" className="est-td--unit" data-k="단위">
+                식
+              </span>
+              <span role="cell" className="est-td--qty" data-k="수량">
+                1
+              </span>
+              <span role="cell" className="est-td--price" data-k="단가">
+                {num(t.legacyExtra)}원
+              </span>
+              <span role="cell" className="est-td--amt">
+                {num(t.legacyExtra)}원
+              </span>
+            </div>
           )}
         </div>
 
+        {/* 자재비 · 배송비 · 시공비 나눠 보기 (공과잡비·부가세 전) */}
+        <div className="est-parts" aria-label="비용 구분">
+          {(["material", "delivery", "labor"] as Kind[]).map((k) => (
+            <div key={k} className={`est-part est-part--${k}${parts[k] ? "" : " is-zero"}`}>
+              <span>{KIND_LABEL[k]}비</span>
+              <strong>{parts[k] ? `${num(parts[k])}원` : "없음"}</strong>
+            </div>
+          ))}
+          <p>공과잡비·부가세 전 금액이에요.</p>
+        </div>
 
         <dl className="est-totals">
           <div>
+            <dt>계</dt>
+            <dd>{num(t.subtotal)}원</dd>
+          </div>
+          {t.overhead > 0 && (
+            <div>
+              <dt>공과잡비 ({t.rate}%)</dt>
+              <dd>{num(t.overhead)}원</dd>
+            </div>
+          )}
+          <div>
             <dt>공급가액</dt>
-            <dd>{num(supply)}원</dd>
+            <dd>{num(t.supply)}원</dd>
           </div>
           <div>
             <dt>부가세 (10%)</dt>
-            <dd>{num(vat)}원</dd>
+            <dd>{num(t.vat)}원</dd>
           </div>
           <div className="est-totals__grand">
             <dt>합계</dt>
-            <dd>{num(grand)}원</dd>
+            <dd>{num(t.grand)}원</dd>
           </div>
         </dl>
 
@@ -190,7 +263,7 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
         <dl className="est-terms">
           <div>
             <dt>식비 등 현장 경비</dt>
-            <dd>{e.meals_included === false ? "별도 청구" : "시공비에 포함"}</dd>
+            <dd>{e.meals_included === false ? "별도 청구" : "견적 금액에 포함"}</dd>
           </div>
           {e.schedule_note && (
             <div>
@@ -235,6 +308,9 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
             <br />
             시공 계약은 고객과 조경업체가 직접 맺습니다.
           </p>
+          <button type="button" className="est-save" data-no-capture="1" onClick={() => void download()} disabled={saving}>
+            {saving ? "이미지 만드는 중…" : "견적서 이미지로 저장"}
+          </button>
           <div className="est-issuer">
             <img src="/figma/logo-mark.svg" width={56} height={19} alt="" />
             <span>
@@ -251,24 +327,7 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
 
 /** 대시보드 요약용: 부가세 포함 합계 */
 export function estimateGrand(e: Estimate) {
-  const t =
-    e.items.reduce((a, i) => a + i.material_cost + i.delivery_cost + i.labor_cost, 0) +
-    (e.equipment_cost ?? 0) +
-    (e.waste_cost ?? 0) +
-    (e.extra_labor_cost ?? 0);
-  return e.vat_included ? t : t + Math.round(t * 0.1);
-}
-
-/** 진행 범위 고르기용: 자재·배송·시공 묶음별 금액 (추가 비용은 시공에 포함) */
-export function estimateParts(e: Estimate) {
-  const sum = (k: "material_cost" | "delivery_cost" | "labor_cost") => e.items.reduce((a, i) => a + i[k], 0);
-  const extra = (e.equipment_cost ?? 0) + (e.waste_cost ?? 0) + (e.extra_labor_cost ?? 0);
-  const withVat = (n: number) => (e.vat_included ? n : n + Math.round(n * 0.1));
-  return {
-    material: withVat(sum("material_cost")),
-    delivery: withVat(sum("delivery_cost")),
-    labor: withVat(sum("labor_cost") + extra),
-  };
+  return estimateTotals(e).grand;
 }
 
 /** 견적서 아래 도움말 띠: 카카오 채널 · 문의하기 */

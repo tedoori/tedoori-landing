@@ -237,3 +237,35 @@
 .adm-care__list input { accent-color: #1da049; }
 .adm-care__cat { padding: 1px 8px; border-radius: 999px; background: #eef1ee; color: #4b524d; font-size: 11.5px; font-weight: 800; white-space: nowrap; }
 .adm-care__title { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-weight: 700; }
+
+/* 견적서 입력 표 (업체 방식) */
+.adm-etable { display: grid; gap: 6px; }
+.adm-etr { display: grid; grid-template-columns: 70px minmax(120px, 2fr) minmax(90px, 1.4fr) 76px 64px minmax(90px, 1.2fr) minmax(80px, 1fr) auto; gap: 6px; align-items: center; padding: 8px; border: 1px solid #e2e6e1; border-radius: 12px; background: #fff; }
+.adm-etr .ui-input { min-height: 0; height: 36px; padding: 0 8px; font-size: 13.5px; }
+.adm-etr--head { padding-block: 4px; border: 0; background: none; color: #6b746e; font-size: 12px; font-weight: 800; }
+.adm-etr__num { text-align: right; font-variant-numeric: tabular-nums; }
+.adm-etr__amt { text-align: right; font-variant-numeric: tabular-nums; font-size: 14px; }
+.adm-etr__tools { display: flex; gap: 2px; }
+.adm-etr__tools .adm-btn { width: 30px; height: 30px; padding: 0; }
+.adm-etr__unit { grid-column: 4 / 6; }
+.adm-etr__note { grid-column: 1 / -1; }
+@media (max-width: 760px) {
+  .adm-etr { grid-template-columns: 1fr 1fr 1fr; }
+  .adm-etr--head { display: none; }
+  .adm-etr > input:first-child { grid-column: 1 / -1; }
+  .adm-etr__amt { grid-column: 1 / 3; text-align: left; }
+}
+.adm-esum { display: grid; gap: 6px; justify-self: end; width: min(100%, 380px); margin-left: auto; padding: 14px; border-radius: 12px; background: #f6f8f6; font-size: 14px; }
+.adm-esum > div, .adm-esum > label { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.adm-esum label .ui-input { width: 70px; min-height: 0; height: 32px; padding: 0 8px; }
+.adm-esum label small { margin-left: auto; color: #4b524d; font-size: 13px; }
+.adm-esum__grand { margin-top: 4px; padding-top: 8px; border-top: 1px solid #d5dbd6; }
+.adm-esum__grand strong { color: #0e7a33; font-size: 18px; }
+.adm-etr--head { padding: 4px 9px; } .adm-etr--head span:nth-child(n+4) { text-align: right; } .adm-etr--head span:nth-child(3) { text-align: left; }
+
+.adm-etr__kind { font-weight: 800; }
+.adm-etr__kind.is-material { color: #0e7a33; }
+.adm-etr__kind.is-delivery { color: #2f6fb0; }
+.adm-etr__kind.is-labor { color: #a8452d; }
+.adm-esum__part { color: #4b524d; font-size: 13px; }
+@media (max-width: 760px) { .adm-etr > input:nth-child(2) { grid-column: 2 / -1; } .adm-etr > input:first-child { grid-column: auto; } }

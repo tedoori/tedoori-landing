@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAutoPlay } from "./useAutoPlay";
 import { StatusBadge } from "../ui";
 import "./receipt-cost.css";
 
-// 와이어프레임 문구 그대로 (항목 이름·설명) + 예시 금액
+// 와이어프레임 문구 그대로 (항목 이름·설명) + 실제 견적서처럼 공종 줄 예시. 금액은 현장마다 달라 가림
 const COSTS = [
-  { key: "material", name: "자재비", desc: "자재 종류·수량에 따른 금액", won: 420000 },
-  { key: "delivery", name: "배송비", desc: "업체가 산정한 배송 조건·금액", won: 80000 },
-  { key: "labor", name: "시공비", desc: "견적에 포함된 작업·금액", won: 360000 },
+  { key: "material", name: "자재비", desc: "자재 종류·수량에 따른 금액", lines: [["디딤돌", "자연석 · 1빠렛"], ["에메랄드그린", "H1.5 · 10주"]] },
+  { key: "delivery", name: "배송비", desc: "업체가 산정한 배송 조건·금액", lines: [["운반비", "1톤 · 1식"]] },
+  { key: "labor", name: "시공비", desc: "견적에 포함된 작업·금액", lines: [["식재·설치", "인력 · 1일"]] },
 ] as const;
 
 // 맡길 범위: 고른 범위에 들어가는 항목
@@ -21,43 +21,15 @@ const SCOPES = [
 
 // 견적서에서 짚어주는 말 (번호는 견적서 위 표시와 같음)
 const NOTES = [
-  "항목별로 나눠서 보여드려요. 총액만 보지 않아도 돼요.",
-  "맡길 범위를 바꾸면 빠지는 항목이 '제외'로 표시돼요.",
-  "합계에 부가세가 들어 있는지도 함께 적어요.",
-  "견적서는 14일 동안 유효하고, 보고 나서 진행·조정·보류를 골라요.",
+  "작업 항목마다 규격·수량·단가를 적고, 자재비·배송비·시공비로 묶어 보여드려요.",
+  "맡길 범위를 바꾸면 빠지는 묶음이 '제외'로 표시돼요.",
+  "계 아래에 공과잡비와 부가세를 나눠 적어요.",
+  "견적서는 14일 동안 유효하고, 이미지로 저장할 수도 있어요.",
 ];
 
-const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const seg = (p: number, a: number, b: number) => clamp01((p - a) / (b - a));
 const AUTO_MS = 2600;
-
-/** 합계 숫자가 굴러가듯 바뀜 */
-function useCountTo(target: number) {
-  const [v, setV] = useState(target);
-  const from = useRef(target);
-  useEffect(() => {
-    const start = from.current;
-    if (start === target) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      from.current = target;
-      return setV(target);
-    }
-    let raf = 0;
-    const t0 = performance.now();
-    const tick = (t: number) => {
-      const k = Math.min(1, (t - t0) / 520);
-      const e = 1 - Math.pow(1 - k, 3);
-      const n = Math.round((start + (target - start) * e) / 1000) * 1000;
-      setV(n);
-      from.current = n;
-      if (k < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [target]);
-  return v;
-}
 
 /**
  * 07 · 비용은 항목별로 (영수증 출력)
@@ -91,7 +63,6 @@ export function ReceiptCost() {
   }, [ready, scope]);
 
   const keys: readonly string[] = SCOPES[scope].keys;
-  const total = useCountTo(COSTS.filter((c) => keys.includes(c.key)).reduce((s, c) => s + c.won, 0));
 
   return (
     <div className="rc-track" ref={track}>
@@ -137,7 +108,7 @@ export function ReceiptCost() {
                   <span>
                     견적서 · 예시 <i className="rc-pin rc-pin--on">1</i>
                   </span>
-                  <small>디딤석 · 화강석 판석 12장 · 경기 용인시</small>
+                  <small>공종 · 규격 · 수량 · 단가로 적어요</small>
                   <span className="rc-dots" aria-hidden="true">
                     — — — — — — — —
                   </span>
@@ -153,7 +124,15 @@ export function ReceiptCost() {
                           <span className="rc-row__won">
                             {i === 1 && <i className="rc-pin rc-pin--on">2</i>}
                             {out && <em>제외</em>}
-                            <b>{won(c.won)}</b>
+                            <b className="rc-mask" aria-label="금액은 실측 후 정해져요">000,000원</b>
+                          </span>
+                          <span className="rc-lines">
+                            {c.lines.map(([w, m]) => (
+                              <span key={w}>
+                                <span>{w}</span>
+                                <span>{m}</span>
+                              </span>
+                            ))}
                           </span>
                         </dd>
                       </div>
@@ -161,16 +140,29 @@ export function ReceiptCost() {
                   })}
                 </dl>
                 <div className="rc-line rc-total" style={{ "--k": "var(--l8)" } as React.CSSProperties}>
-                  <span>
-                    합계 <small>부가세 포함</small> <i className="rc-pin rc-pin--on">3</i>
+                  <span className="rc-total__rows">
+                    <span>
+                      계 <b className="rc-mask">0,000,000원</b>
+                    </span>
+                    <span>
+                      공과잡비 <b className="rc-mask">000,000원</b>
+                    </span>
+                    <span>
+                      부가세 10% <b className="rc-mask">000,000원</b>
+                    </span>
                   </span>
-                  <strong aria-live="polite">{won(total)}</strong>
+                  <span className="rc-total__grand">
+                    <span>
+                      합계 <i className="rc-pin rc-pin--on">3</i>
+                    </span>
+                    <strong>실측 후 산정</strong>
+                  </span>
                 </div>
                 <p className="rc-line rc-paper__foot" style={{ "--k": "var(--l9)" } as React.CSSProperties}>
                   실측 내용을 바탕으로 금액과 일정을 정리해요.
                   <br />
                   <span className="rc-valid">
-                    <i className="rc-pin rc-pin--on">4</i> 유효기간 14일 · 제외: 기존 바닥 철거
+                    <i className="rc-pin rc-pin--on">4</i> 유효기간 14일 · 이미지로 저장 가능
                   </span>
                 </p>
                 <span className="rc-barcode" aria-hidden="true" />
@@ -189,7 +181,7 @@ export function ReceiptCost() {
               </li>
             ))}
           </ol>
-          <p className="rc-sample">금액은 이해를 돕기 위한 예시예요. 실제 금액은 실측 후 견적서로 안내해요.</p>
+          <p className="rc-sample">항목은 예시예요. 금액은 현장마다 달라 실측 후 견적서로 안내해요.</p>
         </div>
       </div>
     </div>

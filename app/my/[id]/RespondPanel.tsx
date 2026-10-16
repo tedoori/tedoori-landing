@@ -120,7 +120,7 @@ export function RespondPanel({ id, status, response, parts, onDone }: { id: stri
     setBusy(true);
     setError("");
     const lines = [
-      pick === "go" ? `진행 범위: ${PART_LABEL.filter(([k]) => scope.includes(k)).map(([, l]) => l).join("·")} (${scopeTotal.toLocaleString("ko-KR")}원, 부가세 포함)` : "",
+      pick === "go" ? `진행 범위: ${PART_LABEL.filter(([k]) => scope.includes(k)).map(([, l]) => l).join("·")} (${scopeTotal.toLocaleString("ko-KR")}원, 공과잡비·부가세 전)` : "",
       chips.length ? `${pick === "go" ? "희망 시기" : pick === "adjust" ? "조정할 부분" : "보류 이유"}: ${chips.filter((c) => c !== "날짜를 정해둘게요").concat(wantsDate ? [`희망일 ${date}`] : []).join(", ")}` : "",
       message.trim(),
     ].filter(Boolean);
@@ -175,7 +175,7 @@ export function RespondPanel({ id, status, response, parts, onDone }: { id: stri
                 ))}
               </div>
               <p className="resp-sum">
-                선택한 범위 합계 <strong>{scopeTotal.toLocaleString("ko-KR")}원</strong> <small>부가세 포함 · 범위를 바꾸면 담당자가 확인 후 견적을 다시 맞춰드려요</small>
+                선택한 범위 금액 <strong>{scopeTotal.toLocaleString("ko-KR")}원</strong> <small>공과잡비·부가세 전 · 범위를 바꾸면 담당자가 확인 후 견적을 다시 맞춰드려요</small>
               </p>
             </>
           )}
