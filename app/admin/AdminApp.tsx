@@ -33,15 +33,16 @@ type Row = {
   created_at: string;
 };
 
+// 진행 순서대로. done(진행 확정)은 관리자 화면에서 "완료"로 표시
 const STATUS: [string, string][] = [
   ["received", "접수됨"],
   ["checking", "확인 중"],
   ["visit", "실측 예정"],
-  ["needs", "보완 필요"],
   ["quoted", "견적 도착"],
-  ["done", "진행 확정"],
+  ["needs", "보완 필요"],
   ["hold", "보류"],
   ["canceled", "취소됨"],
+  ["done", "완료"],
 ];
 const LABEL = Object.fromEntries(STATUS);
 const RESP: Record<string, string> = { go: "진행할게요", adjust: "조정 상담", hold: "보류" };
@@ -62,7 +63,7 @@ export function AdminApp() {
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
   const [rows, setRows] = useState<Row[]>([]);
-  const [filter, setFilter] = useState("open");
+  const [filter, setFilter] = useState("all");
   const [q, setQ] = useState("");
   const [selId, setSelId] = useState<string | null>(null);
 
@@ -149,7 +150,7 @@ export function AdminApp() {
       </header>
 
       <nav className="adm-filters" aria-label="상태 거르기">
-        {[["open", `진행 중 ${rows.filter((r) => !["done", "hold", "canceled"].includes(r.status)).length}`], ["all", `전체 ${rows.length}`], ...STATUS.map(([k, l]) => [k, `${l} ${count(k)}`])].map(([k, l]) => (
+        {[["all", `전체 ${rows.length}`], ["open", `진행 중 ${rows.filter((r) => !["done", "hold", "canceled"].includes(r.status)).length}`], ...STATUS.map(([k, l]) => [k, `${l} ${count(k)}`])].map(([k, l]) => (
           <button key={k} className={filter === k ? "is-on" : ""} onClick={() => setFilter(k)}>
             {l}
           </button>

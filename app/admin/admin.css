@@ -19,6 +19,7 @@
 
 .adm-filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .adm-filters button { height: 34px; padding: 0 12px; border: 1px solid #dfe4e0; border-radius: 999px; background: #fff; font: inherit; font-size: 13px; font-weight: 700; color: #4b524d; cursor: pointer; }
+.adm-filters button:nth-child(2) { margin-right: 10px; }
 .adm-filters button.is-on { border-color: #1d2420; background: #1d2420; color: #fff; }
 .adm-search { flex: 1 1 220px; height: 36px; min-height: 0; margin-left: auto; font-size: 14px; }
 
