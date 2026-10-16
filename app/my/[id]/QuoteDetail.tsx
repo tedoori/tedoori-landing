@@ -52,6 +52,7 @@ export type ListRow = {
   works: string[];
   works_unknown: boolean;
   status: QuoteStatus;
+  build_at?: string | null;
   created_at: string;
 };
 
@@ -230,6 +231,8 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
     active: rows.filter((r) => ACTIVE.includes(r.status)).length,
     quoted: rows.filter((r) => r.status === "quoted").length,
     // 견적서를 받은 신청 (견적 도착 뒤 진행 확정·보류 포함)
+    // 시공까지 끝난 신청
+    finished: rows.filter((r) => r.status === "done" && !!r.build_at && new Date(r.build_at).getTime() <= Date.now()).length,
     estimates: rows.filter((r) => ["quoted", "done", "hold"].includes(r.status)).length,
   };
   const name = h?.name ?? d?.name;
@@ -322,6 +325,10 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
               <button type="button" onClick={() => goTab("estimate")}>
                 <span>견적 도착</span>
                 <strong className={counts.quoted ? "is-hot" : ""}>{counts.quoted}</strong>
+              </button>
+              <button type="button" onClick={() => goTab("list")}>
+                <span>시공 완료</span>
+                <strong>{counts.finished}</strong>
               </button>
             </div>
 

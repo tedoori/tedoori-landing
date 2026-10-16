@@ -17,6 +17,7 @@ type QuoteRow = {
   works: string[];
   works_unknown: boolean;
   status: QuoteStatus;
+  build_at?: string | null;
   created_at: string;
 };
 
