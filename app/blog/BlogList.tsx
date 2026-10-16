@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { JournalArticle } from "../journal/data";
 
 const FALLBACK_COVER = "/service/garden-end-s.webp";
@@ -14,6 +14,12 @@ export function BlogList({ articles }: { articles: JournalArticle[] }) {
   const [cat, setCat] = useState("전체");
   const [q, setQ] = useState("");
   const [page, setPage] = useState(1);
+
+  // 글 페이지 경로(블로그 › 분류)에서 넘어오면 그 분류로 열기: /blog?cat=자재 선택
+  useEffect(() => {
+    const c = new URLSearchParams(window.location.search).get("cat");
+    if (c && (BLOG_CATEGORIES as readonly string[]).includes(c)) setCat(c);
+  }, []);
 
   const query = q.trim().toLowerCase();
   const filtering = cat !== "전체" || !!query;
@@ -36,29 +42,37 @@ export function BlogList({ articles }: { articles: JournalArticle[] }) {
 
   const go = (n: number) => {
     setPage(n);
-    document.getElementById("blog-list-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById("blog-tabs")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
     <>
-      <div className="bl-tools">
-        <div className="bl-cats" role="group" aria-label="분류">
-          {["전체", ...BLOG_CATEGORIES].map((c) => (
-            <button key={c} type="button" className="bl-cat" aria-pressed={cat === c} onClick={() => (setCat(c), setPage(1))}>
-              {c}
-            </button>
-          ))}
+      {/* 히어로 하나: 제목·설명·검색, 아래 경계에 분류 탭 */}
+      <section className="bl-hero" aria-labelledby="blog-title">
+        <div className="container bl-hero__inner">
+          <p className="bl-eyebrow">TEDOORI BLOG</p>
+          <h1 id="blog-title" className="bl-display">전원주택 조경, 필요한 것부터 알아봐요.</h1>
+          <p className="lead">마당을 어디부터 바꿀지 막막할 때, 테두리 조경견적을 준비하는 데 필요한 정보를 모았어요.</p>
+          <label className="bl-search">
+            <span className="sr-only">블로그 글 검색</span>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+            <input type="search" value={q} onChange={(e) => (setQ(e.target.value), setPage(1))} placeholder="궁금한 내용을 검색해보세요" />
+          </label>
+          <div id="blog-tabs" className="bl-tabs" role="tablist" aria-label="분류">
+            {["전체", ...BLOG_CATEGORIES].map((c) => (
+              <button key={c} type="button" role="tab" className="bl-tab" aria-selected={cat === c} onClick={() => (setCat(c), setPage(1))}>
+                {c}
+              </button>
+            ))}
+          </div>
         </div>
-        <label className="bl-search">
-          <span className="sr-only">블로그 글 검색</span>
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="7" />
-            <path d="m20 20-3.5-3.5" />
-          </svg>
-          <input type="search" value={q} onChange={(e) => (setQ(e.target.value), setPage(1))} placeholder="궁금한 내용을 검색해보세요" />
-        </label>
-      </div>
+      </section>
 
+      <section className="bl-list" aria-label="블로그 글">
+        <div className="container bl-content">
       {featured && cur === 1 && (
         <Link href={`/blog/${featured.slug}`} className="bl-feature">
           <img src={featured.cover ?? FALLBACK_COVER} alt="" width={900} height={560} />
@@ -115,6 +129,8 @@ export function BlogList({ articles }: { articles: JournalArticle[] }) {
           </button>
         </nav>
       )}
+        </div>
+      </section>
     </>
   );
 }

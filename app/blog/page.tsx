@@ -16,38 +16,18 @@ export default function BlogPage() {
     <>
       <SiteHeader />
       <main id="main" className="bl">
-        <section className="bl-hero" aria-labelledby="blog-title">
-          <div className="container bl-hero__inner">
-            <p className="bl-eyebrow">TEDOORI BLOG</p>
-            <h1 id="blog-title" className="bl-display">
-              전원주택 조경, 필요한 것부터 알아봐요.
-            </h1>
-            <p className="lead">
-              마당을 어디부터 바꿀지 막막할 때, 테두리 조경견적을 준비하는 데 필요한 정보를 모았어요.
-            </p>
-          </div>
-        </section>
-
-        <section className="bl-list" aria-labelledby="blog-list-title">
-          <div className="container bl-content">
-            <div className="bl-head">
-              <p className="bl-eyebrow">LANDSCAPING NOTES</p>
-              <h2 id="blog-list-title" className="bl-title">조경을 시작하기 전에</h2>
+        <BlogList articles={JOURNAL_ARTICLES} />
+        <div className="container">
+          <div className="bl-cta">
+            <div>
+              <strong>우리 집 마당에 맞는 조경을 상담해볼까요?</strong>
+              <p>준비된 정보가 많지 않아도 괜찮아요. 사진 한 장부터 시작할 수 있어요.</p>
             </div>
-
-            <BlogList articles={JOURNAL_ARTICLES} />
-
-            <div className="bl-cta">
-              <div>
-                <strong>우리 집 마당에 맞는 조경을 상담해볼까요?</strong>
-                <p>준비된 정보가 많지 않아도 괜찮아요. 사진 한 장부터 시작할 수 있어요.</p>
-              </div>
-              <Link href="/quote" className="btn btn--primary">
-                무료 견적 시작하기
-              </Link>
-            </div>
+            <Link href="/quote" className="btn btn--primary">
+              무료 견적 시작하기
+            </Link>
           </div>
-        </section>
+        </div>
       </main>
       <SiteFooter />
     </>

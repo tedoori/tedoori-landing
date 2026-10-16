@@ -31,13 +31,12 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
         <article>
           <header className="bl-article__hero">
             <div className="container bl-article__inner">
-              <Link href="/blog" className="bl-back">
-                <span aria-hidden="true">←</span> 블로그로 돌아가기
-              </Link>
-              <span className="bl-meta">
-                <em>{article.category}</em>
-                {article.readingTime}
-              </span>
+              <nav className="bl-crumb" aria-label="경로">
+                <Link href="/blog">블로그</Link>
+                <span aria-hidden="true">›</span>
+                <Link href={`/blog?cat=${encodeURIComponent(article.category)}`}>{article.category}</Link>
+                <span className="bl-crumb__time">{article.readingTime}</span>
+              </nav>
               <h1>{article.title}</h1>
               <p className="lead">{article.excerpt}</p>
               <figure className="bl-article__cover">

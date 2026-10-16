@@ -134,3 +134,25 @@
 .bl-back:hover { background: #d3ecd9; }
 .bl-back:active { transform: scale(0.97); }
 @media (max-width: 700px) { .bl-article__cover { margin-bottom: 0; } .bl-article__body { padding-top: 32px; } }
+
+/* ---------- 3차: 히어로 하나 + 분류 탭 줄 ---------- */
+.bl-hero__inner { gap: 10px; padding-block: 16px 0; }
+@media (min-width: 900px) { .bl-hero__inner { padding-block: 24px 0; } }
+.bl-hero .bl-search { flex: none; width: 100%; max-width: 480px; height: 48px; margin-top: 8px; border-color: transparent; box-shadow: 0 6px 18px -12px rgba(22, 35, 27, 0.35); }
+.bl-tabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin-top: 14px; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); }
+.bl-tabs::-webkit-scrollbar { display: none; }
+.bl-tab { position: relative; flex: none; padding: 12px 14px 14px; border: 0; background: none; color: var(--muted); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; transition: color 160ms ease; }
+.bl-tab:hover { color: var(--forest); }
+.bl-tab::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 0; height: 3px; border-radius: 3px 3px 0 0; background: var(--primary); transform: scaleX(0); transition: transform 220ms var(--bl-ease); }
+.bl-tab[aria-selected="true"] { color: var(--forest); font-weight: 800; }
+.bl-tab[aria-selected="true"]::after { transform: none; }
+.bl-hero { border-bottom: 1px solid #e2e6e1; }
+.bl-list { padding-block: 32px 0; }
+.bl-list .bl-content { gap: 32px; }
+
+/* 글 경로: 블로그 › 분류 */
+.bl-crumb { display: flex; align-items: center; gap: 8px; color: #8a938d; font-size: 14px; font-weight: 700; }
+.bl-crumb a { color: var(--muted); transition: color 160ms ease; }
+.bl-crumb a:hover { color: #0e7a33; text-decoration: underline; text-underline-offset: 4px; }
+.bl-crumb a:last-of-type { color: #0e7a33; }
+.bl-crumb__time { margin-left: 4px; padding-left: 12px; border-left: 1px solid #dfe4e0; font-weight: 500; }
