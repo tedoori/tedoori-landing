@@ -46,7 +46,7 @@ export function CompletionCard({ note, photos, at, careSlugs }: { note: string |
 
 type Care = { slug: string; title: string; category: string; cover_url: string | null };
 
-/** 완료 뒤 관리법: 관리자가 고른 글(고른 순서), 안 골랐으면 관리 방법 분류 최신 3개. 글이 없으면 보이지 않음 */
+/** 완료 뒤 관리법: 관리자가 고른 글(고른 순서). 안 골랐으면 관리 방법 → 셀프 시공 최신 3개, 둘 다 없으면 보이지 않음 */
 function CareLinks({ slugs }: { slugs: string[] }) {
   const [posts, setPosts] = useState<Care[]>([]);
   const key = slugs.join(",");
@@ -54,10 +54,15 @@ function CareLinks({ slugs }: { slugs: string[] }) {
     const sb = getSupabase();
     if (!sb) return;
     const base = sb.from("blog_posts").select("slug, title, category, cover_url").eq("published", true);
-    const query = key ? base.in("slug", key.split(",")) : base.eq("category", "관리 방법").order("published_at", { ascending: false }).limit(3);
+    // 안 골랐으면: 관리 방법 글 먼저, 모자라면 셀프 시공 글로 채워 최신순 3개
+    const query = key ? base.in("slug", key.split(",")) : base.in("category", ["관리 방법", "셀프 시공"]).order("published_at", { ascending: false }).limit(6);
     void query.then(({ data }) => {
       const rows = (data ?? []) as Care[];
-      setPosts(key ? key.split(",").map((v) => rows.find((r) => r.slug === v)).filter((r): r is Care => !!r) : rows);
+      setPosts(
+        key
+          ? key.split(",").map((v) => rows.find((r) => r.slug === v)).filter((r): r is Care => !!r)
+          : [...rows.filter((r) => r.category === "관리 방법"), ...rows.filter((r) => r.category !== "관리 방법")].slice(0, 3),
+      );
     });
   }, [key]);
   if (!posts.length) return null;

@@ -670,16 +670,17 @@ function CarePicker({ value, onChange }: { value: string[]; onChange: (v: string
       .then(({ data }) => setPosts((data ?? []) as CarePost[]));
   }, [sb]);
   const k = q.trim().toLowerCase();
+  const rank = (p: CarePost) => (p.category === "관리 방법" ? 0 : p.category === "셀프 시공" ? 1 : 2);
   const list = posts
     .filter((p) => !k || `${p.title} ${p.category}`.toLowerCase().includes(k))
-    .sort((a, b) => Number(b.category === "관리 방법") - Number(a.category === "관리 방법"));
+    .sort((a, b) => rank(a) - rank(b));
   const picked = value.map((v) => posts.find((p) => p.slug === v)).filter((p): p is CarePost => !!p);
   const toggle = (slug: string) => onChange(value.includes(slug) ? value.filter((v) => v !== slug) : value.length >= 3 ? value : [...value, slug]);
 
   return (
     <div className="adm-care">
       <p className="adm-care__head">
-        함께 보여줄 블로그 글 <small>최대 3개 · 안 고르면 관리 방법 최신 글이 자동으로 보여요</small>
+        함께 보여줄 블로그 글 <small>최대 3개 · 안 고르면 관리 방법 → 셀프 시공 최신 글이 자동으로 보여요 (둘 다 없으면 안 보여요)</small>
       </p>
       {picked.length > 0 && (
         <ol className="adm-care__picked">
