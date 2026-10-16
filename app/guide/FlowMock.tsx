@@ -69,14 +69,17 @@ export function FlowMock() {
         ))}
       </ol>
 
-      <p className="fm-now" key={`now-${i}`}>{STEPS[i].desc}</p>
+      <p className="fm-now" key={`now-${i}`}>
+        <strong>{i + 1}. {STEPS[i].k}</strong>
+        {STEPS[i].desc}
+      </p>
 
       <div className="fm-stage">
         <div className="fm-iphone" aria-live="polite">
           <div className="fm-display">
             <span className="fm-island" aria-hidden="true" />
             <div className="fm-status" aria-hidden="true">
-              <span>9:41</span>
+              <span>8:05</span>
               <span className="fm-status__icons">
                 <svg viewBox="0 0 18 12" width="17" height="11"><rect x="0" y="8" width="3" height="4" rx="1" /><rect x="5" y="5" width="3" height="7" rx="1" /><rect x="10" y="2.5" width="3" height="9.5" rx="1" /><rect x="15" y="0" width="3" height="12" rx="1" /></svg>
                 <svg viewBox="0 0 16 12" width="15" height="11"><path d="M8 2.2c2.3 0 4.4.9 6 2.4l1.2-1.3A10.3 10.3 0 0 0 8 .4 10.3 10.3 0 0 0 .8 3.3L2 4.6a8.5 8.5 0 0 1 6-2.4Zm0 3.6c1.3 0 2.5.5 3.4 1.3l1.2-1.3A6.7 6.7 0 0 0 8 4a6.7 6.7 0 0 0-4.6 1.8l1.2 1.3c.9-.8 2.1-1.3 3.4-1.3ZM8 9.4 9.8 7.6a2.6 2.6 0 0 0-3.6 0Z" /></svg>
@@ -97,7 +100,6 @@ export function FlowMock() {
             <span className="fm-home" aria-hidden="true" />
           </div>
         </div>
-        <p className="fm-caption">화면 예시예요</p>
       </div>
     </div>
   );

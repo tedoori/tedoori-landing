@@ -93,7 +93,8 @@
   .fm-step__no { width: 26px; height: 26px; font-size: 12px; }
   .fm-step__txt strong { font-size: 15px; }
   .fm-step__txt span { display: none; }
-  .fm-now { display: block; min-height: 3.2em; text-align: center; color: rgba(255, 255, 255, 0.78); font-size: 15px; animation: fm-fade 300ms var(--ease) both; }
+  .fm-now { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(29, 160, 73, 0.5); text-align: center; color: #fff; font-size: 16px; font-weight: 700; line-height: 1.5; animation: fm-fade 300ms var(--ease) both; }
+  .fm-now strong { color: #7fdc9e; font-size: 13px; font-weight: 800; }
 }
 @keyframes fm-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
@@ -145,7 +146,7 @@
   justify-content: space-between;
   align-items: center;
   height: 47px;
-  padding: 4px 26px 0 30px;
+  padding: 4px 16px 0 30px;
   font-size: 14px;
   font-weight: 700;
 }
@@ -183,7 +184,6 @@
   border-radius: 99px;
   background: #111;
 }
-.fm-caption { position: relative; color: rgba(255, 255, 255, 0.6); font-size: 12px; }
 
 /* 화면 전환: 새 화면이 옆에서 밀려 들어오며 흐림이 걷힘, 안쪽 조각은 차례로 */
 .fm-screen {
