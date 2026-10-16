@@ -7,7 +7,7 @@ const TYPES = ["서비스", "자료 보완", "수정", "취소", "견적", "기�
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** prefill: 내 신청 안에서 열 때 접수번호·이메일·연락처를 미리 채움 */
-export function ContactForm({ prefill }: { prefill?: { receiptNo?: string | null; email?: string | null; phone?: string | null } } = {}) {
+export function ContactForm({ prefill }: { prefill?: { receiptNo?: string | null; email?: string | null; phone?: string | null; locked?: boolean } } = {}) {
   const [type, setType] = useState<string>("서비스");
   const [receiptNo, setReceiptNo] = useState(prefill?.receiptNo ?? "");
   const [message, setMessage] = useState("");
@@ -94,6 +94,22 @@ export function ContactForm({ prefill }: { prefill?: { receiptNo?: string | null
         </div>
       </fieldset>
 
+      {prefill?.locked ? (
+        <dl className="q-locked">
+          <div>
+            <dt>접수번호</dt>
+            <dd>{receiptNo || "—"}</dd>
+          </div>
+          <div>
+            <dt>답변받을 이메일</dt>
+            <dd>{email}</dd>
+          </div>
+          <div>
+            <dt>연락처</dt>
+            <dd>{phone || "—"}</dd>
+          </div>
+        </dl>
+      ) : (
       <label className="q-field">
         <span className="q-label">관련 접수번호 · 선택</span>
         <input
@@ -104,6 +120,7 @@ export function ContactForm({ prefill }: { prefill?: { receiptNo?: string | null
           onChange={(e) => setReceiptNo(e.target.value)}
         />
       </label>
+      )}
 
       <label className="q-field">
         <span className="q-label">문의 내용 · 필수</span>
@@ -118,6 +135,8 @@ export function ContactForm({ prefill }: { prefill?: { receiptNo?: string | null
         />
       </label>
 
+      {!prefill?.locked && (
+        <>
       <label className="q-field">
         <span className="q-label">이메일 · 필수</span>
         <input
@@ -145,6 +164,8 @@ export function ContactForm({ prefill }: { prefill?: { receiptNo?: string | null
           onChange={(e) => setPhone(e.target.value)}
         />
       </label>
+        </>
+      )}
 
       {/* 자동 등록 프로그램 막기: 사람에게는 보이지 않는 칸 */}
       <input ref={trapRef} name="website" tabIndex={-1} autoComplete="off" className="sr-only" aria-hidden="true" />

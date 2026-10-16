@@ -595,9 +595,8 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
         {d && tab === "ask" && (
           <>
             <TabHead title="문의하기" rows={rows} selId={selId} onPick={(id) => pick(id, "ask")} />
-            <p className="dash-muted">고른 신청의 접수번호와 연락처를 미리 채워뒀어요. 답변은 이메일로 드려요.</p>
             <div className="dash-ask">
-              <ContactForm key={d.id} prefill={{ receiptNo: d.receipt_no, email: d.email, phone: d.phone }} />
+              <ContactForm key={d.id} prefill={{ receiptNo: d.receipt_no, email: email || d.email, phone: d.phone, locked: true }} />
             </div>
           </>
         )}
