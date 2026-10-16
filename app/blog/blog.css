@@ -1,3 +1,6 @@
+/* 편집기에서 고를 수 있는 글꼴(명조·손글씨): 글에 쓰였을 때만 내려받음 */
+@import url("https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Noto+Serif+KR:wght@400;700&display=swap");
+
 /* ---------- 조경 블로그: 목록 · 글 (서비스 소개·이용안내와 같은 연한 초록 회색 바탕) ---------- */
 .bl {
   --bl-tint: rgb(243, 245, 240);
@@ -202,3 +205,20 @@
 /* 휴대폰에서만 줄바꿈 */
 .bl-hero .lead br.bl-br-m { display: none; }
 @media (max-width: 700px) { .bl-hero .lead br.bl-br-m { display: inline; } }
+
+/* ---------- 본문 (편집기에서 쓴 글 · 편집 화면에도 같은 모양) ---------- */
+.bl-prose { color: #3d4842; font-size: 17px; line-height: 1.85; word-break: keep-all; overflow-wrap: anywhere; }
+.bl-prose > * + * { margin-top: 16px; }
+.bl-prose h2 { margin-top: 44px; color: var(--forest); font-size: 24px; line-height: 1.4; font-weight: 800; letter-spacing: -0.02em; }
+.bl-prose h3 { margin-top: 32px; color: var(--forest); font-size: 20px; line-height: 1.45; font-weight: 800; }
+.bl-prose h2:first-child, .bl-prose h3:first-child { margin-top: 0; }
+.bl-prose a { color: #0e7a33; text-decoration: underline; text-underline-offset: 4px; }
+.bl-prose strong { color: var(--forest); }
+.bl-prose ul, .bl-prose ol { padding-left: 1.4em; }
+.bl-prose ul { list-style: disc; }
+.bl-prose ol { list-style: decimal; }
+.bl-prose li + li { margin-top: 6px; }
+.bl-prose blockquote { padding: 14px 18px; border-left: 4px solid var(--primary); border-radius: 0 12px 12px 0; background: rgb(243, 245, 240); color: var(--forest); }
+.bl-prose img { display: block; max-width: 100%; height: auto; margin-inline: auto; border-radius: 16px; }
+.bl-prose hr { border: 0; border-top: 1px solid #e2e6e1; margin-block: 32px; }
+.bl-prose p:empty::before { content: "\00a0"; }

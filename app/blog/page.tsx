@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "../_components/SiteFooter";
 import { SiteHeader } from "../_components/SiteHeader";
-import { JOURNAL_ARTICLES } from "../journal/data";
+import { getPosts } from "../../lib/blog";
 import { BlogList } from "./BlogList";
 import "./blog.css";
 
@@ -11,12 +11,16 @@ export const metadata: Metadata = {
   description: "전원주택 조경견적, 잔디·자갈·디딤석 선택과 마당 부분조경 정보를 테두리가 쉽게 안내해요.",
 };
 
-export default function BlogPage() {
+// 관리자가 글을 저장하면 바로 새로 만들고(revalidatePath), 그 밖에는 1분마다 확인
+export const revalidate = 60;
+
+export default async function BlogPage() {
+  const posts = await getPosts();
   return (
     <>
       <SiteHeader />
       <main id="main" className="bl">
-        <BlogList articles={JOURNAL_ARTICLES} />
+        <BlogList articles={posts} />
         <div className="container">
           <div className="bl-cta">
             <div>

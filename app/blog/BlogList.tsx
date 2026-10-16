@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import type { JournalArticle } from "../journal/data";
+import type { BlogPost } from "../../lib/blog";
 
 const FALLBACK_COVER = "/service/garden-end-s.webp";
 // 분류는 고정 목록: 글이 아직 없는 분류도 미리 보여줌 (견적 준비 + 시공 후 관리 + 직접 시공 꿀팁)
@@ -10,7 +10,7 @@ export const BLOG_CATEGORIES = ["견적 안내", "자재 선택", "부분조경"
 const PER_PAGE = 9;
 
 /** 블로그 목록: 검색 + 분류 + 관리자가 고른 큰 글 1개 + 한 페이지 9개, 번호로 넘김 */
-export function BlogList({ articles }: { articles: JournalArticle[] }) {
+export function BlogList({ articles }: { articles: BlogPost[] }) {
   const [cat, setCat] = useState("전체");
   const [q, setQ] = useState("");
   const [page, setPage] = useState(1);

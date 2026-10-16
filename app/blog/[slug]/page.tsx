@@ -3,23 +3,26 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "../../_components/SiteFooter";
 import { SiteHeader } from "../../_components/SiteHeader";
-import { JOURNAL_ARTICLES, getArticle } from "../../journal/data";
+import { getPosts } from "../../../lib/blog";
 import "../blog.css";
 
-export function generateStaticParams() {
-  return JOURNAL_ARTICLES.map(({ slug }) => ({ slug }));
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  return (await getPosts()).map(({ slug }) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const article = getArticle(slug);
+  const article = (await getPosts()).find((a) => a.slug === slug);
   if (!article) return {};
   return { title: `${article.title} | 테두리`, description: article.excerpt };
 }
 
 export default async function BlogArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const article = getArticle(slug);
+  const JOURNAL_ARTICLES = await getPosts();
+  const article = JOURNAL_ARTICLES.find((a) => a.slug === slug);
   if (!article) notFound();
 
   // 네이버 블로그처럼 글 아래 이전 글·다음 글 + 목록
@@ -49,12 +52,7 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
             </div>
           </header>
           <div className="container bl-article__body">
-            {article.sections.map((section) => (
-              <section key={section.heading} className="bl-article__section">
-                <h2>{section.heading}</h2>
-                {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-              </section>
-            ))}
+            <div className="bl-prose" dangerouslySetInnerHTML={{ __html: article.html }} />
             <aside className="bl-cta">
               <div>
                 <strong>우리 집 마당도 상담해볼까요?</strong>

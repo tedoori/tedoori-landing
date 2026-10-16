@@ -4,6 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { getAdminSupabase } from "../../lib/supabase";
 import { shrinkPhoto } from "../../lib/photo";
 import { EstimateEditor } from "./EstimateEditor";
+import dynamic from "next/dynamic";
+
+// 블로그 편집기는 블로그 메뉴를 열 때만 불러옴
+const BlogAdmin = dynamic(() => import("./BlogAdmin").then((m) => m.BlogAdmin), { ssr: false, loading: () => <p className="adm-note">편집기를 불러오는 중…</p> });
 import { CompletionCard } from "../my/[id]/CompletionCard";
 
 type Row = {
@@ -77,6 +81,7 @@ export function AdminApp() {
   const [filter, setFilter] = useState("all");
   const [q, setQ] = useState("");
   const [selId, setSelId] = useState<string | null>(null);
+  const [area, setArea] = useState<"quotes" | "blog">("quotes");
 
   const loadRows = useCallback(async () => {
     if (!sb) return;
@@ -150,6 +155,14 @@ export function AdminApp() {
     <div className="adm-app">
       <header className="adm-top">
         <h1>테두리 관리자</h1>
+        <nav className="adm-area" aria-label="관리 메뉴">
+          <button type="button" className={area === "quotes" ? "is-on" : ""} onClick={() => setArea("quotes")}>
+            견적 신청
+          </button>
+          <button type="button" className={area === "blog" ? "is-on" : ""} onClick={() => setArea("blog")}>
+            블로그
+          </button>
+        </nav>
         <div className="adm-top__right">
           <button className="adm-btn" onClick={() => void loadRows()}>
             새로고침
@@ -160,6 +173,10 @@ export function AdminApp() {
         </div>
       </header>
 
+      {area === "blog" ? (
+        <BlogAdmin />
+      ) : (
+      <>
       <nav className="adm-filters" aria-label="상태 거르기">
         {[["all", `전체 ${rows.length}`], ["open", `진행 중 ${rows.filter((r) => !CLOSED.includes(r.status)).length}`], ...STATUS.map(([k, l]) => [k, `${l} ${count(k)}`])].map(([k, l]) => (
           <button key={k} className={filter === k ? "is-on" : ""} onClick={() => setFilter(k)}>
@@ -193,6 +210,8 @@ export function AdminApp() {
 
         <section className="adm-detail">{sel ? <Detail key={sel.id} r={sel} onSaved={loadRows} /> : <p className="adm-note">왼쪽에서 신청을 골라주세요.</p>}</section>
       </div>
+      </>
+      )}
     </div>
   );
 }
