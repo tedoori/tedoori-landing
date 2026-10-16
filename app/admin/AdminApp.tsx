@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getSupabase } from "../../lib/supabase";
+import { getAdminSupabase } from "../../lib/supabase";
 import { EstimateEditor } from "./EstimateEditor";
 
 type Row = {
@@ -56,10 +56,10 @@ const toLocal = (v: string | null) => {
 const fromLocal = (v: string) => (v ? new Date(`${v}:00+09:00`).toISOString() : null);
 
 export function AdminApp() {
-  const sb = getSupabase();
-  const [phase, setPhase] = useState<"loading" | "email" | "code" | "denied" | "ready">("loading");
+  const sb = getAdminSupabase();
+  const [phase, setPhase] = useState<"loading" | "email" | "denied" | "ready">("loading");
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
+  const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
   const [rows, setRows] = useState<Row[]>([]);
   const [filter, setFilter] = useState("open");
@@ -87,20 +87,14 @@ export function AdminApp() {
     void check();
   }, [check]);
 
-  const send = async (e: React.FormEvent) => {
+  // 관리자는 이메일 + 비밀번호 (Supabase → Authentication → Users 에서 만든 계정)
+  const login = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!sb) return;
     setMsg("");
-    const { error } = await sb.auth.signInWithOtp({ email: email.trim().toLowerCase(), options: { shouldCreateUser: true } });
-    if (error) return setMsg("확인 메일을 보내지 못했어요. 관리자 이메일인지 확인해주세요.");
-    setPhase("code");
-  };
-  const verify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!sb) return;
-    const { error } = await sb.auth.verifyOtp({ email: email.trim().toLowerCase(), token: code.trim(), type: "email" });
-    if (error) return setMsg("코드가 맞지 않거나 만료됐어요.");
-    setCode("");
+    const { error } = await sb.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
+    if (error) return setMsg("이메일 또는 비밀번호가 맞지 않아요.");
+    setPassword("");
     await check();
   };
 
@@ -117,21 +111,15 @@ export function AdminApp() {
   const sel = rows.find((r) => r.id === selId) ?? null;
 
   if (phase === "loading") return <p className="adm-note">불러오는 중…</p>;
-  if (phase === "email" || phase === "code")
+  if (phase === "email")
     return (
       <section className="adm-login">
         <h1>테두리 관리자</h1>
-        {phase === "email" ? (
-          <form onSubmit={send}>
-            <input className="ui-input" type="email" placeholder="관리자 이메일" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            <button className="btn btn--primary">확인 코드 받기</button>
-          </form>
-        ) : (
-          <form onSubmit={verify}>
-            <input className="ui-input" inputMode="numeric" placeholder="메일로 받은 코드" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} required />
-            <button className="btn btn--primary">로그인</button>
-          </form>
-        )}
+        <form onSubmit={login}>
+          <input className="ui-input" type="email" autoComplete="username" placeholder="관리자 이메일" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input className="ui-input" type="password" autoComplete="current-password" placeholder="비밀번호" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          <button className="btn btn--primary">로그인</button>
+        </form>
         {msg && <p className="my-error">{msg}</p>}
       </section>
     );
@@ -198,7 +186,7 @@ export function AdminApp() {
 }
 
 function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> }) {
-  const sb = getSupabase();
+  const sb = getAdminSupabase();
   const [status, setStatus] = useState(r.status);
   const [visitAt, setVisitAt] = useState(toLocal(r.visit_at));
   const [visitNote, setVisitNote] = useState(r.visit_note ?? "");

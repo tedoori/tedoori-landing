@@ -22,3 +22,12 @@ export function getSupabaseForToken(accessToken: string): SupabaseClient | null 
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
+
+let adminClient: SupabaseClient | null = null;
+
+// 관리자 화면 전용 연결. 로그인 정보를 따로 보관해서 '내 신청'(고객 로그인)과 섞이지 않음
+export function getAdminSupabase(): SupabaseClient | null {
+  if (!url || !anonKey) return null;
+  adminClient ??= createClient(url, anonKey, { auth: { storageKey: "tedoori-admin-auth" } });
+  return adminClient;
+}

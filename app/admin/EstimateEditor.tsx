@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { getSupabase } from "../../lib/supabase";
+import { getAdminSupabase } from "../../lib/supabase";
 
 type Item = { work: string; material: string; spec: string; quantity: string; material_cost: number; delivery_cost: number; labor_cost: number; note: string };
 type Est = {
@@ -41,7 +41,7 @@ const num = (v: string) => Math.max(0, Number(v.replace(/[^\d]/g, "")) || 0);
 
 /** 견적서 작성: 임시 저장 / 고객에게 보내기 */
 export function EstimateEditor({ quoteId, status, onSent }: { quoteId: string; status: string; onSent: () => Promise<void> }) {
-  const sb = getSupabase();
+  const sb = getAdminSupabase();
   const [est, setEst] = useState<Est>(blankEst());
   const [items, setItems] = useState<Item[]>([blankItem()]);
   const [open, setOpen] = useState(false);
