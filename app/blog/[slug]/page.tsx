@@ -31,7 +31,9 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
         <article>
           <header className="bl-article__hero">
             <div className="container bl-article__inner">
-              <Link href="/blog" className="bl-back">← 블로그로 돌아가기</Link>
+              <Link href="/blog" className="bl-back">
+                <span aria-hidden="true">←</span> 블로그로 돌아가기
+              </Link>
               <span className="bl-meta">
                 <em>{article.category}</em>
                 {article.readingTime}

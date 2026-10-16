@@ -91,3 +91,46 @@
 }
 .bl-list { padding-block: 28px 72px; }
 @media (max-width: 700px) { .bl-head__text { display: none; } .bl-content { gap: 20px; } }
+
+/* ---------- 2차 손질 ---------- */
+/* 히어로(헤더 바로 아래): 한 덩어리로 낮게 */
+.bl-hero__inner { gap: 6px; padding-block: 12px 28px; }
+.bl-hero .bl-display { font-size: clamp(24px, 1rem + 1.2vw, 32px); line-height: 1.3; }
+.bl-hero .bl-display br { display: none; }
+.bl-hero .lead { font-size: 15px; }
+.bl-hero .lead br { display: none; }
+@media (min-width: 900px) { .bl-hero__inner { padding-block: 20px 36px; } }
+.bl-head { display: grid; gap: 0; justify-content: start; }
+.bl-list { padding-block: 32px 0; }
+
+/* 검색 + 분류 */
+.bl-tools { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 20px; }
+.bl-cats { margin-inline: 0; padding: 2px 0; flex: 1 1 auto; min-width: 0; }
+.bl-search { display: flex; align-items: center; gap: 8px; flex: 0 1 300px; height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid #dfe4e0; background: #fff; color: #8a938d; }
+.bl-search:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(29, 160, 73, 0.15); }
+.bl-search input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; color: var(--forest); font: inherit; font-size: 15px; }
+@media (max-width: 700px) {
+  .bl-cats { margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); flex-basis: 100%; }
+  .bl-search { flex-basis: 100%; }
+}
+.bl-empty { padding: 48px 16px; border-radius: 20px; background: var(--bl-tint); color: var(--muted); text-align: center; }
+
+/* 페이지 번호 */
+.bl-pages { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
+.bl-pages button { min-width: 40px; height: 40px; padding: 0 10px; border-radius: 12px; border: 1px solid #dfe4e0; background: #fff; color: var(--forest); font: inherit; font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; cursor: pointer; }
+.bl-pages button[aria-current="page"] { background: var(--forest); border-color: var(--forest); color: #fff; }
+.bl-pages button:disabled { opacity: 0.35; cursor: default; }
+
+/* 상담 띠와 푸터 사이 간격 */
+.bl-cta { margin-bottom: clamp(56px, 8vw, 96px); }
+
+/* 글 페이지: 바탕은 모두 흰색 */
+.bl-article__hero { background: #fff; }
+.bl-article__cover { margin-bottom: 0; box-shadow: none; }
+.bl-article__body { padding-top: clamp(40px, 6vw, 64px); }
+.bl-related { margin-bottom: clamp(56px, 8vw, 96px); }
+.bl-article__body > .bl-cta { margin-bottom: 0; }
+.bl-back { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px 0 12px; border-radius: 999px; background: #e3f3e6; color: #0e7a33; font-size: 14px; font-weight: 800; transition: background-color 160ms ease, transform 160ms ease; }
+.bl-back:hover { background: #d3ecd9; }
+.bl-back:active { transform: scale(0.97); }
+@media (max-width: 700px) { .bl-article__cover { margin-bottom: 0; } .bl-article__body { padding-top: 32px; } }

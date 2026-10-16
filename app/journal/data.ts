@@ -6,12 +6,15 @@ export type JournalArticle = {
   readingTime: string;
   /** 목록·글 머리 사진 */
   cover?: string;
+  /** 블로그 목록 맨 위에 크게 보일 글 (관리자가 하나 고름) */
+  featured?: boolean;
   sections: { heading: string; paragraphs: string[] }[];
 };
 
 export const JOURNAL_ARTICLES: JournalArticle[] = [
   {
     slug: "how-landscaping-estimate-works",
+    featured: true,
     cover: "/service/work-bed-s.webp",
     category: "견적 안내",
     title: "전원주택 마당 조경견적은 어떻게 계산할까요?",

@@ -140,6 +140,6 @@
 /* 헤더 자리 빈 칸: 바로 아래 첫 섹션 색과 이어지게 (서비스 소개·이용 안내 히어로) */
 .site-header-space:has(+ main.gd > .gd-hero:first-child),
 .site-header-space:has(+ main.sv > .sv-hero:first-child),
-.site-header-space:has(+ main.bl) {
+.site-header-space:has(+ main.bl > .bl-hero:first-child) {
   background: rgb(243, 245, 240);
 }

@@ -20,14 +20,10 @@ export default function BlogPage() {
           <div className="container bl-hero__inner">
             <p className="bl-eyebrow">TEDOORI BLOG</p>
             <h1 id="blog-title" className="bl-display">
-              전원주택 조경,
-              <br />
-              필요한 것부터 알아봐요.
+              전원주택 조경, 필요한 것부터 알아봐요.
             </h1>
             <p className="lead">
-              마당을 어디부터 바꿀지 막막할 때,
-              <br />
-              테두리 조경견적을 준비하는 데 필요한 정보를 모았어요.
+              마당을 어디부터 바꿀지 막막할 때, 테두리 조경견적을 준비하는 데 필요한 정보를 모았어요.
             </p>
           </div>
         </section>
@@ -35,15 +31,8 @@ export default function BlogPage() {
         <section className="bl-list" aria-labelledby="blog-list-title">
           <div className="container bl-content">
             <div className="bl-head">
-              <div>
-                <p className="bl-eyebrow">LANDSCAPING NOTES</p>
-                <h2 id="blog-list-title" className="bl-title">조경을 시작하기 전에</h2>
-              </div>
-              <p className="bl-head__text">
-                식재·잔디·자갈·판석·디딤석부터 견적 준비까지,
-                <br />
-                지금 필요한 글부터 읽어보세요.
-              </p>
+              <p className="bl-eyebrow">LANDSCAPING NOTES</p>
+              <h2 id="blog-list-title" className="bl-title">조경을 시작하기 전에</h2>
             </div>
 
             <BlogList articles={JOURNAL_ARTICLES} />
