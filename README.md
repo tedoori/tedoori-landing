@@ -102,6 +102,7 @@
 | `/my` | 이메일 확인 · 내 신청 목록 (페이지네이션) |
 | `/my/[id]` | 신청 상세 (동적 라우트) |
 | `/my/[id]/edit` | 신청 수정 |
+| `/blog` | 전원주택 조경 정보와 견적 준비 글 |
 | `/contact` · `/menu` · `/terms` · `/privacy` | 문의 · 전체 메뉴 · 약관 · 개인정보 처리방침 |
 
 재사용 UI: `app/_components/ui` (StatusBadge·Callout·EmptyState 등), `SiteHeader`·`SiteFooter`, `/my` 화면 공통 스타일 `app/my/my.css`.

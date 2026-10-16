@@ -152,28 +152,30 @@ Claude Code 세션이 중단된 뒤 작업을 이어갈 때 참고하는 인수�
 - 현재 메인 제목은 `전원주택 조경 플랫폼 | 테두리`입니다.
 - 서비스 페이지 제목은 `조경업체·조경 플랫폼 | 테두리`입니다.
 - `app/sitemap.ts`와 `app/robots.ts`를 추가했습니다.
-- 사이트맵에는 고객용 공개 페이지와 `/journal` 글 4개가 포함되어 있습니다.
+- 사이트맵에는 고객용 공개 페이지와 `/blog` 글 4개가 포함되어 있습니다.
 - `/design`, `/lab-*`, `/my/[id]`, `/my/[id]/edit`는 검색 비노출 또는 내부 화면으로 유지합니다.
 - Production 확인 완료: `https://tedoori.com/`, `/robots.txt`, `/sitemap.xml` 및 주요 페이지 메타태그가 정상 응답합니다.
 
-### 조경 정보 저널
+### 조경 블로그
 
-- `/journal` 정보 허브를 추가했습니다.
+- `/blog` 정보 허브를 추가했습니다. 기존 `/journal` 주소는 `/blog`로 영구 이동합니다.
 - 글 4개를 추가했습니다.
-  - `/journal/how-landscaping-estimate-works`
-  - `/journal/lawn-gravel-stepping-stone`
-  - `/journal/small-yard-landscaping-start`
-  - `/journal/prepare-landscaping-estimate`
+  - `/blog/how-landscaping-estimate-works`
+  - `/blog/lawn-gravel-stepping-stone`
+  - `/blog/small-yard-landscaping-start`
+  - `/blog/prepare-landscaping-estimate`
 - 각 글에 `테두리 조경견적`, `전원주택 조경` 관련 문맥과 `/quote` CTA를 넣었습니다.
-- 전체 메뉴와 sitemap에서 `/journal`과 글 4개로 이동할 수 있습니다.
+- 전체 메뉴와 sitemap에서 `/blog`와 글 4개로 이동할 수 있습니다.
 - 네이버 블로그 발행용 초안은 `docs/naver-blog-drafts.md`에 정리했습니다.
-- 네이버 블로그에 실제 발행하려면 사용자 계정 로그인과 게시 확인이 필요합니다.
+- 네이버 블로그는 아직 만들지 않았으며, 초안은 추후 발행할 수 있도록 보존했습니다.
+- Footer에 `teduri.official@gmail.com`, 카카오톡 `@테두리`, Instagram `@tedoori_official`을 연결했습니다.
 
 ### 최신 커밋 및 배포
 
 - `9a1c69a seo: refine page titles and descriptions`
 - `c3cda7c seo: include landscaping platform keywords`
 - `5939c0a feat: add landscaping journal and blog drafts`
+- `b2aa0a4 feat: switch journal to blog and add social channels`
 - GitHub: `https://github.com/tedoori/tedoori-landing`
 - Production: `https://tedoori.com`
 - 최신 Vercel Production 배포 상태: Ready 확인
@@ -181,10 +183,7 @@ Claude Code 세션이 중단된 뒤 작업을 이어갈 때 참고하는 인수�
 
 ### 다음 사용자 확인 필요
 
-- 네이버 블로그 실제 주소
-- 인스타그램 실제 주소
-- 사용자가 제공할 경우 `teduri.official@gmail.com`과 카카오톡 `@테두리`를 footer·문의 영역에 연결
-- 네이버 블로그 게시 후 해당 글과 `/journal` 글의 상호 링크 확인
+- 네이버 블로그를 실제로 개설할 경우 초안과 `/blog` 글의 상호 링크 확인
 
 
 ### 2026-10-16 미션 6 CRUD 구현 완료 (Claude Code)
