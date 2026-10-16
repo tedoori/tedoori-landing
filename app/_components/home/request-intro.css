@@ -6,6 +6,12 @@
   position: relative;
   z-index: 2;
   margin-top: -100svh;
+  /* 히어로 마지막 화면과 겹치는 동안 아래 히어로 버튼이 눌리도록 */
+  pointer-events: none;
+}
+
+.ri-after {
+  pointer-events: auto;
 }
 
 .ri-track {
@@ -426,7 +432,7 @@
   transform: translateY(14px) scale(0.92);
   transition:
     opacity 300ms linear,
-    transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1.2);
+    transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .ri-float strong {

@@ -139,9 +139,7 @@ export function YardStory() {
         <HeroFilm step={current.id} />
 
         <div className="ys-copy" ref={textRef}>
-          {step === 0 ? (
-            <p className="ys-kicker">서울·경기·인천 부분조경</p>
-          ) : (
+          {step > 0 && (
             <div className="ys-progress" aria-hidden="true">
               <span className="ys-progress__label">작업</span>
               <span className="ys-progress__count">
@@ -160,11 +158,10 @@ export function YardStory() {
           </p>
           <div className="ys-actions">
             <Link href={isOutro ? `/quote?work=${encodeURIComponent([...activeWorks].join(","))}` : "/quote"} className="btn btn--primary">
-              {isOutro ? "이 조합으로 무료 견적 요청" : "무료 견적 시작하기"}
+              무료 견적 시작하기
             </Link>
             {step === 0 && (
               <p className="ys-hint">
-                <span className="ys-hint__dot" aria-hidden="true" />
                 서울·경기·인천 · <strong>견적 요청 별도 비용 없음</strong>
               </p>
             )}

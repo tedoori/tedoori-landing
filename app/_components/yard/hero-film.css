@@ -74,7 +74,6 @@
 
 .ys.ys--film .ys-body,
 .ys.ys--film .ys-hint,
-.ys.ys--film .ys-kicker,
 .ys.ys--film .ys-progress {
   color: rgba(255, 255, 255, 0.88);
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
@@ -115,42 +114,24 @@
 }
 
 .ys.ys--film .ys-body,
-.ys.ys--film .ys-hint,
-.ys.ys--film .ys-kicker {
+.ys.ys--film .ys-hint {
   color: #fff;
   text-shadow:
     0 1px 4px rgba(0, 0, 0, 0.6),
     0 4px 18px rgba(0, 0, 0, 0.5);
 }
 
-/* 견적 버튼: 크게, 밝은 초록에 빛 번짐 */
+/* 견적 버튼: 크게, 사진 위에서도 떠 보이게 (중립 그림자) */
 .ys.ys--film .ys-actions .btn {
   min-height: 60px;
   padding-inline: 36px;
   font-size: 18px;
   background: #12873b;
-  box-shadow:
-    0 0 0 4px rgba(184, 240, 196, 0.25),
-    0 14px 40px -8px rgba(30, 166, 76, 0.75);
-  animation: hf-cta 2.4s ease-in-out infinite;
+  box-shadow: 0 10px 28px -10px rgba(0, 0, 0, 0.55);
 }
 
 .ys.ys--film .ys-actions .btn:hover {
   background: #0d6e30;
-}
-
-@keyframes hf-cta {
-  50% {
-    box-shadow:
-      0 0 0 10px rgba(184, 240, 196, 0),
-      0 14px 40px -8px rgba(30, 166, 76, 0.75);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ys.ys--film .ys-actions .btn {
-    animation: none;
-  }
 }
 
 @media (max-width: 899px) {

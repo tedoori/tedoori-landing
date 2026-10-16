@@ -610,13 +610,6 @@
   }
 }
 
-.ys-kicker {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-muted);
-  min-height: 21px;
-}
-
 
 /* ---------- 히어로 디오라마 (배경 있는 영상 그대로, 가장자리만 배경색으로 녹임) ---------- */
 .ys--dio {
@@ -700,33 +693,6 @@
 .ys-hint strong {
   color: var(--primary);
   font-weight: 700;
-}
-.ys-hint__dot {
-  position: relative;
-  width: 8px;
-  height: 8px;
-  flex: none;
-  border-radius: 50%;
-  background: #3fae6a;
-}
-.ys-hint__dot::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: #3fae6a;
-  animation: ys-ping 1.8s ease-out infinite;
-}
-@keyframes ys-ping {
-  to {
-    transform: scale(2.6);
-    opacity: 0;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .ys-hint__dot::after {
-    animation: none;
-  }
 }
 /* 사진 위라서 어두운 유리 알약으로 */
 .ys-actions .ys-hint {

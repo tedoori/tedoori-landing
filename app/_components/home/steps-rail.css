@@ -44,7 +44,7 @@
 
 .sr-status__badge {
   display: inline-flex;
-  animation: sr-badge 520ms cubic-bezier(0.2, 0.8, 0.2, 1.4) both;
+  animation: sr-badge 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes sr-badge {
@@ -357,12 +357,12 @@
 }
 
 .sr-panel.is-on .sv0__thumbs span {
-  animation: sv-up 600ms cubic-bezier(0.2, 0.8, 0.2, 1.2) both;
+  animation: sv-up 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: calc(250ms + var(--k) * 220ms);
 }
 
 .sr-panel.is-on .sv0__thumbs i {
-  animation: sv-pop 360ms cubic-bezier(0.2, 0.8, 0.2, 1.6) both;
+  animation: sv-pop 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: calc(900ms + var(--k) * 220ms);
 }
 

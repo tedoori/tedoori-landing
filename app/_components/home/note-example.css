@@ -3,11 +3,6 @@
 .ne {
   position: relative;
   background-color: #f6f2ea;
-  /* 모눈 종이 책상 */
-  background-image:
-    linear-gradient(rgba(140, 120, 90, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(140, 120, 90, 0.07) 1px, transparent 1px);
-  background-size: 28px 28px;
 }
 
 .ne-track {
@@ -113,7 +108,7 @@
 .ne-paper__label {
   font-size: 21px;
   line-height: 40px;
-  color: #6b7c99;
+  color: #56657f;
 }
 
 .ne-paper__text {
@@ -171,7 +166,7 @@
   margin-bottom: 6px;
   font-size: 12px;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--forest-900, #16231b);
 }
 
 .ne-postit__text {
