@@ -1,6 +1,8 @@
 import Link from "next/link";
 
-const KAKAO_URL = "http://pf.kakao.com/_HeKBX";
+const KAKAO_URL = "https://pf.kakao.com/_HeKBX";
+const CONTACT_EMAIL = "teduri.official@gmail.com";
+const INSTAGRAM_URL = "https://www.instagram.com/tedoori_official/";
 
 export function SiteFooter() {
   return (
@@ -29,6 +31,9 @@ export function SiteFooter() {
                 </li>
                 <li>
                   <Link href="/quote">무료 견적 신청</Link>
+                </li>
+                <li>
+                  <Link href="/blog">조경 블로그</Link>
                 </li>
               </ul>
             </div>
@@ -63,6 +68,10 @@ export function SiteFooter() {
               →
             </span>
           </a>
+          <div className="site-footer__channels" aria-label="테두리 채널">
+            <a href={`mailto:${CONTACT_EMAIL}`}>이메일 <span>{CONTACT_EMAIL}</span></a>
+            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">인스타그램 <span>@tedoori_official</span></a>
+          </div>
         </div>
 
         <div className="site-footer__bottom">

@@ -1,6 +1,6 @@
 # 네이버 블로그 발행 초안
 
-사이트의 `/journal` 글과 같은 주제로 발행할 수 있는 초안입니다. 네이버 블로그 글을 올릴 때 본문 마지막에 대응하는 테두리 홈페이지 글 링크와 `무료 견적 신청` 링크를 함께 넣어주세요.
+사이트의 `/blog` 글과 같은 주제로 발행할 수 있는 초안입니다. 네이버 블로그를 나중에 시작할 때 본문 마지막에 대응하는 테두리 홈페이지 글 링크와 `무료 견적 신청` 링크를 함께 넣어주세요.
 
 ## 1. 전원주택 마당 조경견적은 어떻게 계산할까요?
 
@@ -12,7 +12,7 @@
 
 작업할 곳이 보이는 사진과 희망 시기, 원하는 분위기를 준비해 주세요. 완성된 계획이 없어도 현재 불편한 점을 적어주면 충분해요.
 
-사이트 글: https://tedoori.com/journal/how-landscaping-estimate-works
+사이트 글: https://tedoori.com/blog/how-landscaping-estimate-works
 견적 신청: https://tedoori.com/quote
 
 ## 2. 잔디·자갈·디딤석, 우리 집 마당에 맞는 재료 고르기
@@ -25,7 +25,7 @@
 
 테두리는 전원주택 조경 상담에서 한 가지 재료만 고르기보다 잔디·자갈·디딤석을 공간별로 조합하는 방법도 함께 살펴봐요.
 
-사이트 글: https://tedoori.com/journal/lawn-gravel-stepping-stone
+사이트 글: https://tedoori.com/blog/lawn-gravel-stepping-stone
 견적 신청: https://tedoori.com/quote
 
 ## 3. 작은 마당 부분조경, 어디부터 시작할까요?
@@ -36,7 +36,7 @@
 
 처음부터 완성된 정원 계획을 만들지 않아도 괜찮아요. 지금 필요한 공간과 예산, 희망 시기를 기준으로 테두리 조경견적을 받아본 뒤 다음 단계를 결정할 수 있어요.
 
-사이트 글: https://tedoori.com/journal/small-yard-landscaping-start
+사이트 글: https://tedoori.com/blog/small-yard-landscaping-start
 견적 신청: https://tedoori.com/quote
 
 ## 4. 조경견적 신청 전에 준비하면 좋은 세 가지
@@ -49,7 +49,7 @@
 
 테두리는 내용을 확인한 뒤 전원주택 조경에 맞는 상담을 안내해요.
 
-사이트 글: https://tedoori.com/journal/prepare-landscaping-estimate
+사이트 글: https://tedoori.com/blog/prepare-landscaping-estimate
 견적 신청: https://tedoori.com/quote
 
 ## 발행 메모

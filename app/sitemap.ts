@@ -8,9 +8,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: SITE_URL, priority: 1, changeFrequency: "weekly" },
     { url: `${SITE_URL}/service`, priority: 0.8, changeFrequency: "monthly" },
     { url: `${SITE_URL}/guide`, priority: 0.8, changeFrequency: "monthly" },
-    { url: `${SITE_URL}/journal`, priority: 0.8, changeFrequency: "weekly" },
+    { url: `${SITE_URL}/blog`, priority: 0.8, changeFrequency: "weekly" },
     ...JOURNAL_ARTICLES.map((article) => ({
-      url: `${SITE_URL}/journal/${article.slug}`,
+      url: `${SITE_URL}/blog/${article.slug}`,
       priority: 0.7,
       changeFrequency: "monthly" as const,
     })),

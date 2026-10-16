@@ -1138,6 +1138,24 @@ button {
   font-weight: 800;
 }
 
+.site-footer__channels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding-top: 2px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.site-footer__channels a:hover {
+  color: #fff;
+}
+
+.site-footer__channels span {
+  margin-left: 4px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
 .site-footer__bottom {
   display: flex;
   flex-wrap: wrap;

@@ -26,7 +26,7 @@ import { PrivacyContent } from "../_components/legal/PrivacyContent";
 import { TermsContent } from "../_components/legal/TermsContent";
 
 const STORAGE_KEY = "teduri-quote-v1";
-const KAKAO_URL = "http://pf.kakao.com/_HeKBX";
+const KAKAO_URL = "https://pf.kakao.com/_HeKBX";
 // 접수 완료 화면: 진행 단계 (이용 안내 노선도와 같은 이름)
 const DONE_TRACK = ["견적 요청", "내용 확인", "방문 실측", "견적 확인", "진행 결정"];
 const MORE_LINKS = [
