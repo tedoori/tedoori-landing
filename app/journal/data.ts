@@ -4,12 +4,15 @@ export type JournalArticle = {
   title: string;
   excerpt: string;
   readingTime: string;
+  /** 목록·글 머리 사진 */
+  cover?: string;
   sections: { heading: string; paragraphs: string[] }[];
 };
 
 export const JOURNAL_ARTICLES: JournalArticle[] = [
   {
     slug: "how-landscaping-estimate-works",
+    cover: "/service/work-bed-s.webp",
     category: "견적 안내",
     title: "전원주택 마당 조경견적은 어떻게 계산할까요?",
     excerpt: "전체 정원이 아니라 바꾸고 싶은 공간부터, 조경견적을 살펴볼 때 확인할 항목을 정리했어요.",
@@ -39,6 +42,7 @@ export const JOURNAL_ARTICLES: JournalArticle[] = [
   },
   {
     slug: "lawn-gravel-stepping-stone",
+    cover: "/service/work-stone-s.webp",
     category: "자재 선택",
     title: "잔디·자갈·디딤석, 우리 집 마당에 맞는 재료 고르기",
     excerpt: "마당의 용도와 관리 방식에 따라 잔디, 자갈, 디딤석을 고르는 기준을 쉽게 설명해요.",
@@ -67,6 +71,7 @@ export const JOURNAL_ARTICLES: JournalArticle[] = [
   },
   {
     slug: "small-yard-landscaping-start",
+    cover: "/service/work-lawn-s.webp",
     category: "부분조경",
     title: "작은 마당 부분조경, 어디부터 시작할까요?",
     excerpt: "마당 전체 공사가 부담스러운 분을 위해 작은 공간에서 전원주택 조경을 시작하는 순서를 안내해요.",
@@ -95,6 +100,7 @@ export const JOURNAL_ARTICLES: JournalArticle[] = [
   },
   {
     slug: "prepare-landscaping-estimate",
+    cover: "/guide/hero-shot.webp",
     category: "신청 준비",
     title: "조경견적 신청 전에 준비하면 좋은 세 가지",
     excerpt: "사진, 대략적인 크기, 희망 시기만 준비해도 전원주택 조경 상담을 시작할 수 있어요.",

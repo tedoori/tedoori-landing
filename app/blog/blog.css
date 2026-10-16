@@ -1,0 +1,93 @@
+/* ---------- 조경 블로그: 목록 · 글 (서비스 소개·이용안내와 같은 연한 초록 회색 바탕) ---------- */
+.bl {
+  --bl-tint: rgb(243, 245, 240);
+  --bl-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  background: #fff;
+}
+.bl-eyebrow { color: #0e7a33; font-size: 12px; font-weight: 800; letter-spacing: 0.12em; }
+.bl-display { letter-spacing: -0.035em; text-wrap: balance; font-size: clamp(26px, 1.1rem + 1.6vw, 38px); font-weight: 800; line-height: 1.3; }
+.bl-title { margin-top: 8px; font-size: clamp(24px, 1.3rem + 1vw, 34px); line-height: 1.3; font-weight: 800; letter-spacing: -0.02em; }
+
+/* 히어로: 헤더 빈 칸과 같은 색으로 이어짐 (상단 흰 선 없음) */
+.bl-hero { background: var(--bl-tint); }
+.bl-hero__inner { display: grid; gap: 16px; gap: 10px; padding-block: clamp(20px, 3vw, 40px) clamp(28px, 4vw, 48px); }
+.bl-hero .lead { max-width: 600px; color: var(--muted); font-size: 15px; }
+
+.bl-content { display: grid; gap: 28px; }
+.bl-head { display: flex; justify-content: space-between; align-items: end; gap: 32px; }
+.bl-head__text { max-width: 360px; color: var(--muted); font-size: 15px; }
+
+/* 분류 */
+.bl-cats { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin-inline: calc(var(--gutter) * -1); padding: 2px var(--gutter); }
+.bl-cats::-webkit-scrollbar { display: none; }
+.bl-cat { flex: none; min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid #dfe4e0; background: #fff; color: var(--forest); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 160ms var(--bl-ease); }
+.bl-cat:hover { border-color: var(--forest); }
+.bl-cat:active { transform: scale(0.97); }
+.bl-cat[aria-pressed="true"] { background: var(--forest); border-color: var(--forest); color: #fff; }
+
+/* 글 공통 */
+.bl-meta { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
+.bl-meta em { padding: 2px 9px; border-radius: 999px; background: #e3f3e6; color: #0e7a33; font-size: 12px; font-style: normal; font-weight: 800; }
+.bl-excerpt { color: var(--muted); font-size: 15px; line-height: 1.6; }
+
+/* 맨 앞 글 */
+.bl-feature { display: grid; overflow: hidden; border-radius: 24px; background: var(--bl-tint); animation: bl-in 420ms var(--bl-ease) both; }
+.bl-feature img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; transition: transform 500ms var(--bl-ease); }
+.bl-feature:hover img { transform: scale(1.03); }
+.bl-feature__body { display: flex; flex-direction: column; gap: 12px; padding: 24px; }
+.bl-feature strong { font-size: clamp(22px, 1rem + 1.4vw, 32px); line-height: 1.35; font-weight: 800; letter-spacing: -0.02em; text-wrap: balance; }
+.bl-more { margin-top: 4px; color: #0e7a33; font-size: 14px; font-weight: 800; }
+@media (min-width: 900px) {
+  .bl-feature { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: center; }
+  .bl-feature img { height: 100%; aspect-ratio: auto; min-height: 360px; }
+  .bl-feature__body { padding: 40px; }
+}
+
+/* 카드 */
+.bl-grid { display: grid; gap: 28px 20px; }
+@media (min-width: 700px) { .bl-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .bl-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.bl-grid li { animation: bl-in 420ms var(--bl-ease) both; animation-delay: calc(80ms + var(--n) * 60ms); }
+.bl-card { display: flex; flex-direction: column; gap: 10px; height: 100%; }
+.bl-card__img { overflow: hidden; border-radius: 18px; background: var(--bl-tint); }
+.bl-card__img img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; transition: transform 500ms var(--bl-ease); }
+.bl-card:hover .bl-card__img img { transform: scale(1.04); }
+.bl-card strong { font-size: 19px; line-height: 1.4; font-weight: 800; letter-spacing: -0.01em; }
+.bl-card:hover strong { color: #0e7a33; }
+@keyframes bl-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* 상담 띠 */
+.bl-cta { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-top: 16px; padding: 28px 32px; border-radius: 24px; background: var(--forest); color: #fff; }
+.bl-cta strong { font-size: 20px; }
+.bl-cta p { margin-top: 5px; color: rgba(255, 255, 255, 0.72); font-size: 14px; }
+.bl-cta .btn { flex: none; width: auto; max-width: none; }
+
+/* ---------- 글 ---------- */
+.bl-article__hero { background: var(--bl-tint); }
+.bl-article__inner { display: grid; gap: 14px; max-width: calc(780px + var(--gutter) * 2); padding-block: clamp(32px, 5vw, 64px) 0; }
+.bl-back { width: fit-content; color: #0e7a33; font-size: 14px; font-weight: 700; }
+.bl-article__inner h1 { font-size: clamp(28px, 1.2rem + 2.4vw, 44px); line-height: 1.3; font-weight: 800; letter-spacing: -0.03em; text-wrap: balance; }
+.bl-article__inner .lead { color: var(--muted); }
+.bl-article__cover { margin-top: 20px; margin-bottom: -80px; overflow: hidden; border-radius: 24px; box-shadow: 0 30px 60px -40px rgba(22, 35, 27, 0.5); }
+.bl-article__cover img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.bl-article__body { max-width: calc(720px + var(--gutter) * 2); padding-block: 128px clamp(48px, 8vw, 96px); }
+.bl-article__section { display: grid; gap: 12px; margin-bottom: 44px; }
+.bl-article__section h2 { font-size: 24px; line-height: 1.4; font-weight: 800; letter-spacing: -0.02em; }
+.bl-article__section p { color: #3d4842; font-size: 17px; line-height: 1.85; }
+.bl-related { display: grid; gap: 16px; margin-top: 56px; padding-top: 32px; border-top: 1px solid #e2e6e1; }
+.bl-related h2 { font-size: 18px; font-weight: 800; }
+.bl-related ul { display: grid; gap: 20px; }
+@media (min-width: 700px) { .bl-related ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+@media (max-width: 700px) {
+  .bl-head, .bl-cta { align-items: start; flex-direction: column; }
+  .bl-cta { padding: 24px; }
+  .bl-cta .btn { width: 100%; }
+  .bl-article__cover { margin-bottom: -48px; border-radius: 18px; }
+  .bl-article__body { padding-top: 88px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bl-feature, .bl-grid li { animation: none; }
+}
+.bl-list { padding-block: 28px 72px; }
+@media (max-width: 700px) { .bl-head__text { display: none; } .bl-content { gap: 20px; } }
