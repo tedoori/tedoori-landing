@@ -123,3 +123,74 @@
   .dash-focus__next { flex-direction: column; align-items: stretch; text-align: center; }
   .dash-steps__label { font-size: 12px; }
 }
+
+/* 1단계: 헤더 아래 간격 · 신청 줄 수정 버튼 · 모바일 메뉴 4칸 */
+.section:has(> .my-page .is-dash) { padding-top: clamp(20px, 3vw, 36px); }
+.dash-row { display: flex; align-items: center; gap: 10px; padding: 0 14px 0 0; }
+.dash-row.is-on { padding: 0 13px 0 0; }
+.dash-row__pick { display: flex; flex: 1; min-width: 0; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 0 16px 18px; border: 0; background: transparent; font: inherit; text-align: left; cursor: pointer; }
+.dash-row__edit { flex: none; text-decoration: none; }
+@media (max-width: 899px) {
+  .dash-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; overflow: visible; }
+  .dash-nav button { position: relative; flex-direction: column; justify-content: center; gap: 4px; width: 100%; padding: 10px 4px; border-radius: 14px; font-size: 13px; }
+  .dash-nav button span { flex: none; }
+  .dash-nav__count { position: absolute; top: 4px; right: 6px; min-width: 18px; padding: 1px 5px; font-size: 11px; }
+  .dash-nav__dot { position: absolute; top: 8px; right: 12px; }
+}
+@media (max-width: 599px) {
+  .dash-row { flex-wrap: wrap; padding: 0 0 12px; }
+  .dash-row.is-on { padding: 0 0 11px; }
+  .dash-row__pick { flex-basis: 100%; padding-right: 14px; }
+  .dash-row__edit { margin-left: 18px; }
+}
+
+/* 2단계: 탭 머리말 · 신청 고르기 · 방문 일정 카드 */
+.dash-tabhead { display: grid; gap: 10px; }
+.dash-tabhead__title { font-size: clamp(24px, 3.4vw, 30px); font-weight: 800; letter-spacing: -0.02em; }
+.dash-tabhead__sub { color: var(--muted); font-size: 14px; font-weight: 600; }
+.dash-pick { display: flex; flex-wrap: wrap; gap: 8px; }
+.dash-pick button { display: grid; gap: 1px; padding: 10px 14px; border: 1px solid #e3e7e4; border-radius: 14px; background: #fff; font: inherit; text-align: left; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.dash-pick button strong { font-size: 14px; }
+.dash-pick button span { color: var(--muted); font-size: 12px; }
+.dash-pick button:hover { border-color: #1da049; }
+.dash-pick button.is-on { border-color: #1da049; background: #eaf6ee; box-shadow: inset 0 0 0 1px #1da049; }
+
+.dash-main .visit { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "cal body" "info info"; row-gap: 20px; background: #fff; border: 1px solid #e8ebe8; box-shadow: 0 10px 30px -18px rgba(20, 40, 28, 0.25); }
+.dash-main .visit-cal { grid-area: cal; }
+.dash-main .visit-body { grid-area: body; }
+.visit-info { grid-area: info; display: grid; border-top: 1px solid #eef0ee; }
+.visit-info div { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; padding: 12px 0; border-bottom: 1px solid #f1f3f1; font-size: 14px; }
+.visit-info div:last-child { border-bottom: 0; padding-bottom: 0; }
+.visit-info dt { color: var(--muted); }
+.visit-info dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.visit.is-pending .visit-cal__month { background: #9aa39d; }
+.visit.is-pending .visit-cal__day { color: #9aa39d; }
+.visit.is-pending .visit-cal__week,
+.visit.is-pending .visit-kicker { color: #6b746e; }
+.visit.is-pending .visit-dday { background: #9aa39d; }
+@media (max-width: 479px) {
+  .visit-info div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+
+/* 3단계: 견적 항목 목록 (웹·모바일 동일) */
+.est-list { display: grid; border-top: 2px solid #1d2420; }
+.est-list__head { display: flex; justify-content: space-between; padding: 10px 2px; border-bottom: 1px solid #e9e6de; color: #6b716c; font-size: 12px; font-weight: 700; }
+.est-li { display: grid; gap: 8px; padding: 16px 2px; border-bottom: 1px solid #e9e6de; }
+.est-li:last-child { border-bottom: 1px solid #1d2420; }
+.est-li__top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.est-li__top strong { font-size: 17px; font-weight: 800; }
+.est-li__top b { font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.est-li__facts { display: flex; flex-wrap: wrap; gap: 6px; }
+.est-li__facts li { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 8px; background: #f3f2ec; font-size: 13px; font-weight: 600; color: #2b322d; }
+.est-li__facts li span { color: #8a8f88; font-size: 12px; font-weight: 700; }
+.est-li__costs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.est-li__costs div { display: grid; gap: 2px; padding: 8px 10px; border-radius: 10px; background: #fafaf7; border: 1px solid #efede6; }
+.est-li__costs dt { color: #8a8f88; font-size: 12px; font-weight: 700; }
+.est-li__costs dd { margin: 0; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.est-li__note { color: #8a6d2f; font-size: 13px; }
+.est-li--extra { background: #fbfaf6; padding-inline: 12px; }
+.est-next { text-align: center; }
+@media (max-width: 479px) {
+  .est-li__costs { grid-template-columns: minmax(0, 1fr); }
+  .est-li__costs div { display: flex; justify-content: space-between; }
+}

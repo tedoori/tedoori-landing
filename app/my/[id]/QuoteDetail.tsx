@@ -228,12 +228,6 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
               {k === "estimate" && d?.estimate && <i className="dash-nav__dot" aria-label="견적서 도착" />}
             </button>
           ))}
-          {d && (
-            <Link href={`/my/${d.id}/edit`} className="dash-nav__link">
-              <Icon k="edit" />
-              <span>신청서 수정</span>
-            </Link>
-          )}
         </nav>
         <div className="dash-side__foot">
           <Link href="/quote" className="dash-side__new">
@@ -363,13 +357,13 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
                 <strong>{total}건</strong>
                 <span className="dash-widget__v">신청 내용·사진·연락처 확인</span>
               </button>
-              <Link href={`/my/${d.id}/edit`} className="dash-widget">
+              <button type="button" className="dash-widget" onClick={() => goTab("list")}>
                 <span className="dash-widget__k">
                   <Icon k="edit" /> 신청서 수정
                 </span>
                 <strong>내용·사진 고치기</strong>
-                <span className="dash-widget__v">작업, 크기, 희망 시기, 사진</span>
-              </Link>
+                <span className="dash-widget__v">신청 내역에서 고칠 신청을 골라요</span>
+              </button>
             </div>
           </>
         )}
@@ -383,8 +377,8 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
             </header>
             <ul className="dash-list">
               {rows.map((r) => (
-                <li key={r.id}>
-                  <button type="button" className={`dash-row${r.id === selId ? " is-on" : ""}`} onClick={() => pick(r.id)} aria-pressed={r.id === selId}>
+                <li key={r.id} className={`dash-row${r.id === selId ? " is-on" : ""}`}>
+                  <button type="button" className="dash-row__pick" onClick={() => pick(r.id)} aria-pressed={r.id === selId}>
                     <span className="dash-row__main">
                       <strong>{worksText(r)}</strong>
                       <span>
@@ -393,6 +387,9 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
                     </span>
                     <StatusBadge status={r.status} />
                   </button>
+                  <Link href={`/my/${r.id}/edit`} className="addr-edit dash-row__edit">
+                    <Icon k="edit" /> 수정
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -404,37 +401,25 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
         {/* ---------- 방문 일정 ---------- */}
         {d && tab === "visit" && (
           <>
-            <header className="dash-hello">
-              <p className="my-eyebrow">방문 일정 · {d.receipt_no}</p>
-              <h1 className="dash-hello__title">실측 방문</h1>
-            </header>
-            {d.visit_at ? (
-              <VisitCard at={d.visit_at} note={d.visit_note} />
-            ) : (
-              <EmptyState icon="info" title="실측 일정을 조율하고 있어요." desc="담당자가 전화나 문자로 연락드려 방문 날짜를 정해요. 정해지면 메일로도 알려드려요." />
+            <TabHead title="방문 일정" rows={rows} selId={selId} onPick={(id) => pick(id, "visit")} />
+            {canAddress && (
+              <AddressCard
+                id={d.id}
+                address={d.visit_address}
+                detail={d.visit_address_detail}
+                memo={d.visit_memo}
+                onSaved={() => void load()}
+                intro="상세 주소를 미리 입력해 두시면 실측 일정을 더 빨리 잡을 수 있어요."
+              />
             )}
-            {canAddress ? (
-              <AddressCard id={d.id} address={d.visit_address} detail={d.visit_address_detail} memo={d.visit_memo} onSaved={() => void load()} />
-            ) : (
-              d.visit_address && (
-                <section className="addr addr--done">
-                  <p className="addr-kicker">방문 주소</p>
-                  <p className="addr-value">
-                    {d.visit_address} {d.visit_address_detail}
-                  </p>
-                </section>
-              )
-            )}
+            <VisitCard at={d.visit_at} note={d.visit_note} address={canAddress ? undefined : d.visit_address} detail={d.visit_address_detail} memo={canAddress ? undefined : d.visit_memo} />
           </>
         )}
 
         {/* ---------- 견적서 ---------- */}
         {d && tab === "estimate" && (
           <>
-            <header className="dash-hello">
-              <p className="my-eyebrow">견적서 · {d.receipt_no}</p>
-              <h1 className="dash-hello__title">항목별 견적</h1>
-            </header>
+            <TabHead title="견적서" rows={rows} selId={selId} onPick={(id) => pick(id, "estimate")} />
             {d.estimate ? (
               <EstimateCard estimate={d.estimate} receiptNo={d.receipt_no} customer={d.name} />
             ) : (
@@ -468,6 +453,32 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
         </div>
       )}
     </div>
+  );
+}
+
+/** 탭 머리말: 제목 + 어떤 신청을 보고 있는지 (여러 건이면 골라 바꾸기) */
+function TabHead({ title, rows, selId, onPick }: { title: string; rows: ListRow[]; selId: string | null; onPick: (id: string) => void }) {
+  const cur = rows.find((r) => r.id === selId);
+  return (
+    <header className="dash-tabhead">
+      <h1 className="dash-tabhead__title">{title}</h1>
+      {rows.length > 1 ? (
+        <div className="dash-pick" role="group" aria-label="신청 고르기">
+          {rows.map((r) => (
+            <button key={r.id} type="button" className={r.id === selId ? "is-on" : ""} aria-pressed={r.id === selId} onClick={() => onPick(r.id)}>
+              <strong>{worksText(r)}</strong>
+              <span>{r.receipt_no}</span>
+            </button>
+          ))}
+        </div>
+      ) : (
+        cur && (
+          <p className="dash-tabhead__sub">
+            {cur.receipt_no} · {worksText(cur)}
+          </p>
+        )
+      )}
+    </header>
   );
 }
 

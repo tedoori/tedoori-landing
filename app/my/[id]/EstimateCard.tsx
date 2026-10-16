@@ -96,65 +96,74 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
           </strong>
         </div>
 
-        <div className="est-table" role="table" aria-label="항목별 견적">
-          <div className="est-row est-row--head" role="row">
-            <span role="columnheader">작업 · 자재</span>
-            <span role="columnheader">규격</span>
-            <span role="columnheader">수량</span>
-            <span role="columnheader">자재비</span>
-            <span role="columnheader">배송비</span>
-            <span role="columnheader">시공비</span>
-            <span role="columnheader">금액</span>
-          </div>
-          {e.items.map((i) => (
-            <div key={i.id} className="est-row" role="row">
-              <span role="cell" className="est-c-name">
-                <strong>{i.work}</strong>
-                {i.material && <em>{i.material}</em>}
-                {i.note && <small>{i.note}</small>}
-              </span>
-              <span role="cell" className="est-c-spec">
-                {i.spec || "—"}
-              </span>
-              <span role="cell" className="est-c-qty">
-                {i.quantity || "—"}
-              </span>
-              <span role="cell" data-k="자재">
-                {num(i.material_cost)}
-              </span>
-              <span role="cell" data-k="배송">
-                {num(i.delivery_cost)}
-              </span>
-              <span role="cell" data-k="시공">
-                {num(i.labor_cost)}
-              </span>
-              <span role="cell" className="est-c-sum">
-                {num(i.material_cost + i.delivery_cost + i.labor_cost)}
-              </span>
-            </div>
-          ))}
-          {extras.map(([k, v]) => (
-            <div key={k} className="est-row est-row--extra" role="row">
-              <span role="cell" className="est-c-name">
-                <strong>{k}</strong>
-                <em>추가 비용</em>
-              </span>
-              <span role="cell" className="est-c-spec">
-                —
-              </span>
-              <span role="cell" className="est-c-qty">
-                —
-              </span>
-              <span role="cell" className="est-c-blank" />
-              <span role="cell" className="est-c-blank" />
-              <span role="cell" className="est-c-blank" />
-              <span role="cell" className="est-c-sum">
-                {num(v)}
-              </span>
-            </div>
-          ))}
+        {/* 항목: 웹·모바일 같은 모양. 비어 있는 값은 숨김 */}
+        <div className="est-list">
+          <p className="est-list__head">
+            <span>작업 항목</span>
+            <span>금액</span>
+          </p>
+          {e.items.map((i) => {
+            const facts = [
+              i.material && ["자재", i.material],
+              i.spec && ["규격", i.spec],
+              i.quantity && ["수량", i.quantity],
+            ].filter(Boolean) as [string, string][];
+            const costs = (
+              [
+                ["자재비", i.material_cost],
+                ["배송비", i.delivery_cost],
+                ["시공비", i.labor_cost],
+              ] as [string, number][]
+            ).filter(([, v]) => v > 0);
+            return (
+              <article key={i.id} className="est-li">
+                <header className="est-li__top">
+                  <strong>{i.work}</strong>
+                  <b>{num(i.material_cost + i.delivery_cost + i.labor_cost)}원</b>
+                </header>
+                {facts.length > 0 && (
+                  <ul className="est-li__facts">
+                    {facts.map(([k, v]) => (
+                      <li key={k}>
+                        <span>{k}</span>
+                        {v}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {costs.length > 0 && (
+                  <dl className="est-li__costs">
+                    {costs.map(([k, v]) => (
+                      <div key={k}>
+                        <dt>{k}</dt>
+                        <dd>{num(v)}원</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+                {i.note && <p className="est-li__note">{i.note}</p>}
+              </article>
+            );
+          })}
+          {extras.length > 0 && (
+            <article className="est-li est-li--extra">
+              <header className="est-li__top">
+                <strong>추가 비용</strong>
+                <b>{num(extras.reduce((a, [, v]) => a + v, 0))}원</b>
+              </header>
+              <dl className="est-li__costs">
+                {extras.map(([k, v]) => (
+                  <div key={k}>
+                    <dt>{k}</dt>
+                    <dd>{num(v)}원</dd>
+                  </div>
+                ))}
+              </dl>
+              {e.extra_note && <p className="est-li__note">{e.extra_note}</p>}
+            </article>
+          )}
         </div>
-        {e.extra_note && <p className="est-foot-note">추가 비용 · {e.extra_note}</p>}
+
 
         <dl className="est-totals">
           <div>
