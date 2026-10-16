@@ -830,3 +830,121 @@
 .est-xl thead tr:first-child th:last-child { text-align: left; }
 .est-sign { flex-wrap: wrap; }
 .est-sign p { flex: 1 1 260px; }
+
+/* ---------- 묶음 소계 줄 (자재비 · 배송비 · 시공비) ---------- */
+.est-xl .t-group td { padding-top: 16px; padding-bottom: 8px; border-bottom: 1px solid #e3e6e2; color: #1d2420; font-weight: 800; }
+.est-xl .t-group td span { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; }
+.est-xl .t-group td span::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #1da049; }
+.est-xl .t-group--delivery td span::before { background: #2f6fb0; }
+.est-xl .t-group--labor td span::before { background: #c4673f; }
+.est-xl .t-group td small { margin-left: 6px; color: #8a938d; font-size: 12px; font-weight: 600; }
+.est-xl .t-group td.t-amt { font-size: 14px; }
+.est-xl tbody tr:not(.t-group) td.t-name { padding-left: 24px; font-weight: 600; }
+@media (max-width: 640px) {
+  .est-xl .t-group { padding: 14px 2px 6px !important; border-bottom: 1px solid #e3e6e2 !important; }
+  .est-xl .t-group td:first-child { display: block; }
+  .est-xl tbody tr:not(.t-group) td.t-name { padding-left: 15px !important; }
+}
+
+/* ================= 시안 A · 숲색 합계 상자 ================= */
+.est--a .est-grand { padding: 22px 24px; border: 0; border-radius: 16px; background: #16231b; }
+.est--a .est-grand span { color: rgba(255, 255, 255, 0.72); }
+.est--a .est-grand strong { color: #fff; }
+.est--a .est-grand small { color: rgba(255, 255, 255, 0.6); }
+.est--a .est-xl thead th { border-bottom: 2px solid #16231b; }
+.est--a .est-xl .t-group td { background: #f6f3ec; border-bottom: 0; }
+.est--a .est-xl .t-group td:first-child { border-radius: 10px 0 0 10px; }
+.est--a .est-xl .t-group td:last-child { border-radius: 0 10px 10px 0; }
+.est--a .est-xl tfoot .t-total td { border-top: 2px solid #16231b; }
+.est--a .est-parts { display: none; }
+
+/* ================= 시안 B · 초록 테두리 강조 ================= */
+.est--b .est-grand { padding: 20px 22px; border: 2px solid #1da049; border-radius: 16px; background: #fff; }
+.est--b .est-grand strong { color: #0e7a33; }
+.est--b .est-xl { border-top: 2px solid #1d2420; }
+.est--b .est-xl thead th { border-bottom: 1px solid #1d2420; }
+.est--b .est-xl .t-group td { background: #f2f8f3; border-bottom: 0; }
+.est--b .est-xl .t-group--delivery td { background: #f0f5fb; }
+.est--b .est-xl .t-group--labor td { background: #fbf3ef; }
+.est--b .est-xl .t-group td:first-child { box-shadow: inset 4px 0 0 #1da049; }
+.est--b .est-xl .t-group--delivery td:first-child { box-shadow: inset 4px 0 0 #2f6fb0; }
+.est--b .est-xl .t-group--labor td:first-child { box-shadow: inset 4px 0 0 #c4673f; }
+.est--b .est-xl tfoot .t-total td { background: #1da049; border-top: 0; color: #fff; }
+.est--b .est-xl tfoot .t-total td.t-amt, .est--b .est-xl tfoot .t-total td.t-note { color: #fff; }
+.est--b .est-parts { display: none; }
+
+/* ================= 시안 C · 모래색 상자 ================= */
+.est--c .est-grand { padding: 22px 24px; border: 0; border-radius: 16px; background: #f5efe3; }
+.est--c .est-grand span { color: #6b5b3e; }
+.est--c .est-grand strong { color: #0e7a33; }
+.est--c .est-sheet { padding: 6px 14px 14px; border-radius: 18px; background: #faf7f0; }
+.est--c .est-xl thead th { border-bottom: 1px solid #d9cfbb; }
+.est--c .est-xl tbody td { border-bottom: 1px solid #efe8da; }
+.est--c .est-xl .t-group td { border-bottom: 1px solid #d9cfbb; }
+.est--c .est-xl tfoot .t-total td { border-top: 1px solid #b9ad97; }
+.est--c .est-parts { display: none; }
+
+/* ================= 시안 D · 굵은 선 대비 ================= */
+.est--d .est-grand { padding: 0 0 20px; border-bottom: 3px solid #1d2420; }
+.est--d .est-grand strong { font-size: clamp(34px, 5vw, 46px); background: linear-gradient(transparent 62%, #c9f0d4 62%); }
+.est--d .est-xl { border-top: 3px solid #1d2420; }
+.est--d .est-xl thead th { border-bottom: 1px solid #1d2420; color: #1d2420; }
+.est--d .est-xl .t-group td { border-bottom: 1px solid #1d2420; font-size: 14px; }
+.est--d .est-xl tfoot .t-total td { background: #16231b; border-top: 0; color: #fff; }
+.est--d .est-xl tfoot .t-total td.t-amt { color: #9be3b2; font-size: 19px; }
+.est--d .est-xl tfoot .t-total td.t-note { color: rgba(255, 255, 255, 0.7); }
+.est--d .est-parts { display: none; }
+.est--d .est-grand { border-bottom: 0; padding-bottom: 6px; }
+
+/* ================= 확정 모양 (D 정리): 굵은 선 대비 · 차분한 묶음 칸 · 고른 행 ================= */
+.est--sheet .est-parts { display: none; }
+.est--sheet .est-grand { padding: 0 0 8px; border: 0; background: none; align-items: flex-end; }
+.est--sheet .est-grand span { color: #6b746e; font-size: 13px; font-weight: 700; }
+.est--sheet .est-grand strong { font-size: clamp(34px, 5vw, 46px); letter-spacing: -0.035em; color: #16231b; background: linear-gradient(transparent 64%, #c9f0d4 64%); padding: 0 2px; }
+.est--sheet .est-grand small { color: #6b746e; }
+
+.est--sheet .est-xl { border-top: 3px solid #16231b; border-bottom: 1px solid #16231b; font-size: 14px; line-height: 1.4; }
+.est--sheet .est-xl th, .est--sheet .est-xl td { height: 46px; padding: 0 12px; vertical-align: middle; border: 0; border-bottom: 1px solid #ecefeb; background: none; }
+.est--sheet .est-xl thead th { height: 34px; color: #4b524d; font-size: 12px; font-weight: 700; border-bottom: 1px solid #16231b; }
+.est--sheet .est-xl thead tr:first-child th[colspan] { height: 28px; padding: 0 12px; border-bottom: 1px solid #d5dad6; color: #6b746e; }
+.est--sheet .est-xl thead th[rowspan] { vertical-align: middle; }
+.est--sheet .est-xl tbody tr:last-child td { border-bottom: 0; }
+.est--sheet .est-xl tbody tr:not(.t-group) td.t-name { padding-left: 26px; font-weight: 600; color: #1d2420; }
+.est--sheet .est-xl .t-spec, .est--sheet .est-xl .t-unit { color: #6b746e; }
+.est--sheet .est-xl .t-num { color: #4b524d; }
+.est--sheet .est-xl .t-amt { color: #16231b; font-weight: 700; }
+.est--sheet .est-xl .t-note { color: #8a6d3b; font-size: 12.5px; }
+.est--sheet .est-xl tbody tr:hover td { background: none; }
+/* 묶음 칸: 차분한 회색 바탕 · 큰 글씨 */
+.est--sheet .est-xl .t-group td { height: 44px; padding-top: 0; padding-bottom: 0; background: #f3f4f1; border-top: 1px solid #16231b; border-bottom: 1px solid #d5dad6; }
+.est--sheet .est-xl tbody .t-group:first-child td { border-top: 0; }
+.est--sheet .est-xl .t-group td span::before { display: none; }
+.est--sheet .est-xl .t-group .t-group__name { font-size: 15.5px; font-weight: 800; color: #16231b; letter-spacing: -0.01em; }
+.est--sheet .est-xl .t-group td small { margin-left: 8px; color: #6b746e; font-size: 12.5px; font-weight: 600; }
+.est--sheet .est-xl .t-group td.t-amt { font-size: 15.5px; font-weight: 800; color: #16231b; }
+
+/* 아래 금액: 계 · 공과잡비 · 공급가액 · 부가세 → 합계 줄만 진하게 */
+.est--sheet .est-totals { width: min(100%, 380px); gap: 0; font-size: 14px; }
+.est--sheet .est-totals div { align-items: center; min-height: 36px; padding: 0 2px; border-bottom: 1px solid #ecefeb; }
+.est--sheet .est-totals dt { color: #6b746e; }
+.est--sheet .est-totals dd { color: #1d2420; font-weight: 700; font-variant-numeric: tabular-nums; }
+.est--sheet .est-totals__supply { border-top: 1px solid #16231b; }
+.est--sheet .est-totals__grand { margin-top: 10px; min-height: 54px !important; padding: 0 16px !important; border: 0 !important; border-radius: 12px; background: #16231b; }
+.est--sheet .est-totals__grand dt { color: #fff; font-weight: 800; }
+.est--sheet .est-totals__grand dd { color: #9be3b2; font-size: 21px; letter-spacing: -0.02em; }
+
+@media (max-width: 640px) {
+  .est--sheet .est-xl { border-top-width: 2px; }
+  .est--sheet .est-xl td { height: auto; }
+  .est--sheet .est-xl tbody tr:not(.t-group) { padding: 12px 4px; }
+  .est--sheet .est-xl .t-group { padding: 10px 12px !important; background: #f3f4f1; border-top: 1px solid #16231b; border-bottom: 1px solid #d5dad6 !important; }
+  .est--sheet .est-xl .t-group td { background: none !important; border: 0 !important; }
+  .est--sheet .est-xl tbody tr:not(.t-group) td.t-name { padding-left: 4px !important; }
+  .est--sheet .est-totals { width: 100%; }
+}
+/* 이미지 저장 */
+.est-paper.is-capture .est--sheet .est-xl td, .est--sheet .est-paper.is-capture .est-xl td { height: 46px; padding: 0 12px !important; vertical-align: middle; border: 0 !important; border-bottom: 1px solid #ecefeb !important; }
+.est--sheet .est-paper.is-capture .est-xl .t-group td { background: #f3f4f1 !important; border-top: 1px solid #16231b !important; border-bottom: 1px solid #d5dad6 !important; }
+.est--sheet .est-paper.is-capture .est-xl tbody tr:not(.t-group) td.t-name { padding-left: 26px !important; }
+.est--sheet .est-terms div { align-items: center; min-height: 44px; padding: 8px 0; }
+@media (max-width: 640px) { .est--sheet .est-xl .t-group td, .est--sheet .est-xl tbody td { height: auto !important; } .est--sheet .est-xl .t-group { align-items: center; } }

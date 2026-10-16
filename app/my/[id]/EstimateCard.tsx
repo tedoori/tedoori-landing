@@ -82,9 +82,12 @@ export function estimateTotals(e: Pick<Estimate, "items" | "overhead_rate" | "va
 }
 
 /** 실측 후 받은 견적서. 조경업체 방식: 공종명 · 규격 · 단위 · 수량 · 단가 · 금액 → 계 · 공과잡비 · 공급가액 · 부가세 · 합계 */
-export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: Estimate; receiptNo: string | null; customer: string | null }) {
+export function EstimateCard({ estimate: e, receiptNo, customer, variant }: { estimate: Estimate; receiptNo: string | null; customer: string | null; variant?: string }) {
   const t = estimateTotals(e);
   const parts = estimateParts(e);
+  // 단가로 적은 새 견적서는 자재 → 배송 → 시공 순으로 묶어 보여줌 (예전 견적서는 그대로)
+  const grouped = e.items.length > 0 && e.items.every((i) => (i.unit_price ?? 0) > 0);
+  const groups = (["material", "delivery", "labor"] as Kind[]).map((k) => ({ kind: k, items: e.items.filter((i) => (i.kind ?? "material") === k) })).filter((g) => g.items.length);
   const paper = useRef<HTMLDivElement>(null);
   const [saving, setSaving] = useState(false);
   // 견적서를 그림(PNG)으로 내려받기 — 휴대폰·PC 같은 모양으로 보관
@@ -113,7 +116,7 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
   const expired = new Date(until).getTime() + 86400000 < Date.now();
 
   return (
-    <section className="est" aria-labelledby="est-title">
+    <section className={`est est--sheet${variant ? ` est--${variant}` : ""}`} aria-labelledby="est-title">
       <div className="est-paper" ref={paper}>
         <header className="est-top">
           <div>
@@ -180,7 +183,20 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
               </tr>
             </thead>
             <tbody>
-              {e.items.map((i) => {
+              {(grouped ? groups : [{ kind: null as Kind | null, items: e.items }]).flatMap((g) => [
+                ...(g.kind
+                  ? [
+                      <tr key={`g-${g.kind}`} className={`t-group t-group--${g.kind}`}>
+                        <td colSpan={5}>
+                          <span className="t-group__name">{KIND_LABEL[g.kind]}비</span>
+                          <small>{g.items.length}건</small>
+                        </td>
+                        <td className="t-num t-amt">{num(parts[g.kind])}</td>
+                        <td className="t-note" />
+                      </tr>,
+                    ]
+                  : []),
+                ...g.items.map((i) => {
                 const priced = (i.unit_price ?? 0) > 0;
                 return (
                   <tr key={i.id}>
@@ -201,7 +217,8 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
                     <td className="t-note">{i.note || ""}</td>
                   </tr>
                 );
-              })}
+              }),
+              ])}
               {t.legacyExtra > 0 && (
                 <tr>
                   <td className="t-name">추가 비용</td>
@@ -214,37 +231,6 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
                 </tr>
               )}
             </tbody>
-            <tfoot>
-              <tr className="t-sub">
-                <td className="t-name">계</td>
-                <td className="t-spec" />
-                <td className="t-unit" />
-                <td className="t-num" />
-                <td className="t-num" />
-                <td className="t-num t-amt">{num(t.subtotal)}</td>
-                <td className="t-note" />
-              </tr>
-              {t.overhead > 0 && (
-                <tr className="t-sub">
-                  <td className="t-name">공과잡비</td>
-                  <td className="t-spec t-center">{t.rate}%</td>
-                  <td className="t-unit" />
-                  <td className="t-num" />
-                  <td className="t-num" />
-                  <td className="t-num t-amt">{num(t.overhead)}</td>
-                  <td className="t-note" />
-                </tr>
-              )}
-              <tr className="t-total">
-                <td className="t-name">합계</td>
-                <td className="t-spec" />
-                <td className="t-unit" />
-                <td className="t-num">{qtyText(e.items.reduce((a, i) => a + ((i.unit_price ?? 0) > 0 ? Number(i.qty ?? 1) : 1), 0))}</td>
-                <td className="t-num" />
-                <td className="t-num t-amt">{num(t.subtotal + t.overhead)}</td>
-                <td className="t-note">{e.vat_included ? "부가세 포함" : "부가세 별도"}</td>
-              </tr>
-            </tfoot>
           </table>
         </div>
 
@@ -261,6 +247,16 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
 
         <dl className="est-totals">
           <div>
+            <dt>계</dt>
+            <dd>{num(t.subtotal)}원</dd>
+          </div>
+          {t.overhead > 0 && (
+            <div>
+              <dt>공과잡비 {t.rate}%</dt>
+              <dd>{num(t.overhead)}원</dd>
+            </div>
+          )}
+          <div className="est-totals__supply">
             <dt>공급가액</dt>
             <dd>{num(t.supply)}원</dd>
           </div>
