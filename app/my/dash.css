@@ -194,3 +194,61 @@
   .est-li__costs { grid-template-columns: minmax(0, 1fr); }
   .est-li__costs div { display: flex; justify-content: space-between; }
 }
+
+/* 4단계: PC 폭 넓히기 · 전체 신청 현황 · 움직임 */
+.my-page:has(.is-dash) { max-width: calc(1240px + var(--gutter) * 2); }
+.my-applications.is-dash { max-width: none; }
+.dash { grid-template-columns: 260px minmax(0, 1fr); }
+@media (min-width: 1200px) {
+  .dash-widgets { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.dash-focus__tag { display: inline-block; margin-right: 6px; padding: 2px 8px; border-radius: 6px; background: #eaf6ee; color: #137a37; font-size: 11px; font-weight: 800; vertical-align: 1px; }
+
+.dash-all { padding: 6px; border-radius: 20px; background: #fff; border: 1px solid #e8ebe8; }
+.dash-all__head { padding: 10px 12px 6px; font-size: 14px; font-weight: 800; }
+.dash-all__head small { margin-left: 6px; color: var(--muted); font-weight: 600; }
+.dash-all ul { display: grid; }
+.dash-all button { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; border: 0; border-radius: 12px; background: transparent; font: inherit; text-align: left; cursor: pointer; }
+.dash-all button:hover { background: #f5f7f5; }
+.dash-all button > span:not(.ui-status) { display: grid; min-width: 0; }
+.dash-all strong { font-size: 15px; }
+.dash-all small { color: var(--muted); font-size: 12px; }
+.dash-all .ui-status { flex: none; white-space: nowrap; }
+
+/* 현재 단계: 숨 쉬듯 퍼지는 고리 */
+.dash-steps li.is-now .dash-steps__dot::after { content: ""; position: absolute; inset: -2px; border-radius: 50%; border: 2px solid #1da049; animation: dash-ring 1.8s ease-out infinite; }
+@keyframes dash-ring {
+  from { transform: scale(1); opacity: 0.8; }
+  to { transform: scale(1.9); opacity: 0; }
+}
+/* 상태 배지 점: 진행 중이면 깜빡 */
+.ui-status--visit::before,
+.ui-status--quoted::before,
+.ui-status--checking::before { animation: dash-blink 1.4s ease-in-out infinite; }
+@keyframes dash-blink {
+  50% { opacity: 0.25; transform: scale(0.7); }
+}
+/* 새 소식 빨간 점 */
+.dash-nav__dot { animation: dash-dot 1.2s ease-in-out infinite; }
+@keyframes dash-dot {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(229, 72, 77, 0.5); }
+  50% { transform: scale(1.15); box-shadow: 0 0 0 5px rgba(229, 72, 77, 0); }
+}
+/* 지금 할 일 버튼: 빛이 한 번씩 지나감 + 누를 때 눌림 */
+.dash-focus__next .btn { position: relative; overflow: hidden; transition: transform 0.15s, box-shadow 0.15s; }
+.dash-focus__next .btn::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%); transform: translateX(-120%); animation: dash-shine 3.2s ease-in-out infinite; }
+.dash-focus__next .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px -10px rgba(29, 160, 73, 0.8); }
+.dash-focus__next .btn:active { transform: translateY(0) scale(0.98); }
+@keyframes dash-shine {
+  0%, 55% { transform: translateX(-120%); }
+  85%, 100% { transform: translateX(120%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dash-steps li.is-now .dash-steps__dot::after,
+  .ui-status--visit::before,
+  .ui-status--quoted::before,
+  .ui-status--checking::before,
+  .dash-nav__dot,
+  .dash-focus__next .btn::after { animation: none; }
+}

@@ -140,6 +140,20 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
     if (h === "list" || h === "visit" || h === "estimate") setTab(h);
   }, []);
 
+  const latestId = rows[0]?.id ?? null;
+  const [h, setH] = useState<QuoteDetailData | null>(null);
+  const loadHome = useCallback(async () => {
+    if (!latestId) return;
+    try {
+      setH(await quoteApi<QuoteDetailData>(`/${encodeURIComponent(latestId)}`));
+    } catch {
+      /* 홈 요약은 실패해도 다른 탭은 그대로 */
+    }
+  }, [latestId]);
+  useEffect(() => {
+    void loadHome();
+  }, [loadHome]);
+
   const load = useCallback(async () => {
     if (!selId) return;
     setLoadError("");
@@ -197,7 +211,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
     active: rows.filter((r) => ACTIVE.includes(r.status)).length,
     quoted: rows.filter((r) => r.status === "quoted").length,
   };
-  const name = d?.name;
+  const name = h?.name ?? d?.name;
   const canAddress = d ? ADDRESS_OPEN.includes(d.status) : false;
   const menu: [Tab, string, number | null][] = [
     ["home", "홈", null],
@@ -225,7 +239,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
               <Icon k={k} />
               <span>{label}</span>
               {n !== null && <em className="dash-nav__count">{n}</em>}
-              {k === "estimate" && d?.estimate && <i className="dash-nav__dot" aria-label="견적서 도착" />}
+              {k === "estimate" && counts.quoted > 0 && <i className="dash-nav__dot" aria-label="견적서 도착" />}
             </button>
           ))}
         </nav>
@@ -259,7 +273,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
           </Callout>
         )}
 
-        {total > 0 && !d && !loadError && (
+        {total > 0 && (tab === "home" ? !h : !d) && !loadError && (
           <div className="my-skeleton" aria-busy="true" aria-label="불러오는 중">
             <span />
             <span />
@@ -268,7 +282,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
         )}
 
         {/* ---------- 홈 ---------- */}
-        {d && tab === "home" && (
+        {h && tab === "home" && (
           <>
             <header className="dash-hello">
               <p className="my-eyebrow">MY GARDEN</p>
@@ -290,22 +304,47 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
               </button>
             </div>
 
+            {rows.length > 1 && (
+              <section className="dash-all" aria-label="전체 신청 현황">
+                <p className="dash-all__head">
+                  전체 신청 현황 <small>최신순</small>
+                </p>
+                <ul>
+                  {rows.map((r) => (
+                    <li key={r.id}>
+                      <button type="button" onClick={() => pick(r.id)}>
+                        <span>
+                          <strong>{worksText(r)}</strong>
+                          <small>
+                            {r.receipt_no} · {formatDate(r.created_at)}
+                          </small>
+                        </span>
+                        <StatusBadge status={r.status} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
             <section className="dash-focus" aria-labelledby="focus-title">
               <div className="dash-focus__top">
                 <div>
-                  <p className="dash-focus__no">{d.receipt_no}</p>
+                  <p className="dash-focus__no">
+                    <span className="dash-focus__tag">가장 최근 신청</span> {h.receipt_no}
+                  </p>
                   <h2 id="focus-title" className="dash-focus__title">
-                    {worksText(d)}
+                    {worksText(h)}
                   </h2>
                   <p className="dash-focus__meta">
-                    {d.region} {d.district} · {d.housing} · {formatDate(d.created_at)} 신청
+                    {h.region} {h.district} · {h.housing} · {formatDate(h.created_at)} 신청
                   </p>
                 </div>
-                <StatusBadge status={d.status} />
+                <StatusBadge status={h.status} />
               </div>
-              <Steps status={d.status} />
+              <Steps status={h.status} />
               {(() => {
-                const n = nextAction(d);
+                const n = nextAction(h);
                 return (
                   <div className="dash-focus__next">
                     <div>
@@ -313,7 +352,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
                       <span>{n.desc}</span>
                     </div>
                     {n.tab && (
-                      <button type="button" className="btn btn--primary" onClick={() => goTab(n.tab!)}>
+                      <button type="button" className="btn btn--primary" onClick={() => pick(h.id, n.tab!)}>
                         {n.cta}
                       </button>
                     )}
@@ -322,33 +361,33 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
               })()}
             </section>
 
-            {canAddress && !d.visit_address && (
+            {ADDRESS_OPEN.includes(h.status) && !h.visit_address && (
               <AddressCard
-                id={d.id}
-                address={d.visit_address}
-                detail={d.visit_address_detail}
-                memo={d.visit_memo}
-                onSaved={() => void load()}
+                id={h.id}
+                address={h.visit_address}
+                detail={h.visit_address_detail}
+                memo={h.visit_memo}
+                onSaved={() => (void loadHome(), void load())}
                 intro="상세 주소를 미리 입력해 두시면 실측 일정을 더 빨리 잡을 수 있어요."
               />
             )}
 
             <div className="dash-widgets">
-              <button type="button" className={`dash-widget${d.visit_at ? " is-visit" : ""}`} onClick={() => goTab("visit")}>
+              <button type="button" className={`dash-widget${h.visit_at ? " is-visit" : ""}`} onClick={() => pick(h.id, "visit")}>
                 <span className="dash-widget__k">
                   <Icon k="visit" /> 방문 일정
                 </span>
-                <strong>{d.visit_at ? formatVisit(d.visit_at) : "일정 조율 중"}</strong>
+                <strong>{h.visit_at ? formatVisit(h.visit_at) : "일정 조율 중"}</strong>
                 <span className="dash-widget__v">
-                  {d.visit_address ? `${d.visit_address} ${d.visit_address_detail ?? ""}` : "방문 주소를 아직 입력하지 않았어요"}
+                  {h.visit_address ? `${h.visit_address} ${h.visit_address_detail ?? ""}` : "방문 주소를 아직 입력하지 않았어요"}
                 </span>
               </button>
-              <button type="button" className={`dash-widget${d.estimate ? " is-estimate" : ""}`} onClick={() => goTab("estimate")}>
+              <button type="button" className={`dash-widget${h.estimate ? " is-estimate" : ""}`} onClick={() => pick(h.id, "estimate")}>
                 <span className="dash-widget__k">
                   <Icon k="estimate" /> 견적서
                 </span>
-                <strong>{d.estimate ? `${estimateGrand(d.estimate).toLocaleString("ko-KR")}원` : "실측 후 도착해요"}</strong>
-                <span className="dash-widget__v">{d.estimate ? "부가세 포함 · 항목별 견적 보기" : "자재비·배송비·시공비를 나눠 보내드려요"}</span>
+                <strong>{h.estimate ? `${estimateGrand(h.estimate).toLocaleString("ko-KR")}원` : "실측 후 도착해요"}</strong>
+                <span className="dash-widget__v">{h.estimate ? "부가세 포함 · 항목별 견적 보기" : "자재비·배송비·시공비를 나눠 보내드려요"}</span>
               </button>
               <button type="button" className="dash-widget" onClick={() => goTab("list")}>
                 <span className="dash-widget__k">
