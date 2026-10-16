@@ -54,7 +54,7 @@ export default function GuidePage() {
                 <br />이 두 가지부터 준비해요.
               </h2>
               <p className="lead">작업할 곳이 보이는 사진을 찍고,<br />대략적인 크기를 떠올려 두면 충분해요.</p>
-              <p className="note">예산은 선택이에요. 이름과 휴대전화는 방문 실측 안내에 필요해요. 상세주소는 지금 받지 않아요.</p>
+              <p className="note">예산은 선택이에요. 이름과 휴대전화는 방문 실측 안내에 필요해요. 상세주소는 실측 일정을 정할 때 받아요.</p>
             </div>
             <Checklist />
           </div>

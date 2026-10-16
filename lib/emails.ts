@@ -23,8 +23,9 @@ export type QuoteRow = {
   created_at: string;
 };
 
-const esc = (s: string) =>
+export const escapeHtml = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+const esc = escapeHtml;
 
 export function summaryRows(q: QuoteRow): [string, string][] {
   return [

@@ -7,6 +7,8 @@ import { Callout, EmptyState, StatusBadge, type QuoteStatus } from "../../_compo
 import { QuoteApiError, quoteApi } from "../../../lib/quote-api";
 import { useIdleSignOut } from "../../../lib/idle";
 import { EstimateCard, type Estimate } from "./EstimateCard";
+import { VisitCard } from "./VisitCard";
+import { AddressCard } from "./AddressCard";
 
 export type QuoteDetailData = {
   id: string;
@@ -27,6 +29,9 @@ export type QuoteDetailData = {
   status: QuoteStatus;
   visit_at: string | null;
   visit_note: string | null;
+  visit_address: string | null;
+  visit_address_detail: string | null;
+  visit_memo: string | null;
   estimate: Estimate | null;
   created_at: string;
   updated_at: string;
@@ -196,9 +201,11 @@ export function QuoteDetail({ id }: { id: string }) {
       </header>
 
       {d.status === "visit" && d.visit_at && (
-        <Callout tone="info" title={`실측 방문 · ${formatVisit(d.visit_at)}`}>
-          {d.visit_note || "담당자가 방문해 작업할 곳의 크기와 상태를 확인해요. 일정 변경은 문의하기로 알려주세요."}
-        </Callout>
+        <VisitCard at={d.visit_at} note={d.visit_note} />
+      )}
+
+      {["checking", "visit", "needs"].includes(d.status) && (
+        <AddressCard id={d.id} address={d.visit_address} detail={d.visit_address_detail} memo={d.visit_memo} onSaved={() => void load()} />
       )}
 
       {d.estimate && <EstimateCard estimate={d.estimate} receiptNo={d.receipt_no} customer={d.name} />}
