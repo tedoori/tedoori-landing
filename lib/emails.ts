@@ -254,66 +254,135 @@ const SITE = "https://tedoori.com";
 const button = (href: string, text: string) =>
   `<a href="${href}" style="display:inline-block;padding:14px 22px;border-radius:12px;background-color:#1DA049;font-family:${FONT};font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;">${esc(text)}</a>`;
 
-export type StatusRow = { id: string; receipt_no: string; email: string; name: string | null; status: string; visit_at: string | null; visit_note: string | null };
+export type StatusRow = {
+  id: string;
+  receipt_no: string;
+  email: string;
+  name: string | null;
+  status: string;
+  visit_at: string | null;
+  visit_note: string | null;
+  build_at?: string | null;
+  build_note?: string | null;
+  customer_response?: string | null;
+};
 
 const visitText = (v: string) =>
   new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "long", day: "numeric", weekday: "short", hour: "numeric", minute: "2-digit" }).format(new Date(v));
+const sentAt = () => new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date());
 
-/** 상태가 visit / quoted 로 바뀔 때 고객에게 보내는 메일. 다른 상태면 null */
-export function statusEmail(q: StatusRow) {
+/**
+ * 진행 상태가 바뀔 때 고객에게 보내는 메일. 보낼 필요 없는 변화면 null
+ * prev = 바뀌기 전 상태 (되돌린 경우 문구를 다르게)
+ */
+export function statusEmail(q: StatusRow, prev?: StatusRow | null) {
   const who = q.name ? `${esc(q.name)} 님, ` : "";
   const link = `${SITE}/my/${q.id}`;
-  if (q.status === "visit") {
-    const when = q.visit_at ? visitText(q.visit_at) : "일정 확정 후 다시 알려드려요";
-    const body = `
-      ${section(`
-        <h1 style="margin:0;font-family:${FONT};font-size:22px;line-height:1.4;font-weight:800;color:#16231B;">실측 방문 일정이 정해졌어요</h1>
-        <p style="margin:10px 0 0 0;font-family:${FONT};font-size:15px;line-height:1.6;color:#4E5A53;">${who}담당자가 방문해 작업할 곳의 크기와 바닥 상태를 확인해요.</p>
-      `, "28px 32px 0 32px")}
-      ${section(`
-        <div style="background-color:#E7DFCF;border-radius:12px;padding:20px;text-align:center;font-family:${FONT};">
-          <div style="font-size:13px;color:#46524B;margin-bottom:6px;">방문 일시</div>
-          <div style="font-size:22px;font-weight:800;color:#16231B;">${esc(when)}</div>
-          ${q.visit_note ? `<div style="font-size:13px;line-height:1.6;color:#46524B;margin-top:8px;">${esc(q.visit_note)}</div>` : ""}
-        </div>
-      `)}
-      ${section(`<p style="margin:0;font-family:${FONT};font-size:13px;line-height:1.7;color:#4E5A53;">일정을 바꾸고 싶으면 이 메일에 회신하거나 카카오톡 채널 @테두리로 알려주세요.</p>`)}
-      ${section(button(link, "내 신청 보기"), "20px 32px 28px 32px")}
-    `;
-    return {
-      subject: `[테두리] 실측 방문 일정 안내 (${q.receipt_no})`,
-      html: shell({ preheader: `방문 일시 ${when}`, body, footer: "테두리 · 서울·경기·인천 부분조경 견적<br>이 메일에 회신하시면 테두리 운영자에게 전달돼요." }),
-    };
+  const footer = "테두리 · 서울·경기·인천 부분조경 견적<br>이 메일에 회신하시면 테두리 운영자에게 전달돼요.";
+  // Gmail 이 같은 제목 메일을 묶고 같은 내용을 접어 숨기지 않도록, 매번 보낸 시각을 넣음
+  const stamp = section(`<p style="margin:0;font-family:${FONT};font-size:12px;color:#8A938D;">${esc(sentAt())} 기준 안내 · 접수번호 ${esc(q.receipt_no)}</p>`, "18px 32px 0 32px");
+  const title = (t: string, d: string) =>
+    section(
+      `<h1 style="margin:0;font-family:${FONT};font-size:22px;line-height:1.4;font-weight:800;color:#16231B;">${esc(t)}</h1>
+       <p style="margin:10px 0 0 0;font-family:${FONT};font-size:15px;line-height:1.6;color:#4E5A53;">${who}${esc(d)}</p>`,
+      "24px 32px 0 32px",
+    );
+  const box = (k: string, v: string, sub?: string | null) =>
+    section(`
+      <div style="background-color:#E7DFCF;border-radius:12px;padding:20px;text-align:center;font-family:${FONT};">
+        <div style="font-size:13px;color:#46524B;margin-bottom:6px;">${esc(k)}</div>
+        <div style="font-size:22px;font-weight:800;color:#16231B;">${esc(v)}</div>
+        ${sub ? `<div style="font-size:13px;line-height:1.6;color:#46524B;margin-top:8px;">${esc(sub)}</div>` : ""}
+      </div>`);
+  const note = (t: string) =>
+    section(`<p style="margin:0;padding:14px 16px;border-radius:12px;background-color:#f4f1ea;font-family:${FONT};font-size:13px;line-height:1.7;color:#4E5A53;">${esc(t)}</p>`, "20px 32px 0 32px");
+  const cta = (href: string, text: string) => section(button(href, text), "24px 32px 28px 32px");
+  const mail = (subject: string, preheader: string, body: string) => ({ subject: `[테두리] ${subject} (${q.receipt_no})`, html: shell({ preheader, body: stamp + body, footer }) });
+  const wasAfterQuote = prev && ["done", "completed", "hold", "needs", "canceled"].includes(prev.status);
+
+  switch (q.status) {
+    case "visit": {
+      if (!q.visit_at) return null;
+      const when = visitText(q.visit_at);
+      const changed = prev?.status === "visit" && prev.visit_at && prev.visit_at !== q.visit_at;
+      return mail(
+        changed ? "실측 방문 일정이 바뀌었어요" : "실측 방문 일정 안내",
+        `방문 일시 ${when}`,
+        title(changed ? "실측 방문 일정이 바뀌었어요" : "실측 방문 일정이 정해졌어요", "담당자가 방문해 작업할 곳의 크기와 바닥 상태를 확인해요.") +
+          box("방문 일시", when, q.visit_note) +
+          note("일정을 바꾸고 싶으면 이 메일에 회신하거나 카카오톡 채널 @테두리로 알려주세요.") +
+          cta(`${link}#visit`, "방문 일정 보기"),
+      );
+    }
+    case "quoted":
+      return mail(
+        wasAfterQuote ? "견적서를 다시 확인해주세요" : "견적서가 도착했어요",
+        "항목별 견적서를 확인해보세요.",
+        title(
+          wasAfterQuote ? "견적서를 다시 확인해주세요" : "견적서가 도착했어요",
+          wasAfterQuote ? "담당자와 나눈 이야기를 반영해 견적서를 다시 열어두었어요. 내용을 보고 진행 여부를 다시 알려주세요." : "실측한 내용을 바탕으로 자재비·배송비·시공비를 나눈 견적서를 보내드려요.",
+        ) +
+          note("견적서는 발행일부터 14일 동안 유효해요. 진행 여부는 견적서 아래에서 바로 고를 수 있어요.") +
+          cta(`${link}#estimate`, "견적서 확인하기"),
+      );
+    case "needs":
+      return mail(
+        "견적을 다시 살피고 있어요",
+        "보완할 내용을 확인한 뒤 연락드릴게요.",
+        title("견적을 다시 살피고 있어요", "보완이 필요한 부분을 확인하고 있어요. 담당자가 곧 연락드리고, 새 견적을 다시 보내드릴게요.") +
+          note("사진을 더 보내주시거나 바뀐 내용이 있으면 이 메일에 회신하거나 신청서 수정에서 고쳐주세요.") +
+          cta(link, "내 신청 보기"),
+      );
+    case "done": {
+      if (prev?.status === "done") {
+        // 진행 확정 상태에서 시공 날짜를 정하거나 바꾼 경우만
+        if (!q.build_at || prev.build_at === q.build_at) return null;
+        const when = visitText(q.build_at);
+        return mail(
+          prev.build_at ? "작업 일정이 바뀌었어요" : "작업 일정이 정해졌어요",
+          `작업 일시 ${when}`,
+          title(prev.build_at ? "작업 일정이 바뀌었어요" : "작업 일정이 정해졌어요", "견적서 내용대로 작업해요. 당일 담당자가 먼저 연락드려요.") +
+            box("작업 일시", when, q.build_note) +
+            cta(`${link}#visit`, "일정 보기"),
+        );
+      }
+      return mail(
+        "진행이 확정됐어요",
+        "함께하게 되어 기뻐요.",
+        title("진행이 확정됐어요", "함께하게 되어 기뻐요. 견적서 내용대로 준비하고, 일정이 정해지면 바로 알려드릴게요.") +
+          (q.build_at ? box("작업 일시", visitText(q.build_at), q.build_note) : note("작업 날짜는 담당자가 연락드려 함께 정해요.")) +
+          cta(`${link}#visit`, "진행 상황 보기"),
+      );
+    }
+    case "completed":
+      return mail(
+        "새 정원이 완성됐어요",
+        "작업 완료 사진과 관리법 안내를 확인해보세요.",
+        title("새 정원이 완성됐어요", "함께해주셔서 고마워요. 작업 완료 사진과 관리법 안내를 내 신청에 올려두었어요.") +
+          note("새 정원이 마음에 드셨다면 짧은 후기를 남겨주세요. 다음 정원을 더 잘 만드는 데 큰 힘이 돼요.") +
+          cta(`${link}#visit`, "완료 보고 보기"),
+      );
+    case "hold":
+      // 고객이 직접 보류를 고른 경우는 화면에서 이미 안내했으니 메일 안 보냄 (담당자가 바꾼 경우만)
+      if (q.customer_response === "hold" && prev?.customer_response !== "hold") return null;
+      return mail(
+        "견적을 보류해두었어요",
+        "마음이 정해지면 언제든 알려주세요.",
+        title("견적을 보류해두었어요", "말씀해주신 대로 잠시 보류해둘게요. 견적서는 유효기간까지 내 신청에 남아 있어요.") +
+          note("다시 진행하고 싶으면 카카오톡 채널 @테두리나 이 메일 회신으로 알려주세요.") +
+          cta(`${link}#estimate`, "견적서 보기"),
+      );
+    case "canceled":
+      return mail(
+        "신청이 취소됐어요",
+        "다시 필요하시면 언제든 새로 신청해주세요.",
+        title("신청이 취소됐어요", "이번 신청은 여기서 마무리할게요. 그동안 이야기 나눠주셔서 고마워요.") +
+          note("다시 필요하시면 새 견적을 신청하거나 카카오톡 채널 @테두리로 이야기해주세요.") +
+          cta(`${SITE}/quote`, "새 견적 신청하기"),
+      );
+    default:
+      return null;
   }
-  if (q.status === "completed") {
-    const body = `
-      ${section(`
-        <h1 style="margin:0;font-family:${FONT};font-size:22px;line-height:1.4;font-weight:800;color:#16231B;">새 정원이 완성됐어요</h1>
-        <p style="margin:10px 0 0 0;font-family:${FONT};font-size:15px;line-height:1.6;color:#4E5A53;">${who}함께해주셔서 고마워요. 작업 완료 사진과 관리법 안내를 내 신청에 올려두었어요.</p>
-      `, "28px 32px 0 32px")}
-      ${section(button(`${SITE}/my/${q.id}#visit`, "완료 보고 보기"), "24px 32px 0 32px")}
-      ${section(`<p style="margin:0;padding:14px 16px;border-radius:12px;background-color:#f4f1ea;font-family:${FONT};font-size:13px;line-height:1.7;color:#4E5A53;">새 정원이 마음에 드셨다면 짧은 후기를 남겨주세요. 다음 정원을 더 잘 만드는 데 큰 힘이 돼요.</p>`, "24px 32px 28px 32px")}
-    `;
-    return {
-      subject: `[테두리] 새 정원이 완성됐어요 (${q.receipt_no})`,
-      html: shell({ preheader: "작업 완료 사진과 관리법 안내를 확인해보세요.", body, footer: "테두리 · 서울·경기·인천 부분조경 견적<br>이 메일에 회신하시면 테두리 운영자에게 전달돼요." }),
-    };
-  }
-  if (q.status === "quoted") {
-    const body = `
-      ${section(`
-        <h1 style="margin:0;font-family:${FONT};font-size:22px;line-height:1.4;font-weight:800;color:#16231B;">견적서가 도착했어요</h1>
-        <p style="margin:10px 0 0 0;font-family:${FONT};font-size:15px;line-height:1.6;color:#4E5A53;">${who}실측한 내용을 바탕으로 자재비·배송비·시공비를 나눈 견적서를 보내드려요.</p>
-      `, "28px 32px 0 32px")}
-      ${section(button(link, "견적서 확인하기"), "24px 32px 0 32px")}
-      ${section(`<p style="margin:0;padding:14px 16px;border-radius:12px;background-color:#f4f1ea;font-family:${FONT};font-size:13px;line-height:1.7;color:#4E5A53;">견적서는 발행일부터 14일 동안 유효해요. 진행 여부나 궁금한 점은 이 메일에 회신하거나 카카오톡 채널 @테두리로 알려주세요.</p>`, "24px 32px 28px 32px")}
-    `;
-    return {
-      subject: `[테두리] 견적서가 도착했어요 (${q.receipt_no})`,
-      html: shell({ preheader: "항목별 견적서를 확인해보세요.", body, footer: "테두리 · 서울·경기·인천 부분조경 견적<br>이 메일에 회신하시면 테두리 운영자에게 전달돼요." }),
-    };
-  }
-  return null;
 }
 
 /** 고객이 방문 주소를 넣었을 때 운영자에게: 주소 + 연락처 + 신청 내용 전체 */

@@ -259,7 +259,7 @@ function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> }) {
       .eq("id", r.id);
     setBusy(false);
     if (error) return setDone("저장하지 못했어요: " + error.message);
-    setDone(status !== r.status && ["visit", "quoted", "completed"].includes(status) ? "저장했어요. 고객에게 안내 메일이 가요." : "저장했어요.");
+    setDone(status !== r.status && status !== "received" && status !== "checking" ? "저장했어요. 고객에게 안내 메일이 가요." : "저장했어요.");
     await onSaved();
   };
 

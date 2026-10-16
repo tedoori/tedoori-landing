@@ -23,14 +23,14 @@ export async function POST(req: Request) {
   if (payload?.type !== "UPDATE" || payload.table !== "quote_requests" || !rec) return Response.json({ ok: true, skipped: "not-update" });
 
   const old = payload.old_record;
-  // 실측 예정: 상태가 새로 바뀌었거나, 이미 실측 예정인데 날짜가 바뀐 경우
-  const changed = old?.status !== rec.status || (rec.status === "visit" && old?.visit_at !== rec.visit_at);
+  // 보낼 때: 상태가 바뀜 / 실측 예정 중 방문일이 바뀜 / 진행 확정 중 작업일이 바뀜
+  const changed =
+    old?.status !== rec.status ||
+    (rec.status === "visit" && old?.visit_at !== rec.visit_at) ||
+    (rec.status === "done" && old?.build_at !== rec.build_at);
   if (!changed) return Response.json({ ok: true, skipped: "no-change" });
 
-  // 실측 예정인데 날짜가 아직 없으면 보내지 않음 (날짜를 넣는 순간 보냄)
-  if (rec.status === "visit" && !rec.visit_at) return Response.json({ ok: true, skipped: "no-visit-date" });
-
-  const mail = statusEmail(rec);
+  const mail = statusEmail(rec, old);
   if (!mail) return Response.json({ ok: true, skipped: "status" });
   if (!isMailConfigured()) return Response.json({ ok: true, mailed: false, reason: "mail-not-configured" });
 
