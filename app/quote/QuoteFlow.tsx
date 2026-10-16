@@ -975,7 +975,7 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
               </svg>
             </span>
             <span>
-              <strong>방문 실측 · 필수</strong>
+              <strong>방문 실측 <em className="q-req">*필수</em></strong>
               <span>작업할 곳의 크기와 바닥 상태를 직접 확인해요.</span>
             </span>
           </div>
@@ -1101,7 +1101,7 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
           </dl>
 
           <fieldset className="q-optional">
-            <legend>이름·휴대전화 · 필수</legend>
+            <legend>이름·휴대전화 <em className="q-req">*필수</em></legend>
             <p className="q-hint">방문 실측 일정을 문자·전화로 안내해요.</p>
             <label className="q-field">
               <span>이름</span>
@@ -1133,8 +1133,8 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
           <div className="q-consents">
             {(
               [
-                ["privacy", "개인정보 수집·이용 동의 · 필수", agreePrivacy, setAgreePrivacy, <PrivacyContent key="p" />],
-                ["terms", "이용약관 확인 · 필수", agreeTerms, setAgreeTerms, <TermsContent key="t" />],
+                ["privacy", "개인정보 수집·이용 동의", agreePrivacy, setAgreePrivacy, <PrivacyContent key="p" />],
+                ["terms", "이용약관 확인", agreeTerms, setAgreeTerms, <TermsContent key="t" />],
               ] as const
             ).map(([id, label, checked, setChecked, content]) => {
               const open = openDoc === id;
@@ -1143,7 +1143,9 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
                   <div className="q-consent">
                     <label className="q-consent__label">
                       <input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} />
-                      <span>{label}</span>
+                      <span>
+                        {label} <em className="q-req">*필수</em>
+                      </span>
                     </label>
                     <button
                       type="button"
@@ -1175,7 +1177,6 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
                 </div>
               );
             })}
-            <p className="q-hint">정보는 업체에 전달하기 전, 별도로 확인받아요.</p>
           </div>
 
           <ErrorText />

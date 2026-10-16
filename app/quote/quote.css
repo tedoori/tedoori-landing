@@ -1257,3 +1257,12 @@
     transform: none;
   }
 }
+
+/* 필수 표시: 빨간 글씨로 강조 */
+.q-req {
+  margin-left: 4px;
+  font-style: normal;
+  font-size: 0.85em;
+  font-weight: 700;
+  color: #d93a2b;
+}
