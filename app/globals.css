@@ -56,7 +56,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--forest);
-  font-family: var(--font-pretendard), "Pretendard Variable", Pretendard, system-ui, sans-serif;
+  font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif;
   font-size: 16px;
   line-height: 1.6;
   font-weight: 400;

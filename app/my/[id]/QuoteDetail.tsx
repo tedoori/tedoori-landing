@@ -1,16 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Callout, EmptyState, StatusBadge, type QuoteStatus } from "../../_components/ui";
 import { QuoteApiError, quoteApi } from "../../../lib/quote-api";
 import { EstimateCard, HelpStrip, estimateGrand, estimateParts, type Estimate } from "./EstimateCard";
 import { BUILD_COPY, type BuildKind } from "./VisitCard";
-import { AddressCard } from "./AddressCard";
-import { RespondPanel } from "./RespondPanel";
-import { ReviewCard, type Review } from "./ReviewCard";
-import { CompletionCard } from "./CompletionCard";
-import { ContactForm } from "../../contact/ContactForm";
+import type { Review } from "./ReviewCard";
+
+// 탭을 열 때만 필요한 카드는 나중에 불러옴 (첫 화면 JS 줄이기)
+const AddressCard = dynamic(() => import("./AddressCard").then((m) => m.AddressCard));
+const RespondPanel = dynamic(() => import("./RespondPanel").then((m) => m.RespondPanel));
+const ReviewCard = dynamic(() => import("./ReviewCard").then((m) => m.ReviewCard));
+const CompletionCard = dynamic(() => import("./CompletionCard").then((m) => m.CompletionCard));
+const ContactForm = dynamic(() => import("../../contact/ContactForm").then((m) => m.ContactForm));
 
 export type QuoteDetailData = {
   id: string;

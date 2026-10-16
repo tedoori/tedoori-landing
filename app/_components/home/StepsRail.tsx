@@ -18,11 +18,11 @@ function Visual({ i }: { i: number }) {
   if (i === 0)
     return (
       <div className="sv0">
-        <img className="sv0__bg" src="/service/garden-end.webp" alt="" draggable={false} />
+        <img className="sv0__bg" src="/service/garden-end-s.webp" alt="" draggable={false} loading="lazy" decoding="async" />
         <div className="sv0__thumbs">
-          {["/service/look-left.webp", "/service/garden-end.webp", "/service/look-right.webp"].map((src, k) => (
+          {["/service/look-left-s.webp", "/service/garden-end-s.webp", "/service/look-right-s.webp"].map((src, k) => (
             <span key={src} style={{ "--k": k } as React.CSSProperties}>
-              <img src={src} alt="" draggable={false} />
+              <img src={src} alt="" draggable={false} loading="lazy" decoding="async" />
               <i aria-hidden="true" />
             </span>
           ))}
@@ -32,7 +32,7 @@ function Visual({ i }: { i: number }) {
   if (i === 1)
     return (
       <div className="sv1">
-        <img src="/service/look-right.webp" alt="" draggable={false} />
+        <img src="/service/look-right-s.webp" alt="" draggable={false} loading="lazy" decoding="async" />
         <span className="sv1__lens" aria-hidden="true" />
         <span className="sv1__badge">
           <StatusBadge status="checking" />
@@ -42,7 +42,7 @@ function Visual({ i }: { i: number }) {
   if (i === 2)
     return (
       <div className="sv1 sv3">
-        <img src="/service/prep-size.webp" alt="" draggable={false} />
+        <img src="/service/prep-size-s.webp" alt="" draggable={false} loading="lazy" decoding="async" />
         <span className="sv3__tape" aria-hidden="true" />
         <span className="sv3__chip">방문 실측 · 필수</span>
       </div>

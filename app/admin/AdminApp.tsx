@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getAdminSupabase } from "../../lib/supabase";
+import { shrinkPhoto } from "../../lib/photo";
 import { EstimateEditor } from "./EstimateEditor";
 import { CompletionCard } from "../my/[id]/CompletionCard";
 
@@ -344,9 +345,10 @@ export function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> })
     setUploading(true);
     const added: string[] = [];
     for (const f of Array.from(files).slice(0, 10)) {
-      const ext = (f.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
-      const path = `${r.user_id}/complete/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const { error } = await sb.storage.from("quote-photos").upload(path, f, { contentType: f.type });
+      // 휴대폰 원본(수 MB)을 긴 변 2000px JPEG로 줄여서 올림 → 고객 화면이 빨리 뜸
+      const path = `${r.user_id}/complete/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
+      const blob = await shrinkPhoto(f).catch(() => null);
+      const { error } = blob ? await sb.storage.from("quote-photos").upload(path, blob, { contentType: "image/jpeg" }) : { error: true };
       if (!error) added.push(path);
     }
     setDonePaths((p) => [...p, ...added]);

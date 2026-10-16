@@ -19,7 +19,7 @@ const WORKS = ["식재", "잔디", "자갈", "디딤석", "화단"];
 const PICKED = ["잔디", "디딤석"];
 // 대화 순서: 0 질문1 · 1 답1 · 2 질문2 · 3 칩 고르기 · 4 답2 · 5 질문3 · 6 사진 · 7 접수 완료 화면 · 8 접수 메일 도착
 const CHAT_STEPS = 9;
-const PHOTOS = ["/service/garden-end.webp", "/service/look-left.webp", "/service/look-right.webp"];
+const PHOTOS = ["/service/garden-end-s.webp", "/service/look-left-s.webp", "/service/look-right-s.webp"];
 
 const HEAD = ["서울·경기·인천,", "\n", "집에서", "견적을", "요청하세요."];
 
@@ -195,7 +195,7 @@ export function RequestIntro() {
                       {on(6) && (
                         <div className="ri-photos">
                           {PHOTOS.map((src) => (
-                            <img key={src} src={src} alt="" draggable={false} />
+                            <img key={src} src={src} alt="" draggable={false} loading="lazy" decoding="async" />
                           ))}
                         </div>
                       )}

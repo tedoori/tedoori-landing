@@ -1,16 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import localFont from "next/font/local";
+// 화면에 쓰인 글자 묶음만 내려받는 분할 폰트 (통째 2MB 대신 페이지당 수십 KB)
+import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
 import "./globals.css";
 import "./ds.css";
 import "./_components/ui/ui.css";
 import "./tailwind.css";
-
-const pretendard = localFont({
-  src: "../node_modules/pretendard/dist/web/variable/woff2/PretendardVariable.woff2",
-  weight: "100 900",
-  display: "swap",
-  variable: "--font-pretendard",
-});
 
 export const metadata: Metadata = {
   title: "테두리 · 전원주택 조경 견적",
@@ -54,7 +48,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" className={pretendard.variable}>
+    <html lang="ko">
       <body className="antialiased">{children}</body>
     </html>
   );
