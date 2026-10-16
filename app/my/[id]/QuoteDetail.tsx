@@ -80,8 +80,7 @@ const ACTIVE = ["received", "checking", "visit", "needs", "quoted"];
 const STEPS = ["접수", "확인", "실측", "견적", "결정", "완료"];
 const STEP_OF: Record<string, number> = { received: 0, checking: 1, needs: 1, visit: 2, quoted: 3, done: 4, hold: 4, completed: 5, canceled: 0 };
 
-const canReview = (x: { status: string; build_at: string | null }) =>
-  x.status === "completed" || (x.status === "done" && !!x.build_at && new Date(x.build_at).getTime() <= Date.now());
+const canReview = (x: { status: string; build_at: string | null }) => x.status === "completed";
 
 type Tab = "home" | "list" | "visit" | "estimate";
 
@@ -174,18 +173,24 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
   }, []);
 
   const cache = useRef<Record<string, QuoteDetailData>>({});
+  // 같은 신청을 홈·탭이 동시에 부르면 한 번만 요청
+  const inflight = useRef<Record<string, Promise<QuoteDetailData>>>({});
+  const fetchDetail = useCallback((id: string) => {
+    inflight.current[id] ??= quoteApi<QuoteDetailData>(`/${encodeURIComponent(id)}`).finally(() => delete inflight.current[id]);
+    return inflight.current[id];
+  }, []);
   const latestId = rows[0]?.id ?? null;
   const [h, setH] = useState<QuoteDetailData | null>(null);
   const loadHome = useCallback(async () => {
     if (!latestId) return;
     try {
-      const fresh = await quoteApi<QuoteDetailData>(`/${encodeURIComponent(latestId)}`);
+      const fresh = await fetchDetail(latestId);
       cache.current[fresh.id] = fresh;
       setH(fresh);
     } catch {
       /* 홈 요약은 실패해도 다른 탭은 그대로 */
     }
-  }, [latestId]);
+  }, [latestId, fetchDetail]);
   useEffect(() => {
     void loadHome();
   }, [loadHome]);
@@ -195,13 +200,13 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
     setLoadError("");
     if (cache.current[selId]) setD(cache.current[selId]);
     try {
-      const fresh = await quoteApi<QuoteDetailData>(`/${encodeURIComponent(selId)}`);
+      const fresh = await fetchDetail(selId);
       cache.current[fresh.id] = fresh;
       setD(fresh);
     } catch (e) {
       setLoadError(e instanceof QuoteApiError ? e.message : "신청 내용을 불러오지 못했어요.");
     }
-  }, [selId]);
+  }, [selId, fetchDetail]);
 
   useEffect(() => {
     void load();

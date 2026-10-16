@@ -532,3 +532,6 @@
 @media (max-width: 479px) {
   .done-card__photos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+/* 진행 단계 칸 수가 바뀌어도 한 줄 */
+.dash-steps { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+.addr-loading, .my-checking { padding: 40px 0; text-align: center; }

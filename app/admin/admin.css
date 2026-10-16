@@ -111,3 +111,4 @@
 .adm-preview__head { font-size: 14px; font-weight: 800; }
 .adm-preview__head small { margin-left: 6px; color: var(--muted); font-size: 12px; font-weight: 600; }
 .adm-preview__foot { display: flex; justify-content: center; }
+.adm-done__bar { display: flex; gap: 6px; flex-wrap: wrap; }

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getAdminSupabase } from "../../lib/supabase";
 import { EstimateEditor } from "./EstimateEditor";
+import { CompletionCard } from "../my/[id]/CompletionCard";
 
 type Row = {
   id: string;
@@ -203,6 +204,7 @@ function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> }) {
   const [donePaths, setDonePaths] = useState<string[]>(r.completion_photos ?? []);
   const [doneUrls, setDoneUrls] = useState<Record<string, string>>({});
   const [uploading, setUploading] = useState(false);
+  const [donePreview, setDonePreview] = useState(false);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
@@ -344,7 +346,27 @@ function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> }) {
                 {uploading ? "올리는 중…" : "+ 완료 사진"}
               </label>
             </div>
-            <p className="adm-note">사진과 말을 넣고 상태를 '완료'로 바꿔 저장하면 고객에게 완료 안내 메일이 가요.</p>
+            {donePreview && (
+              <div className="adm-preview">
+                <p className="adm-preview__head">
+                  고객에게 이렇게 보여요 <small>저장 전 내용 기준</small>
+                </p>
+                <CompletionCard note={doneNote || null} photos={donePaths.map((p) => ({ path: p, url: doneUrls[p] ?? null }))} at={r.completed_at ?? new Date().toISOString()} />
+              </div>
+            )}
+            <div className="adm-done__bar">
+              <button className="adm-btn" onClick={() => setDonePreview((v) => !v)}>
+                {donePreview ? "미리보기 닫기" : "미리보기"}
+              </button>
+              <button className="adm-btn" disabled={busy || uploading} onClick={() => void save()}>
+                {r.completion_note || (r.completion_photos ?? []).length ? "완료 보고 수정 저장" : "완료 보고 저장"}
+              </button>
+            </div>
+            <p className="adm-note">
+              {status === "completed"
+                ? "완료 상태라 고객의 내 신청 홈 맨 위에 바로 보여요."
+                : "지금은 진행 확정이라 고객에게 아직 안 보여요. 상태를 '완료'로 바꿔 저장하면 공개되고 완료 안내 메일이 가요."}
+            </p>
           </div>
         )}
         <div className="adm-save">

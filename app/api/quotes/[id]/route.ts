@@ -22,16 +22,14 @@ export async function GET(req: Request, { params }: Ctx) {
   if (error) return fail(500, "load_failed", "신청 내용을 불러오지 못했어요. 잠시 후 다시 시도해주세요.");
   if (!data) return notFound();
 
-  const photos = await signPhotos(auth.supabase, data.photo_paths ?? []);
-
-  // 공개된 견적서 중 가장 최근 것. 견적서 표가 아직 없거나 못 읽으면 견적서 없이 보여줌
-  const { data: est } = await auth.supabase
-    .from("quote_estimates")
-    .select(ESTIMATE_COLUMNS)
-    .eq("quote_id", id)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  // 사진·견적서·후기·완료 사진을 한꺼번에 (차례로 기다리지 않게)
+  const [photos, { data: est }, { data: review }, completionPhotos] = await Promise.all([
+    signPhotos(auth.supabase, data.photo_paths ?? []),
+    // 공개된 견적서 중 가장 최근 것. 못 읽으면 견적서 없이 보여줌
+    auth.supabase.from("quote_estimates").select(ESTIMATE_COLUMNS).eq("quote_id", id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+    auth.supabase.from("quote_reviews").select("rating, body, allow_public, created_at").eq("quote_id", id).maybeSingle(),
+    signPhotos(auth.supabase, data.completion_photos ?? []),
+  ]);
   const estimate = est
     ? {
         ...est,
@@ -39,11 +37,6 @@ export async function GET(req: Request, { params }: Ctx) {
         photos: await signPhotos(auth.supabase, est.photo_paths ?? []),
       }
     : null;
-
-  // 남긴 후기 (표가 없거나 없으면 null)
-  const { data: review } = await auth.supabase.from("quote_reviews").select("rating, body, allow_public, created_at").eq("quote_id", id).maybeSingle();
-
-  const completionPhotos = await signPhotos(auth.supabase, data.completion_photos ?? []);
 
   return Response.json({ ...data, photos, estimate, review: review ?? null, completion_photos: completionPhotos });
 }

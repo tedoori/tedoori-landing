@@ -34,7 +34,7 @@ export function MyApplications() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [verifiedEmail, setVerifiedEmail] = useState("");
-  const [phase, setPhase] = useState<"email" | "verify" | "list">("email");
+  const [phase, setPhase] = useState<"checking" | "email" | "verify" | "list">("checking");
   const [rows, setRows] = useState<QuoteRow[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -72,17 +72,19 @@ export function MyApplications() {
         setError(e.detail.code === "idle" ? e.message : "이메일 인증이 만료됐어요. 다시 확인해주세요.");
       } else {
         setError(e instanceof QuoteApiError ? e.message : "신청 목록을 불러오지 못했어요. 잠시 후 다시 시도해주세요.");
+        setPhase((p) => (p === "checking" ? "email" : p));
       }
     }
     setBusy(false);
   };
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
-    const supabase = getSupabase();
-    if (!supabase) return;
-    void supabase.auth.getUser().then(({ data }) => {
-      if (data.user?.email) void loadList(1);
+    const supabase = isSupabaseConfigured ? getSupabase() : null;
+    if (!supabase) return setPhase("email");
+    // 저장된 로그인 정보로 바로 확인 (서버 왕복 없이). 없으면 이메일 입력 화면
+    void supabase.auth.getSession().then(({ data }) => {
+      if (data.session) void loadList(1);
+      else setPhase("email");
     });
     // 초기 세션이 있으면 인증을 다시 요구하지 않고 본인 목록을 보여준다.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -161,7 +163,13 @@ export function MyApplications() {
 
   return (
     <div className={`my-applications${phase === "list" ? " is-dash" : ""}`}>
-      {phase !== "list" && (
+      {phase === "checking" && (
+        <p className="my-loading my-checking" role="status">
+          내 신청을 불러오는 중이에요…
+        </p>
+      )}
+
+      {(phase === "email" || phase === "verify") && (
         <header className="my-intro">
           <h1 className="title-l">신청 내용은<br />안전하게 확인해요.</h1>
           <p className="lead">신청 이메일로 확인 코드를 받은 뒤, 내 견적 신청을 확인할 수 있어요.</p>
@@ -222,7 +230,7 @@ export function MyApplications() {
         </>
       )}
 
-      {phase !== "list" && (
+      {(phase === "email" || phase === "verify") && (
         <div className="btn-row my-auth-links">
           <Link href="/contact" className="btn btn--secondary">
             신청 이메일을 찾기 어려워요
