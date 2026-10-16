@@ -79,7 +79,7 @@ export function RespondPanel({ id, status, response, parts, onDone }: { id: stri
   if (shown && shown in DONE) {
     return (
       <section className={`resp resp--done is-${shown}`}>
-        <p className="resp-kicker">{byCall ? "담당자와 통화로 정했어요" : "보내주신 응답"}</p>
+        <p className="resp-kicker">{byCall ? "담당자와의 소통으로 정했어요" : "보내주신 응답"}</p>
         <p className="resp-title">{DONE[shown].title}</p>
         <p className="resp-result">{byCall ? CALL[shown] : DONE[shown].body}</p>
       </section>
