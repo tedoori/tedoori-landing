@@ -162,7 +162,9 @@ export function YardStory() {
             </Link>
             {step === 0 && (
               <p className="ys-hint">
-                서울·경기·인천 · <strong>견적 요청 별도 비용 없음</strong>
+                <span>
+                  서울·경기·인천 · <strong>견적 요청 별도 비용 없음</strong>
+                </span>
               </p>
             )}
           </div>
