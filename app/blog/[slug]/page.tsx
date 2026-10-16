@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { SiteFooter } from "../../_components/SiteFooter";
 import { SiteHeader } from "../../_components/SiteHeader";
 import { getPosts } from "../../../lib/blog";
+import { usedFontsUrl } from "../../../lib/blog-fonts";
 import "../blog.css";
 
 export const revalidate = 60;
@@ -16,7 +17,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const article = (await getPosts()).find((a) => a.slug === slug);
   if (!article) return {};
-  return { title: `${article.title} | 테두리`, description: article.excerpt };
+  const image = article.cover ? [{ url: article.cover }] : undefined;
+  return {
+    title: `${article.title} | 테두리`,
+    description: article.excerpt,
+    alternates: { canonical: `/blog/${article.slug}` },
+    openGraph: { type: "article", title: article.title, description: article.excerpt, url: `/blog/${article.slug}`, images: image, publishedTime: article.publishedAt ?? undefined, section: article.category },
+    twitter: { card: "summary_large_image", title: article.title, description: article.excerpt, images: article.cover ? [article.cover] : undefined },
+  };
 }
 
 export default async function BlogArticlePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -24,6 +32,7 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
   const JOURNAL_ARTICLES = await getPosts();
   const article = JOURNAL_ARTICLES.find((a) => a.slug === slug);
   if (!article) notFound();
+  const fontsHref = usedFontsUrl(article.html);
 
   // 네이버 블로그처럼 글 아래 이전 글·다음 글 + 목록
   const idx = JOURNAL_ARTICLES.findIndex((a) => a.slug === article.slug);
@@ -34,6 +43,38 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
   return (
     <>
       <SiteHeader />
+      {/* 검색 결과에 글 정보·경로가 잘 보이도록 (구조화 데이터) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "BlogPosting",
+              headline: article.title,
+              description: article.excerpt,
+              image: article.cover?.startsWith("/") ? `https://tedoori.com${article.cover}` : article.cover,
+              datePublished: article.publishedAt ?? undefined,
+              articleSection: article.category,
+              inLanguage: "ko-KR",
+              mainEntityOfPage: `https://tedoori.com/blog/${article.slug}`,
+              author: { "@type": "Organization", name: "테두리", url: "https://tedoori.com" },
+              publisher: { "@type": "Organization", name: "테두리", logo: { "@type": "ImageObject", url: "https://tedoori.com/figma/logo-mark.svg" } },
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "블로그", item: "https://tedoori.com/blog" },
+                { "@type": "ListItem", position: 2, name: article.category, item: `https://tedoori.com/blog?cat=${encodeURIComponent(article.category)}` },
+                { "@type": "ListItem", position: 3, name: article.title },
+              ],
+            },
+          ]).replace(/</g, "\u003c"),
+        }}
+      />
+      {/* 명조·손글씨를 쓴 글에서만 글꼴을 불러옴 (안 쓴 글은 화면이 막히지 않게) */}
+      {fontsHref && <link rel="stylesheet" href={fontsHref} precedence="default" />}
       <main id="main" className="bl">
         <article>
           <header className="bl-article__hero">

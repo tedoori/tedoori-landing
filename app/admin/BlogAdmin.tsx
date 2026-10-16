@@ -11,6 +11,7 @@ import { getAdminSupabase } from "../../lib/supabase";
 import { shrinkPhoto } from "../../lib/photo";
 import { readingMinutes } from "../../lib/blog";
 import { BLOG_CATEGORIES } from "../blog/BlogList";
+import { BLOG_FONTS, allFontsUrl } from "../../lib/blog-fonts";
 import "../blog/blog.css";
 
 // 관리자 · 블로그: 글 목록 + 네이버 블로그처럼 글꼴·크기·색·정렬·사진을 고치는 편집기
@@ -186,6 +187,7 @@ export function PostEditor({ initial, onClose }: { initial: Draft; onClose: () =
 
   return (
     <div className="bla">
+      <link rel="stylesheet" href={allFontsUrl} precedence="default" />
       <div className="bla-head">
         <button type="button" className="adm-btn" onClick={onClose}>
           ← 글 목록
@@ -317,9 +319,12 @@ function Toolbar({ editor, onNote }: { editor: Editor; onNote: (s: string) => vo
         <option value="h3">작은 제목</option>
       </select>
       <select className="bla-sel" aria-label="글꼴" value={font} onChange={(e) => (e.target.value ? c().setFontFamily(e.target.value).run() : c().unsetFontFamily().run())}>
-        <option value="">기본 글꼴</option>
-        <option value="'Noto Serif KR', 'Nanum Myeongjo', serif">명조</option>
-        <option value="'Nanum Pen Script', cursive">손글씨</option>
+        <option value="">기본 (프리텐다드)</option>
+        {BLOG_FONTS.map((f) => (
+          <option key={f.label} value={f.css} style={{ fontFamily: f.css }}>
+            {f.label}
+          </option>
+        ))}
       </select>
       <select className="bla-sel bla-sel--s" aria-label="글자 크기" value={size} onChange={(e) => (e.target.value ? c().setFontSize(e.target.value).run() : c().unsetFontSize().run())}>
         <option value="">크기</option>

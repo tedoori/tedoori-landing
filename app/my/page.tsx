@@ -7,6 +7,7 @@ import "./dash.css";
 import "../quote/quote.css";
 
 export const metadata: Metadata = {
+  robots: { index: false, follow: true },
   title: "조경견적 신청내역 확인 | 테두리",
   description: "테두리에 조경견적을 신청한 고객이 이메일 인증으로 진행 상태와 신청 내역을 확인할 수 있어요.",
 };

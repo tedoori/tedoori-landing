@@ -7,6 +7,7 @@ import { ZoneExplorer } from "./ZoneExplorer";
 import "./service.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/service" },
   title: "조경업체·조경 플랫폼 | 테두리",
   description: "전원주택 고객을 위한 조경 플랫폼으로 식재·잔디·자갈·판석·디딤석 상담을 도와드려요.",
 };

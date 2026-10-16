@@ -6,6 +6,7 @@ import { QuoteFlow } from "./QuoteFlow";
 import "./quote.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/quote" },
   title: "전원주택 조경견적 신청 | 테두리",
   description: "마당·화단·잔디·나무 조경이 필요한 분께 맞춤 견적을 안내해요. 필요한 공간부터 무료로 신청하세요.",
 };

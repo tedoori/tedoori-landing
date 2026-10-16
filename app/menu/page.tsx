@@ -4,6 +4,7 @@ import { SiteFooter } from "../_components/SiteFooter";
 import { SiteHeader } from "../_components/SiteHeader";
 
 export const metadata: Metadata = {
+  robots: { index: false, follow: true },
   title: "전원주택 조경 메뉴 | 테두리",
   description: "전원주택 조경 서비스와 견적 신청, 이용 안내를 한곳에서 확인하고 원하는 메뉴로 이동하세요.",
 };

@@ -7,6 +7,7 @@ import { FlowMock } from "./FlowMock";
 import "./guide.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/guide" },
   title: "전원주택 조경 견적 안내 | 테두리",
   description: "조경이 처음인 전원주택 고객도 사진과 이메일만으로 견적을 시작할 수 있어요. 신청 방법을 확인하세요.",
 };

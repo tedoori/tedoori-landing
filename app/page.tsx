@@ -20,6 +20,7 @@ import "./home.css";
 // 문구는 피그마 Lo-Fi 와이어프레임(홈) 그대로
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/" },
   title: "전원주택 조경 플랫폼 | 테두리",
   description: "전원주택의 마당 조경이 필요한 분을 위한 조경 사이트예요. 필요한 곳부터 맞춤 견적을 받아보세요.",
 };
@@ -34,6 +35,25 @@ export default async function Home() {
       <a className="skip-link" href="#main">
         본문으로 건너뛰기
       </a>
+      {/* 검색 결과용 사업 정보 (구조화 데이터) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "HomeAndConstructionBusiness",
+            name: "테두리",
+            url: "https://tedoori.com",
+            logo: "https://tedoori.com/figma/logo-mark.svg",
+            image: "https://tedoori.com/hero/final.webp",
+            description: "서울·경기·인천 단독·전원주택의 식재·잔디·자갈·디딤석·화단 부분조경 무료 견적.",
+            email: "contact@tedoori.com",
+            telephone: "+82-10-4963-9285",
+            areaServed: ["서울특별시", "경기도", "인천광역시"],
+            sameAs: ["https://pf.kakao.com/_HeKBX"],
+          }),
+        }}
+      />
       <SiteHeader floating />
       <div className="home-sky" aria-hidden="true">
         <span className="home-sky__glow home-sky__glow--a" />
