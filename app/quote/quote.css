@@ -1275,3 +1275,6 @@
 @media (max-width: 599px) {
   .q-locked { grid-template-columns: minmax(0, 1fr); }
 }
+.q-locked__edit { grid-column: 1 / -1; justify-self: end; padding: 6px 12px; border: 1px solid #dfe4e0; border-radius: 999px; background: #fff; color: #3d4741; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1); }
+.q-locked__edit:active { transform: scale(0.97); }
+.q-locked dd .q-input { height: 40px; min-height: 0; padding: 6px 10px; font-size: 14px; }

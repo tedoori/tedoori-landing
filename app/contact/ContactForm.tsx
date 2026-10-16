@@ -13,6 +13,7 @@ export function ContactForm({ prefill }: { prefill?: { receiptNo?: string | null
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState(prefill?.email ?? "");
   const [phone, setPhone] = useState(prefill?.phone ?? "");
+  const [editContact, setEditContact] = useState(false);
   const [agree, setAgree] = useState(false);
   const [openDoc, setOpenDoc] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -102,12 +103,27 @@ export function ContactForm({ prefill }: { prefill?: { receiptNo?: string | null
           </div>
           <div>
             <dt>답변받을 이메일</dt>
-            <dd>{email}</dd>
+            <dd>
+              {editContact ? (
+                <input type="email" className="q-input" autoComplete="email" inputMode="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              ) : (
+                email
+              )}
+            </dd>
           </div>
           <div>
             <dt>연락처</dt>
-            <dd>{phone || "—"}</dd>
+            <dd>
+              {editContact ? (
+                <input type="tel" className="q-input" autoComplete="tel" inputMode="tel" maxLength={20} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="필요할 때 연락받을 번호" />
+              ) : (
+                phone || "—"
+              )}
+            </dd>
           </div>
+          <button type="button" className="q-locked__edit" onClick={() => setEditContact((v) => !v)}>
+            {editContact ? "수정 완료" : "이메일·연락처 수정"}
+          </button>
         </dl>
       ) : (
       <label className="q-field">
