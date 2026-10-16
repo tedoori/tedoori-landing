@@ -97,7 +97,7 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
       paper.current.classList.add("is-capture");
       await new Promise((r) => requestAnimationFrame(() => r(null)));
       const url = await toPng(paper.current, {
-        width: 760, pixelRatio: 2, backgroundColor: "#fffdf8", filter: (n) => !(n instanceof HTMLElement && n.dataset.noCapture === "1") });
+        width: 760, pixelRatio: 2, backgroundColor: "#ffffff", filter: (n) => !(n instanceof HTMLElement && n.dataset.noCapture === "1") });
       const a = document.createElement("a");
       a.href = url;
       a.download = `테두리-견적서-${receiptNo ?? "예시"}.png`;
@@ -168,15 +168,15 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
             <thead>
               <tr>
                 <th rowSpan={2}>공종명</th>
-                <th rowSpan={2}>규 격</th>
+                <th rowSpan={2}>규격</th>
                 <th rowSpan={2}>단위</th>
-                <th colSpan={3}>견 적 내 역</th>
-                <th rowSpan={2}>비 고</th>
+                <th colSpan={3}>견적 내역</th>
+                <th rowSpan={2}>비고</th>
               </tr>
               <tr>
-                <th>수 량</th>
-                <th>단 가</th>
-                <th>금 액</th>
+                <th>수량</th>
+                <th>단가</th>
+                <th>금액</th>
               </tr>
             </thead>
             <tbody>
@@ -236,7 +236,7 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
                 </tr>
               )}
               <tr className="t-total">
-                <td className="t-name">합 계</td>
+                <td className="t-name">합계</td>
                 <td className="t-spec" />
                 <td className="t-unit" />
                 <td className="t-num">{qtyText(e.items.reduce((a, i) => a + ((i.unit_price ?? 0) > 0 ? Number(i.qty ?? 1) : 1), 0))}</td>

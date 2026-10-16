@@ -748,3 +748,85 @@
   .est-xl tfoot .t-total { margin-top: 6px; padding: 12px; }
   .est-xl tfoot .t-total td.t-note { grid-column: 1 / -1; }
 }
+
+/* ================= 견적서 다듬기: 흰 바탕 · 얇은 선 · 정돈된 숫자 ================= */
+.est-paper { gap: 26px; padding: clamp(22px, 4vw, 48px); background: #fff; border: 1px solid #eceee9; border-radius: 22px; box-shadow: 0 24px 60px -36px rgba(22, 35, 27, 0.28); }
+.est-paper::before { display: none; }
+.est-top { align-items: flex-start; padding-bottom: 22px; border-bottom: 1px solid #eceee9; }
+.est-brand { color: #0e7a33; font-size: 12px; letter-spacing: 0.08em; }
+.est-title { margin-top: 6px; font-size: clamp(26px, 3.4vw, 34px); letter-spacing: -0.03em; }
+.est-info { gap: 6px; font-size: 12.5px; }
+.est-info div { grid-template-columns: 56px auto; }
+.est-info dt { color: #8a938d; }
+.est-info dd { font-weight: 700; color: #1d2420; }
+.est-to p { font-size: 15px; color: #4b524d; }
+.est-to strong { border: 0; padding: 0; color: #1d2420; font-size: 19px; }
+.est-to__sub { margin-top: 4px; color: #8a938d; font-size: 13.5px !important; }
+.est-grand { padding: 0 0 22px; background: none; border: 0; border-bottom: 1px solid #eceee9; border-radius: 0; align-items: flex-end; }
+.est-grand span { color: #8a938d; font-size: 13px; font-weight: 700; }
+.est-grand strong { font-size: clamp(30px, 4.4vw, 40px); letter-spacing: -0.03em; color: #1d2420; }
+.est-grand small { color: #8a938d; font-weight: 700; }
+
+.est-xl { border-top: 0; font-size: 13.5px; }
+.est-xl th, .est-xl td { padding: 13px 10px; border: 0; border-bottom: 1px solid #f0f1ee; }
+.est-xl tbody td { border-bottom: 1px solid #f0f1ee; }
+.est-xl thead th { background: none; color: #8a938d; font-size: 12px; font-weight: 700; letter-spacing: 0; border-bottom: 1px solid #1d2420; }
+.est-xl thead tr:first-child th[colspan] { padding: 0 10px 6px; border-bottom: 1px solid #e3e6e2; color: #8a938d; }
+.est-xl thead tr:last-child th { padding-top: 8px; }
+.est-xl thead th[rowspan] { vertical-align: bottom; }
+.est-xl thead th:first-child { text-align: left; }
+.est-xl .t-name { font-weight: 700; }
+.est-xl .t-spec, .est-xl .t-unit { color: #6b746e; }
+.est-xl .t-num { color: #4b524d; }
+.est-xl .t-amt { color: #1d2420; font-weight: 800; }
+.est-xl .t-note { color: #8a6d3b; font-size: 12.5px; }
+.est-xl tbody tr:hover td { background: #fafbf9; }
+.est-xl tfoot td { background: none; border-bottom: 0; color: #6b746e; font-size: 13px; font-weight: 600; padding-top: 9px; padding-bottom: 9px; }
+.est-xl tfoot .t-sub:first-child td { padding-top: 16px; }
+.est-xl tfoot .t-sub td.t-amt { color: #1d2420; font-weight: 700; }
+.est-xl tfoot .t-total td { background: none; border-top: 1px solid #1d2420; padding-top: 14px; color: #1d2420; font-size: 15px; font-weight: 800; }
+.est-xl tfoot .t-total td.t-amt { color: #0e7a33; font-size: 18px; }
+.est-xl tfoot .t-total td.t-note { color: #8a938d; font-size: 12px; font-weight: 600; }
+
+.est-parts { gap: 10px; }
+.est-part { position: relative; padding: 14px 16px; border-radius: 14px; background: #fff; border: 1px solid #eceee9; box-shadow: none !important; }
+.est-part span { display: inline-flex; align-items: center; gap: 6px; color: #6b746e; font-size: 12.5px; }
+.est-part span::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #1da049; }
+.est-part--delivery span::before { background: #2f6fb0; }
+.est-part--labor span::before { background: #c4673f; }
+.est-part strong { margin-top: 4px; font-size: 16px; letter-spacing: -0.01em; }
+.est-parts p { color: #a3aaa5; }
+
+.est-totals { width: min(100%, 340px); gap: 8px; font-size: 13.5px; }
+.est-totals dt { color: #8a938d; }
+.est-totals__grand { padding-top: 12px; border-top: 1px solid #1d2420; }
+.est-totals__grand dd { font-size: 22px; color: #0e7a33; letter-spacing: -0.02em; }
+
+.est-terms { border-top: 0; gap: 0; }
+.est-terms div { grid-template-columns: 120px minmax(0, 1fr); padding: 12px 0; border-bottom: 1px solid #f0f1ee; font-size: 14px; }
+.est-terms dt { color: #8a938d; font-size: 13px; }
+.est-issue { border-radius: 12px; border-left: 0; background: #fff6e8; }
+.est-sign { padding-top: 20px; border-top: 1px solid #eceee9; }
+.est-sign p { color: #a3aaa5; }
+.est-issuer { border-left: 0; padding-left: 0; }
+.est-save { border-color: #d5dbd6; border-radius: 999px; padding: 0 18px; }
+.est-save:hover { border-color: #1d2420; }
+
+@media (max-width: 640px) {
+  .est-paper { border-radius: 18px; }
+  .est-xl tbody tr { border-bottom: 1px solid #f0f1ee; }
+  .est-xl tfoot .t-total { background: #f1f8f3; border-top: 0; }
+  .est-xl tfoot .t-total td { border-top: 0 !important; }
+  .est-terms div { grid-template-columns: 1fr; gap: 2px; }
+}
+/* 이미지 저장: 흰 바탕 그대로 */
+.est-paper.is-capture { box-shadow: none; border-color: #eceee9; }
+.est-paper.is-capture .est-xl td { border: 0 !important; border-bottom: 1px solid #f0f1ee !important; padding: 13px 10px !important; }
+.est-paper.is-capture .est-xl tfoot td { border-bottom: 0 !important; padding: 9px 10px !important; }
+.est-paper.is-capture .est-xl tfoot .t-total td { background: none !important; border-top: 1px solid #1d2420 !important; padding-top: 14px !important; }
+.est-xl thead tr:first-child th:nth-child(2) { text-align: left; }
+.est-xl thead tr:last-child th { text-align: right; }
+.est-xl thead tr:first-child th:nth-child(3) { text-align: center; }
+.est-xl thead tr:first-child th:last-child { text-align: left; }
+.est-sign { flex-wrap: wrap; }
+.est-sign p { flex: 1 1 260px; }
