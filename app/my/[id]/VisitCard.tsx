@@ -52,7 +52,7 @@ export function VisitCard({ at, note, address, detail, memo, kind = "visit", bui
         <h2 id={`${kind}-title`} className="visit-when">
           {d ? `${part(d, { month: "long", day: "numeric", weekday: "short" })} ${part(d, { hour: "numeric", minute: "2-digit" })}` : build ? bc.pending : "방문 날짜를 정하고 있어요"}
         </h2>
-        <p className="visit-desc">{note || (build ? (d ? bc.ready : bc.waiting) : d ? "담당자가 방문해 작업할 곳의 크기와 바닥 상태를 확인해요." : "담당자가 전화나 문자로 연락드려 날짜를 정해요. 정해지면 메일로도 알려드려요.")}</p>
+        <p className="visit-desc">{note || (build ? (d ? bc.ready : bc.waiting) : d ? "담당자가 방문해 작업할 곳의 크기와 바닥 상태를 확인해요." : "담당자가 연락드려 날짜를 정해요. 정해지면 메일로도 알려드려요.")}</p>
       </div>
       <dl className="visit-info">
         {address !== undefined && (

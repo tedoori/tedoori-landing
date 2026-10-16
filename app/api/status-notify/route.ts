@@ -1,5 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
-import { statusEmail, type StatusRow } from "@/lib/emails";
+import { isEstimateReminder, statusEmail, type StatusRow } from "@/lib/emails";
 import { isMailConfigured, sendMail } from "@/lib/mail";
 
 // Supabase Database Webhook (quote_requests UPDATE) 이 부르는 주소.
@@ -27,7 +27,9 @@ export async function POST(req: Request) {
   const changed =
     old?.status !== rec.status ||
     (rec.status === "visit" && old?.visit_at !== rec.visit_at) ||
-    (rec.status === "done" && old?.build_at !== rec.build_at);
+    (rec.status === "done" && old?.build_at !== rec.build_at) ||
+    // 견적 미응답 안내: 예약 작업이 estimate_reminded_at 을 막 적었을 때
+    isEstimateReminder(rec, old);
   if (!changed) return Response.json({ ok: true, skipped: "no-change" });
 
   const mail = statusEmail(rec, old);

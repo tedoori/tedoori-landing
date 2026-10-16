@@ -265,7 +265,12 @@ export type StatusRow = {
   build_at?: string | null;
   build_note?: string | null;
   customer_response?: string | null;
+  estimate_reminded_at?: string | null;
 };
+
+/** 견적 도착 뒤 응답이 없어 예약 작업이 안내 표시를 막 남긴 순간 */
+export const isEstimateReminder = (q: StatusRow, prev?: StatusRow | null) =>
+  q.status === "quoted" && prev?.status === "quoted" && !prev.estimate_reminded_at && !!q.estimate_reminded_at && !q.customer_response;
 
 const visitText = (v: string) =>
   new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "long", day: "numeric", weekday: "short", hour: "numeric", minute: "2-digit" }).format(new Date(v));
@@ -299,6 +304,15 @@ export function statusEmail(q: StatusRow, prev?: StatusRow | null) {
   const cta = (href: string, text: string) => section(button(href, text), "24px 32px 28px 32px");
   const mail = (subject: string, preheader: string, body: string) => ({ subject: `[테두리] ${subject} (${q.receipt_no})`, html: shell({ preheader, body: stamp + body, footer }) });
   const wasAfterQuote = prev && ["done", "completed", "hold", "needs", "canceled"].includes(prev.status);
+
+  if (isEstimateReminder(q, prev))
+    return mail(
+      "견적서를 아직 확인하지 않으셨나요?",
+      "보내드린 견적서에 대한 생각을 알려주세요.",
+      title("보내드린 견적서, 어떠셨나요?", "견적서를 보내드린 지 며칠 지났어요. 진행·조정·보류 중 편한 쪽을 골라주시면 다음 단계를 안내해드려요.") +
+        note("금액이나 범위가 고민되면 '조정 상담'을 골라주세요. 담당자가 함께 다시 살펴봐요. 궁금한 점은 이 메일에 회신하거나 카카오톡 채널 @테두리로 물어보세요.") +
+        cta(`${link}#estimate`, "견적서 다시 보기"),
+    );
 
   switch (q.status) {
     case "visit": {

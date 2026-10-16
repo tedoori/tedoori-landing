@@ -1,3 +1,9 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { getSupabase } from "../../../lib/supabase";
+
 const day = (v: string) => new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "long", day: "numeric" }).format(new Date(v));
 
 /** 완료 보고: 업체·담당자가 남긴 말 + 작업 완료 사진 */
@@ -33,6 +39,55 @@ export function CompletionCard({ note, photos, at }: { note: string | null; phot
           <p>{note}</p>
         </div>
       )}
+      <CareLinks />
     </section>
+  );
+}
+
+type Care = { slug: string; title: string; cover_url: string | null };
+
+/** 완료 뒤 관리법: 블로그 관리 방법 분류 글 최신 3개. 글이 없으면 아무것도 보이지 않음 */
+function CareLinks() {
+  const [posts, setPosts] = useState<Care[]>([]);
+  useEffect(() => {
+    const sb = getSupabase();
+    if (!sb) return;
+    void sb
+      .from("blog_posts")
+      .select("slug, title, cover_url")
+      .eq("published", true)
+      .eq("category", "관리 방법")
+      .order("published_at", { ascending: false })
+      .limit(3)
+      .then(({ data }) => setPosts((data ?? []) as Care[]));
+  }, []);
+  if (!posts.length) return null;
+  return (
+    <div className="care">
+      <p className="care__title">새 정원, 이렇게 관리해요</p>
+      <ul>
+        {posts.map((p) => (
+          <li key={p.slug}>
+            <Link href={`/blog/${p.slug}`} className="care__link" target="_blank">
+              <span className="care__icon" aria-hidden="true">
+                {p.cover_url ? (
+                  <img src={p.cover_url} alt="" />
+                ) : (
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Z" />
+                    <path d="M5 19 13 11" />
+                  </svg>
+                )}
+              </span>
+              <span className="care__txt">
+                <small>관리 방법 · 테두리 블로그</small>
+                <strong>{p.title}</strong>
+              </span>
+              <span aria-hidden="true">›</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

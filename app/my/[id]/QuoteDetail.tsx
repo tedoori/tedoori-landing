@@ -160,7 +160,7 @@ function autoNextAction(d: QuoteDetailData): { title: string; desc: string; cta?
   if (d.status === "completed") return { title: "테두리가 완료됐어요", desc: "남겨주신 후기 고마워요. 관리법이 궁금하면 언제든 물어보세요.", cta: "완료 보고 보기", tab: "complete" };
   if (d.status === "hold") return { title: "보류 중이에요", desc: "다시 진행하고 싶으면 카카오톡 채널 @테두리로 알려주세요." };
   if (d.status === "canceled") return { title: "취소된 신청이에요", desc: "새로 필요하면 새 견적을 신청해주세요." };
-  return { title: "신청을 확인하고 있어요", desc: "24시간 안에 담당자가 전화나 문자로 연락드려요." };
+  return { title: "신청을 확인하고 있어요", desc: "24시간 안에 담당자가 연락드려요." };
 }
 
 type Props = {
