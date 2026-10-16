@@ -219,8 +219,42 @@ const STAGE_STATUS: Record<Stage, string[]> = {
 const fmtShort = (local: string) =>
   new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "long", day: "numeric", weekday: "short", hour: "numeric", minute: "2-digit" }).format(new Date(`${local}:00+09:00`));
 
-/** 고객에게 보이는 문구 칸: 직접 입력 + 자주 쓰는 문구 고르기 + 어디에 보이는지 */
-function CopyField({ label, path, value, onChange, presets, fallback }: { label: string; path?: string; value: string; onChange: (v: string) => void; presets: string[]; fallback?: string }) {
+type Phrase = { id: string; field: string; text: string };
+
+/** 고객에게 보이는 문구 칸: 직접 입력 + 기본·저장 문구 고르기(저장·수정·삭제) + 어디에 보이는지 */
+function CopyField({ field, label, path, value, onChange, presets, fallback }: { field: string; label: string; path?: string; value: string; onChange: (v: string) => void; presets: string[]; fallback?: string }) {
+  const sb = getAdminSupabase();
+  const [saved, setSaved] = useState<Phrase[]>([]);
+  const [editing, setEditing] = useState(false);
+  const load = useCallback(async () => {
+    if (!sb) return;
+    const { data } = await sb.from("admin_phrases").select("id, field, text").eq("field", field).order("created_at");
+    setSaved((data ?? []) as Phrase[]);
+  }, [sb, field]);
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const add = async () => {
+    const t = value.trim();
+    if (!sb || !t || saved.some((p) => p.text === t)) return;
+    await sb.from("admin_phrases").insert({ field, text: t });
+    void load();
+  };
+  const edit = async (p: Phrase) => {
+    const t = window.prompt("문구 수정", p.text)?.trim();
+    if (!sb || !t || t === p.text) return;
+    await sb.from("admin_phrases").update({ text: t }).eq("id", p.id);
+    void load();
+  };
+  const del = async (p: Phrase) => {
+    if (!sb || !window.confirm(`'${p.text}' 문구를 지울까요?`)) return;
+    await sb.from("admin_phrases").delete().eq("id", p.id);
+    void load();
+  };
+  const all = [...presets.filter((p) => !saved.some((x) => x.text === p)).map((t) => ({ id: "", field, text: t })), ...saved];
+  const canSave = value.trim() && !all.some((p) => p.text === value.trim());
+
   return (
     <div className="adm-copy">
       <label>
@@ -228,11 +262,33 @@ function CopyField({ label, path, value, onChange, presets, fallback }: { label:
         <input className="ui-input" value={value} onChange={(e) => onChange(e.target.value)} placeholder={fallback ?? "직접 입력하거나 아래에서 골라주세요"} />
       </label>
       <div className="adm-copy__chips">
-        {presets.map((p) => (
-          <button key={p} type="button" className={value === p ? "is-on" : ""} onClick={() => onChange(value === p ? "" : p)}>
-            {p}
-          </button>
+        {all.map((p) => (
+          <span key={p.id || p.text} className={`adm-chip${value === p.text ? " is-on" : ""}${p.id ? " is-saved" : ""}`}>
+            <button type="button" onClick={() => onChange(value === p.text ? "" : p.text)}>
+              {p.text}
+            </button>
+            {editing && p.id && (
+              <>
+                <button type="button" className="adm-chip__x" aria-label="수정" onClick={() => void edit(p)}>
+                  ✎
+                </button>
+                <button type="button" className="adm-chip__x" aria-label="삭제" onClick={() => void del(p)}>
+                  ×
+                </button>
+              </>
+            )}
+          </span>
         ))}
+        {canSave && (
+          <button type="button" className="adm-copy__save" onClick={() => void add()}>
+            + 지금 문구 저장
+          </button>
+        )}
+        {saved.length > 0 && (
+          <button type="button" className="adm-copy__clear" onClick={() => setEditing((v) => !v)}>
+            {editing ? "편집 끝" : "저장한 문구 편집"}
+          </button>
+        )}
         {value && (
           <button type="button" className="adm-copy__clear" onClick={() => onChange("")}>
             지우고 자동 문구 쓰기
@@ -410,6 +466,7 @@ export function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> })
               <input className="ui-input" type="datetime-local" value={visitAt} onChange={(e) => setVisitAt(e.target.value)} />
             </label>
             <CopyField
+              field="visit_note"
               label="실측 안내 메모"
               path="고객 화면 › 방문 일정 › 실측 방문 카드 설명 · 실측 안내 메일"
               value={visitNote}
@@ -441,6 +498,7 @@ export function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> })
               </label>
             </div>
             <CopyField
+              field={`build_note_${kind || "auto"}`}
               label={`${kindLabel} 안내 메모`}
               path={`고객 화면 › 방문 일정 › ${kindLabel} 일정 카드 설명 · 홈 '지금 할 일' 설명 · 일정 안내 메일`}
               value={buildNote}
@@ -463,6 +521,7 @@ export function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> })
           </h4>
           <p className="adm-path">고객 화면 › 홈 › 가장 최근 신청 카드 아래 검은 띠</p>
           <CopyField
+            field="next_title"
             label="제목"
             value={nextTitle}
             onChange={setNextTitle}
@@ -473,6 +532,7 @@ export function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> })
             ]}
           />
           <CopyField
+            field="next_desc"
             label="설명"
             value={nextDesc}
             onChange={setNextDesc}

@@ -279,6 +279,43 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
     ["review", "후기", null],
   ];
 
+  // 가장 최근 신청 카드 (홈 · 신청 내역 위 공통)
+  const focusCard = (h: QuoteDetailData) => (
+    <section className="dash-focus" aria-labelledby={`focus-${tab}`}>
+      <div className="dash-focus__top">
+        <div>
+          <p className="dash-focus__no">
+            <span className="dash-focus__tag">가장 최근 신청</span> {h.receipt_no}
+          </p>
+          <h2 id={`focus-${tab}`} className="dash-focus__title">
+            {worksText(h)}
+          </h2>
+          <p className="dash-focus__meta">
+            {h.region} {h.district} · {h.housing} · {formatDate(h.created_at)} 신청
+          </p>
+        </div>
+        <StatusBadge status={h.status} />
+      </div>
+      <Steps status={h.status} />
+      {(() => {
+        const n = nextAction(h);
+        return (
+          <div className="dash-focus__next">
+            <div>
+              <strong>{n.title}</strong>
+              <span>{n.desc}</span>
+            </div>
+            {n.tab && (
+              <button type="button" className="btn btn--primary" onClick={() => pick(h.id, n.tab!)}>
+                {n.cta}
+              </button>
+            )}
+          </div>
+        );
+      })()}
+    </section>
+  );
+
   return (
     <div className="dash">
       {/* 왼쪽: 프로필 + 메뉴 */}
@@ -416,39 +453,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
               </section>
             )}
 
-            <section className="dash-focus" aria-labelledby="focus-title">
-              <div className="dash-focus__top">
-                <div>
-                  <p className="dash-focus__no">
-                    <span className="dash-focus__tag">가장 최근 신청</span> {h.receipt_no}
-                  </p>
-                  <h2 id="focus-title" className="dash-focus__title">
-                    {worksText(h)}
-                  </h2>
-                  <p className="dash-focus__meta">
-                    {h.region} {h.district} · {h.housing} · {formatDate(h.created_at)} 신청
-                  </p>
-                </div>
-                <StatusBadge status={h.status} />
-              </div>
-              <Steps status={h.status} />
-              {(() => {
-                const n = nextAction(h);
-                return (
-                  <div className="dash-focus__next">
-                    <div>
-                      <strong>{n.title}</strong>
-                      <span>{n.desc}</span>
-                    </div>
-                    {n.tab && (
-                      <button type="button" className="btn btn--primary" onClick={() => pick(h.id, n.tab!)}>
-                        {n.cta}
-                      </button>
-                    )}
-                  </div>
-                );
-              })()}
-            </section>
+            {focusCard(h)}
 
             {ADDRESS_OPEN.includes(h.status) && !h.visit_address && (
               <AddressCard
@@ -499,6 +504,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
         {/* ---------- 신청 내역 ---------- */}
         {tab === "list" && total > 0 && (
           <>
+            {h && focusCard(h)}
             <header className="dash-tabhead dash-tabhead--row">
               <h1 className="dash-tabhead__title">신청 내역</h1>
               <p className="dash-tabhead__count">
