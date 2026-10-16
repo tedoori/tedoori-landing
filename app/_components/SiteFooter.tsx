@@ -41,6 +41,9 @@ export function SiteFooter() {
               <p className="site-footer__title">고객 지원</p>
               <ul>
                 <li>
+                  <Link href="/my">내 신청</Link>
+                </li>
+                <li>
                   <Link href="/contact">문의하기</Link>
                 </li>
                 <li>

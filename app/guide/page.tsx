@@ -25,7 +25,7 @@ export default function GuidePage() {
                 <br />
                 진행은 견적을 보고.
               </h1>
-              <p className="lead gd-hero__lead">사진 한 장으로 이야기를 시작해요.<br />운영자가 요청을 읽고, 상담과 일정을 함께 정해요.</p>
+              <p className="lead gd-hero__lead">사진 한 장으로 이야기를 시작해요.<br />담당자가 요청을 읽고, 상담과 일정을 함께 정해요.</p>
             </div>
             <figure className="gd-shot" aria-hidden="true">
               <img src="/guide/hero-shot.webp" alt="" width={1600} height={900} fetchPriority="high" />
@@ -54,7 +54,7 @@ export default function GuidePage() {
                 <br />이 두 가지부터 준비해요.
               </h2>
               <p className="lead">작업할 곳이 보이는 사진을 찍고,<br />대략적인 크기를 떠올려 두면 충분해요.</p>
-              <p className="note">예산은 선택이에요. 이름과 휴대전화는 방문 실측 안내에 필요해요. 상세주소는 실측 일정을 정할 때 받아요.</p>
+              <p className="note">예산은 선택이에요. 이름과 휴대전화는 방문 실측 안내에 필요해요. 상세주소는 접수 후 내 신청에서 미리 입력하거나, 실측 일정을 정할 때 알려주시면 돼요.</p>
             </div>
             <Checklist />
           </div>

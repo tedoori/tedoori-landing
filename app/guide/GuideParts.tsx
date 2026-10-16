@@ -23,11 +23,12 @@ function usePlayP<T extends HTMLElement>(duration: number) {
 
 // ---------- 노선도: 점이 노선을 따라 달리며 역이 켜짐 ----------
 const FLOW = [
-  ["견적 요청", "한 질문씩 답하기"],
-  ["내용 확인", "필요한 내용 확인"],
-  ["방문 실측", "담당자가 방문해 실측"],
-  ["견적 확인", "항목별 금액 확인"],
-  ["진행 결정", "일정과 조건 확인"],
+  ["접수", "한 질문씩 답하기"],
+  ["확인", "필요한 내용 확인"],
+  ["실측", "담당자가 방문해 실측"],
+  ["견적", "항목별 금액 확인"],
+  ["결정", "진행·조정·보류 선택"],
+  ["완료", "완료 사진·후기"],
 ];
 
 export function RouteMap() {
@@ -78,8 +79,8 @@ export function Checklist() {
 
 // ---------- 24시간: 원형 시계 + 메일함 알림 ----------
 const NOTES = [
-  ["신청 확인", "접수 메일을 보내요. 메일이 안 보이면 스팸함도 확인해주세요."],
-  ["추가 자료가 필요하면", "접수 메일에 회신해서 사진이나 설명을 보내주세요."],
+  ["신청 확인", "접수 메일을 보내요. 신청 내용과 진행 단계는 내 신청에서 언제든 볼 수 있어요."],
+  ["추가 자료가 필요하면", "'보완 필요' 메일을 받으면 내 신청에서 신청을 수정해 사진이나 설명을 더해주세요."],
 ];
 
 export function DayClock() {
@@ -168,8 +169,9 @@ export function CostTags() {
 // ---------- 결정: 세로 선이 그려지며 카드가 좌우에서 ----------
 const DECIDE = [
   ["현장 실측 · 필수", "견적 전에 담당자가 방문해 현장을 실측해요. 실측한 내용으로 견적이 나와요."],
-  ["진행 의사 전달", "견적을 보고 접수 메일에 회신해 진행 여부와 궁금한 내용을 알려주세요."],
+  ["진행 의사 전달", "내 신청 견적서에서 진행·조정·보류 중 하나를 골라주세요."],
   ["계약·시공", "업체와 작업 범위·일정·대금을 확인하고 직접 계약해요."],
+  ["완료·후기", "완료 후 내 신청에서 완료 사진을 확인하고 후기를 남길 수 있어요."],
 ];
 
 export function DecideLine() {
@@ -178,7 +180,7 @@ export function DecideLine() {
     <ol ref={ref} className="dl">
       <span className="dl-line" aria-hidden="true" />
       {DECIDE.map(([t, d], i) => (
-        <li key={t} className={`dl-step dl-step--${i % 2 ? "r" : "l"}`} style={{ "--k": `clamp(0, var(--p) * 3.2 - ${i}, 1)` } as React.CSSProperties}>
+        <li key={t} className={`dl-step dl-step--${i % 2 ? "r" : "l"}`} style={{ "--k": `clamp(0, var(--p) * ${DECIDE.length + 0.2} - ${i}, 1)` } as React.CSSProperties}>
           <span className="dl-no" aria-hidden="true">
             {i + 1}
           </span>

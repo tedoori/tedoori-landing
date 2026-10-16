@@ -9,7 +9,7 @@ const STEPS = [
   { title: "견적 요청", desc: "사진과 요청을 보내면 접수가 시작돼요.", status: "received" as QuoteStatus, icon: "send" },
   { title: "내용 확인", desc: "24시간 안에 필요한 내용을 함께 확인해요.", status: "checking" as QuoteStatus, icon: "check" },
   { title: "방문 실측", desc: "담당자가 방문해 현장을 실측해요. 견적은 실측 후에 나와요.", status: "checking" as QuoteStatus, icon: "ruler" },
-  { title: "견적 확인", desc: "항목별 금액을 보고 진행 여부를 결정해요.", status: "quoted" as QuoteStatus, icon: "doc" },
+  { title: "견적 확인", desc: "내 신청에서 항목별 견적서를 보고 진행·조정·보류를 바로 선택해요.", status: "quoted" as QuoteStatus, icon: "doc" },
 ];
 const AUTO_MS = 2800;
 
@@ -160,7 +160,7 @@ export function StepsRail() {
           <br />
           한 번씩 확인해요.
         </h2>
-        <p className="lead">테두리가 요청을 확인해 외부 조경업체의 견적과 시공 상담을 연결해요.</p>
+        <p className="lead">테두리가 요청을 확인해 외부 조경업체의 견적과 시공 상담을 연결해요.<br />진행 상황은 내 신청에서 단계별로 확인할 수 있어요.</p>
         <div className="sr-status" aria-live="polite">
           <span className="sr-status__label">무료 견적 요청</span>
           <span key={active} className="sr-status__badge">

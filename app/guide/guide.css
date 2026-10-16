@@ -201,7 +201,7 @@
 .rm {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 12px;
   margin: var(--sp-14) 0 var(--sp-6);
   padding-top: 34px;
@@ -957,10 +957,10 @@
     margin-left: -11px;
   }
 
-  /* 첫 칸 가운데 ~ 마지막 칸 가운데 (칸 사이 간격 12px × 4) */
+  /* 첫 칸 가운데 ~ 마지막 칸 가운데 (칸 사이 간격 12px × 5) */
   .rm-line {
-    left: calc((100% - 48px) / 10);
-    right: calc((100% - 48px) / 10);
+    left: calc((100% - 60px) / 12);
+    right: calc((100% - 60px) / 12);
   }
 }
 
@@ -974,7 +974,7 @@
 .rm.is-on .rm-dot,
 .rm.is-on .rm-stop strong,
 .rm.is-on .rm-stop span {
-  animation-delay: calc(400ms + var(--i) * 1200ms);
+  animation-delay: calc(400ms + var(--i) * 960ms);
 }
 
 @media (max-width: 699px) {
