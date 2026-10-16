@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/my/"],
+      disallow: ["/my/", "/admin"],
     },
     sitemap: "https://tedoori.com/sitemap.xml",
   };
