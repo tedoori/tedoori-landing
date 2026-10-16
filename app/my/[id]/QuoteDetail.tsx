@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Callout, EmptyState, StatusBadge, type QuoteStatus } from "../../_components/ui";
 import { QuoteApiError, quoteApi } from "../../../lib/quote-api";
 import { EstimateCard, estimateGrand, type Estimate } from "./EstimateCard";
@@ -148,12 +148,15 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
     if (h === "list" || h === "visit" || h === "estimate") setTab(h);
   }, []);
 
+  const cache = useRef<Record<string, QuoteDetailData>>({});
   const latestId = rows[0]?.id ?? null;
   const [h, setH] = useState<QuoteDetailData | null>(null);
   const loadHome = useCallback(async () => {
     if (!latestId) return;
     try {
-      setH(await quoteApi<QuoteDetailData>(`/${encodeURIComponent(latestId)}`));
+      const fresh = await quoteApi<QuoteDetailData>(`/${encodeURIComponent(latestId)}`);
+      cache.current[fresh.id] = fresh;
+      setH(fresh);
     } catch {
       /* 홈 요약은 실패해도 다른 탭은 그대로 */
     }
@@ -165,15 +168,17 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
   const load = useCallback(async () => {
     if (!selId) return;
     setLoadError("");
+    if (cache.current[selId]) setD(cache.current[selId]);
     try {
-      setD(await quoteApi<QuoteDetailData>(`/${encodeURIComponent(selId)}`));
+      const fresh = await quoteApi<QuoteDetailData>(`/${encodeURIComponent(selId)}`);
+      cache.current[fresh.id] = fresh;
+      setD(fresh);
     } catch (e) {
       setLoadError(e instanceof QuoteApiError ? e.message : "신청 내용을 불러오지 못했어요.");
     }
   }, [selId]);
 
   useEffect(() => {
-    setD(null);
     void load();
   }, [load]);
 
@@ -448,7 +453,11 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
                       </span>
                     </span>
                     <StatusBadge status={r.status} />
-                    <span className="dash-row__chev" aria-hidden="true">⌄</span>
+                    <span className="dash-row__chev" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    </span>
                   </button>
                   <Link href={`/my/${r.id}/edit`} className="addr-edit dash-row__edit">
                     <Icon k="edit" /> 수정
@@ -458,10 +467,9 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
                   (d && d.id === r.id ? (
                     <RequestDetail d={d} onDelete={() => (setDeleteError(""), setConfirmOpen(true))} onGo={(t) => pick(r.id, t)} />
                   ) : (
-                    <div className="my-skeleton" aria-busy="true">
-                      <span />
-                      <span />
-                    </div>
+                    <p className="dash-acc__loading" role="status">
+                      불러오는 중…
+                    </p>
                   ))}
                 </li>
                 );
