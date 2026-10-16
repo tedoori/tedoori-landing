@@ -1,9 +1,9 @@
-import { escapeHtml } from "../../../../../lib/emails";
+import { operatorAddressEmail, type QuoteRow } from "../../../../../lib/emails";
 import { notifyOperator } from "../../../../../lib/mail";
 import { authorize, fail, isUuid, notFound } from "../../../../../lib/quote-server";
 
-// 방문 주소 저장 (PUT). 실측 일정을 정하는 동안(확인 중·실측 예정·보완 필요)에만 받음
-const OPEN = ["checking", "visit", "needs"];
+// 방문 주소 저장 (PUT). 진행이 끝나지 않은 신청이면 미리 받음
+const OPEN = ["received", "checking", "visit", "needs"];
 const clean = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -14,7 +14,7 @@ export async function PUT(req: Request, { params }: Ctx) {
   const auth = await authorize(req);
   if (auth instanceof Response) return auth;
 
-  const { data: q } = await auth.supabase.from("quote_requests").select("id, receipt_no, status, name, phone").eq("id", id).maybeSingle();
+  const { data: q } = await auth.supabase.from("quote_requests").select("*").eq("id", id).maybeSingle<QuoteRow & { status: string }>();
   if (!q) return notFound();
   if (!OPEN.includes(q.status)) return fail(409, "closed", "지금은 방문 주소를 받지 않는 단계예요.");
 
@@ -30,9 +30,6 @@ export async function PUT(req: Request, { params }: Ctx) {
     .eq("id", id);
   if (error) return fail(500, "save_failed", "주소를 저장하지 못했어요. 잠시 후 다시 시도해주세요.");
 
-  await notifyOperator({
-    subject: `[테두리] 방문 주소 입력 (${q.receipt_no})`,
-    html: `<p>${escapeHtml(q.receipt_no)} · ${escapeHtml(q.name ?? "")} ${escapeHtml(q.phone ?? "")}</p><p><strong>${escapeHtml(address)} ${escapeHtml(detail)}</strong></p>${memo ? `<p>메모: ${escapeHtml(memo)}</p>` : ""}`,
-  });
+  await notifyOperator(operatorAddressEmail(q, { address, detail, memo }));
   return Response.json({ ok: true });
 }

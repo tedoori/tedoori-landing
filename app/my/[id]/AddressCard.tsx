@@ -30,10 +30,11 @@ type Props = {
   detail: string | null;
   memo: string | null;
   onSaved: () => void;
+  intro?: string;
 };
 
 /** 실측 방문 주소: 일정을 정하는 동안 고객이 직접 입력 */
-export function AddressCard({ id, address, detail, memo, onSaved }: Props) {
+export function AddressCard({ id, address, detail, memo, onSaved, intro }: Props) {
   const [editing, setEditing] = useState(!address);
   const [addr, setAddr] = useState(address ?? "");
   const [det, setDet] = useState(detail ?? "");
@@ -109,7 +110,7 @@ export function AddressCard({ id, address, detail, memo, onSaved }: Props) {
       <h2 id="addr-title" className="addr-title">
         방문 주소를 알려주세요
       </h2>
-      <p className="addr-desc">담당자가 실측하러 갈 주소예요. 실측과 견적 안내에만 쓰고, 업체에는 동의를 받은 뒤에만 전달해요.</p>
+      <p className="addr-desc">{intro ?? "담당자가 실측하러 갈 주소예요."} 실측과 견적 안내에만 쓰고, 업체에는 동의를 받은 뒤에만 전달해요.</p>
 
       <div className="addr-field">
         <span className="addr-label">

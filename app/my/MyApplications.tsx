@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Callout, StatusBadge, type QuoteStatus } from "../_components/ui";
 import { isSupabaseConfigured, getSupabase } from "../../lib/supabase";
@@ -32,6 +33,7 @@ function formatDate(value: string) {
 }
 
 export function MyApplications() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [verifiedEmail, setVerifiedEmail] = useState("");
@@ -67,6 +69,11 @@ export function MyApplications() {
       setRows(data.items.map((row) => ({ ...row, status: safeStatus(row.status) })));
       setTotal(data.total);
       setPage(data.page);
+      // 신청이 1건이면 목록 대신 바로 그 신청의 대시보드로 (/my?list=1 이면 목록 유지)
+      if (data.total === 1 && data.items[0] && !new URLSearchParams(window.location.search).has("list")) {
+        router.replace(`/my/${data.items[0].id}`);
+        return;
+      }
       setPhase("list");
     } catch (e) {
       if (e instanceof QuoteApiError && e.status === 401) {

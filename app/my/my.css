@@ -286,3 +286,62 @@
 .addr-popup__bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #f5f7f5; font-size: 14px; font-weight: 700; }
 .addr-popup__box { height: 440px; }
 .addr-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* ---------- 내 신청 대시보드 ---------- */
+.dash { display: grid; gap: clamp(18px, 3vw, 28px); }
+.dash-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.dash-title { margin-top: 4px; font-size: clamp(26px, 4vw, 36px); font-weight: 800; letter-spacing: -0.02em; }
+
+.dash-steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 18px clamp(12px, 3vw, 28px); border-radius: 18px; background: #f5f7f5; counter-reset: s; }
+.dash-steps li { position: relative; display: grid; justify-items: center; gap: 6px; text-align: center; }
+.dash-steps li + li::before { content: ""; position: absolute; top: 15px; right: 50%; width: 100%; height: 3px; background: #dfe5e1; z-index: 0; }
+.dash-steps li.is-done::before,
+.dash-steps li.is-now::before { background: #1da049; }
+.dash-steps__dot { position: relative; z-index: 1; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 2px solid #dfe5e1; color: #8a948e; font-size: 13px; font-weight: 800; }
+.dash-steps li.is-done .dash-steps__dot { background: #1da049; border-color: #1da049; color: #fff; }
+.dash-steps li.is-now .dash-steps__dot { background: #1d2420; border-color: #1d2420; color: #fff; box-shadow: 0 0 0 5px rgba(29, 160, 73, 0.22); }
+.dash-steps__label { font-size: 13px; font-weight: 700; color: #8a948e; }
+.dash-steps li.is-done .dash-steps__label,
+.dash-steps li.is-now .dash-steps__label { color: #1d2420; }
+.dash-steps.is-canceled { opacity: 0.5; }
+
+.dash-body { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: clamp(20px, 3vw, 36px); align-items: start; }
+.dash-nav { position: sticky; top: 96px; display: grid; gap: 4px; }
+.dash-nav button,
+.dash-nav__link { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 12px 14px; border: 0; border-radius: 12px; background: transparent; color: #4b524d; font: inherit; font-size: 15px; font-weight: 700; text-align: left; text-decoration: none; cursor: pointer; }
+.dash-nav button:hover,
+.dash-nav__link:hover { background: #f1f4f2; color: #1d2420; }
+.dash-nav button.is-on { background: #1d2420; color: #fff; }
+.dash-nav__dot { width: 8px; height: 8px; border-radius: 50%; background: #e5484d; }
+.dash-nav__sub { margin-top: 10px; padding: 8px 14px; color: var(--muted); font-size: 13px; }
+
+.dash-main { display: grid; gap: 18px; min-width: 0; }
+.dash-next { display: grid; gap: 8px; justify-items: start; padding: clamp(20px, 3vw, 28px); border-radius: 20px; background: #16231b; color: #fff; }
+.dash-next__kicker { color: #8fe0a8; font-size: 13px; font-weight: 800; }
+.dash-next__title { font-size: clamp(20px, 3vw, 26px); font-weight: 800; }
+.dash-next__desc { color: rgba(255, 255, 255, 0.75); font-size: 15px; }
+.dash-next .btn { margin-top: 6px; }
+
+.dash-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.dash-tile { position: relative; display: grid; gap: 4px; align-content: start; min-height: 128px; padding: 18px 44px 18px 18px; border: 1px solid var(--line); border-radius: 18px; background: #fff; color: inherit; font: inherit; text-align: left; text-decoration: none; cursor: pointer; transition: border-color 0.15s, transform 0.15s; }
+.dash-tile:hover { border-color: #1da049; transform: translateY(-2px); }
+.dash-tile__k { color: var(--muted); font-size: 13px; font-weight: 700; }
+.dash-tile strong { font-size: 18px; font-weight: 800; overflow-wrap: anywhere; }
+.dash-tile__v { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+.dash-tile__go { position: absolute; top: 18px; right: 18px; color: #1da049; font-weight: 800; }
+.dash-tile.is-visit { background: #f3effd; border-color: #d9cff5; }
+.dash-tile.is-estimate { background: #eef7f1; border-color: #bfe3cb; }
+
+@media (max-width: 799px) {
+  .dash-body { grid-template-columns: minmax(0, 1fr); }
+  .dash-nav { position: sticky; top: 64px; z-index: 5; display: flex; gap: 6px; margin: 0 -16px; padding: 8px 16px; overflow-x: auto; background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(8px); scrollbar-width: none; }
+  .dash-nav button,
+  .dash-nav__link { flex: none; width: auto; padding: 9px 14px; border: 1px solid var(--line); border-radius: 999px; font-size: 14px; gap: 6px; }
+  .dash-nav__sub { flex: none; margin: 0; align-self: center; }
+  .dash-tiles { grid-template-columns: minmax(0, 1fr); }
+  .dash-tile { min-height: 0; }
+  .dash-steps { padding: 14px 6px; }
+  .dash-steps__label { font-size: 12px; }
+}
+.dash-head .ui-status { flex: none; white-space: nowrap; }
+.dash-next .btn { width: auto; min-width: 180px; }

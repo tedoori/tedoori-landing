@@ -301,3 +301,26 @@ export function statusEmail(q: StatusRow) {
   }
   return null;
 }
+
+/** 고객이 방문 주소를 넣었을 때 운영자에게: 주소 + 연락처 + 신청 내용 전체 */
+export function operatorAddressEmail(q: QuoteRow, a: { address: string; detail: string; memo: string }) {
+  const body = `
+    ${section(`
+      <h1 style="margin:0;font-family:${FONT};font-size:20px;line-height:1.4;font-weight:800;color:#16231B;">방문 주소가 들어왔어요 · ${esc(q.receipt_no)}</h1>
+      <p style="margin:8px 0 0 0;font-family:${FONT};font-size:14px;line-height:1.6;color:#4E5A53;">주소를 확인하고 실측 일정을 정해주세요.</p>
+    `, "28px 32px 0 32px")}
+    ${section(`
+      <div style="background-color:#E7DFCF;border-radius:12px;padding:18px 20px;font-family:${FONT};">
+        <div style="font-size:13px;color:#46524B;margin-bottom:6px;">방문 주소</div>
+        <div style="font-size:18px;font-weight:800;line-height:1.5;color:#16231B;">${esc(a.address)}${a.detail ? `<br>${esc(a.detail)}` : ""}</div>
+        ${a.memo ? `<div style="font-size:13px;line-height:1.6;color:#46524B;margin-top:8px;">메모 · ${esc(a.memo)}</div>` : ""}
+      </div>
+    `)}
+    ${section(`${heading("연락처")}${rowsTable([["이름", q.name ?? "-"], ["휴대전화", q.phone ?? "-"], ["이메일", q.email]])}`)}
+    ${section(`${heading("신청 내용")}${rowsTable(summaryRows(q))}`, "24px 32px 28px 32px")}
+  `;
+  return {
+    subject: `[테두리 운영] 방문 주소 입력 ${q.receipt_no} · ${q.name ?? ""}`,
+    html: shell({ preheader: `${a.address} ${a.detail}`, body, footer: "테두리 운영 알림" }),
+  };
+}

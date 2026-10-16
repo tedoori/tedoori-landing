@@ -240,3 +240,13 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
     </section>
   );
 }
+
+/** 대시보드 요약용: 부가세 포함 합계 */
+export function estimateGrand(e: Estimate) {
+  const t =
+    e.items.reduce((a, i) => a + i.material_cost + i.delivery_cost + i.labor_cost, 0) +
+    (e.equipment_cost ?? 0) +
+    (e.waste_cost ?? 0) +
+    (e.extra_labor_cost ?? 0);
+  return e.vat_included ? t : t + Math.round(t * 0.1);
+}
