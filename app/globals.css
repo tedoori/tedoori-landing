@@ -1041,7 +1041,7 @@ button {
 
 @media (min-width: 900px) {
   .site-footer__top {
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.1fr);
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr) minmax(0, 1.2fr);
     align-items: start;
   }
 }
@@ -1088,6 +1088,12 @@ button {
 
 .site-footer__cols a:hover {
   color: #fff;
+}
+
+.site-footer__contact {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
 }
 
 /* 카카오톡 채널 카드 */
@@ -1139,21 +1145,70 @@ button {
 }
 
 .site-footer__channels {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 18px;
-  padding-top: 2px;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.72);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
 
-.site-footer__channels a:hover {
+.site-footer__channel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  color: rgba(255, 255, 255, 0.82);
+  transition: border-color 160ms var(--ease-out), background-color 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+
+.site-footer__channel:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.06);
   color: #fff;
 }
 
-.site-footer__channels span {
-  margin-left: 4px;
+.site-footer__channel-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+}
+
+.site-footer__channel-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.site-footer__channel-copy {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.site-footer__channel-copy strong {
+  font-size: 13px;
+}
+
+.site-footer__channel-copy span {
   color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.site-footer__channel-copy .site-footer__channel-handle {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 12px;
+}
+
+@media (max-width: 520px) {
+  .site-footer__channels {
+    grid-template-columns: 1fr;
+  }
 }
 
 .site-footer__bottom {

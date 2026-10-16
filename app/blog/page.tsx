@@ -19,7 +19,11 @@ export default function BlogPage() {
           <div className="container journal-hero__inner">
             <p className="journal-eyebrow">TEDOORI BLOG</p>
             <h1 id="blog-title" className="title-l">전원주택 조경,<br />필요한 것부터 알아봐요.</h1>
-            <p className="lead">마당을 어디부터 바꿀지 막막할 때, 테두리 조경견적을 준비하는 데 필요한 정보를 모았어요.</p>
+            <p className="lead">
+              마당을 어디부터 바꿀지 막막할 때,
+              <br />
+              테두리 조경견적을 준비하는 데 필요한 정보를 모았어요.
+            </p>
           </div>
         </section>
         <section className="section" aria-labelledby="blog-list-title">
@@ -29,7 +33,11 @@ export default function BlogPage() {
                 <p className="journal-eyebrow">LANDSCAPING NOTES</p>
                 <h2 id="blog-list-title" className="journal-title">조경을 시작하기 전에</h2>
               </div>
-              <p className="journal-section-head__text">식재·잔디·자갈·판석·디딤석부터 견적 준비까지, 지금 필요한 글부터 읽어보세요.</p>
+              <p className="journal-section-head__text">
+                식재·잔디·자갈·판석·디딤석부터 견적 준비까지,
+                <br />
+                지금 필요한 글부터 읽어보세요.
+              </p>
             </div>
             <div className="journal-grid">
               {JOURNAL_ARTICLES.map((article) => (
