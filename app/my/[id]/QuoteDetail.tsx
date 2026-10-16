@@ -226,7 +226,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
     ["home", "홈", null],
     ["list", "신청 내역", total],
     ["visit", "방문 일정", null],
-    ["estimate", "견적서", null],
+    ["estimate", "견적서", counts.quoted || null],
   ];
 
   return (
