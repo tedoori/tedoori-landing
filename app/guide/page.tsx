@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SiteFooter } from "../_components/SiteFooter";
 import { SiteHeader } from "../_components/SiteHeader";
 import { Checklist, CostTags, DayClock, DecideLine, LogoDraw, RouteMap } from "./GuideParts";
+import { FlowMock } from "./FlowMock";
 import "./guide.css";
 
 export const metadata: Metadata = {
@@ -42,6 +43,21 @@ export default function GuidePage() {
           <div className="container">
             <RouteMap />
             <p className="note gd-hero__note">서울·경기·인천 · 견적 요청은 무료예요.</p>
+          </div>
+        </section>
+
+        {/* 단계마다 바뀌는 내 신청 화면 */}
+        <section className="section gd-flow" aria-labelledby="flow-title">
+          <div className="container">
+            <div className="gd-head gd-head--center">
+              <h2 id="flow-title" className="gd-title">
+                신청한 뒤에는
+                <br />
+                내 신청에서 단계별로 확인해요.
+              </h2>
+              <p className="lead">견적 요청부터 완료까지, 지금 어디쯤인지와 할 일을 한 화면에서 보여드려요.</p>
+            </div>
+            <FlowMock />
           </div>
         </section>
 
