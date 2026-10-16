@@ -198,3 +198,7 @@
   .bl-tab[aria-selected="true"] { background: var(--forest); border-color: var(--forest); color: #fff; }
 }
 @media (max-width: 700px) { .bl-tabs { width: 100%; } .bl-hero .bl-search { max-width: none; } }
+
+/* 휴대폰에서만 줄바꿈 */
+.bl-hero .lead br.bl-br-m { display: none; }
+@media (max-width: 700px) { .bl-hero .lead br.bl-br-m { display: inline; } }

@@ -52,7 +52,7 @@ export function BlogList({ articles }: { articles: JournalArticle[] }) {
         <div className="container bl-hero__inner">
           <p className="bl-eyebrow">TEDOORI BLOG</p>
           <h1 id="blog-title" className="bl-display">전원주택 조경, 필요한 것부터 알아봐요.</h1>
-          <p className="lead">마당을 어디부터 바꿀지 막막할 때, 테두리 조경견적을 준비하는 데 필요한 정보를 모았어요.</p>
+          <p className="lead">마당을 어디부터 바꿀지 막막할 때,<br className="bl-br-m" /> 테두리 조경견적을 준비하는 데 필요한 정보를 모았어요.</p>
           <label className="bl-search">
             <span className="sr-only">블로그 글 검색</span>
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
