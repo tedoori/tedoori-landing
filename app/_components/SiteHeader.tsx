@@ -22,6 +22,9 @@ export function SiteHeader({ floating = false }: { floating?: boolean }) {
         <Link href="/quote" className="header-cta">
           무료 견적 신청
         </Link>
+        <Link href="/my" className="icon-link icon-link--account" aria-label="내 신청">
+          <img src="/figma/icon-account.svg" width={24} height={24} alt="" />
+        </Link>
         <Link href="/menu" className="icon-link icon-link--menu" aria-label="전체 메뉴">
           <img src="/figma/icon-menu.svg" width={24} height={24} alt="" />
         </Link>

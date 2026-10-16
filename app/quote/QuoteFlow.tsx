@@ -28,7 +28,7 @@ import { TermsContent } from "../_components/legal/TermsContent";
 const STORAGE_KEY = "teduri-quote-v1";
 const KAKAO_URL = "https://pf.kakao.com/_HeKBX";
 // 접수 완료 화면: 진행 단계 (이용 안내 노선도와 같은 이름)
-const DONE_TRACK = ["견적 요청", "내용 확인", "방문 실측", "견적 확인", "진행 결정"];
+const DONE_TRACK = ["접수", "확인", "실측", "견적", "결정", "완료"];
 const MORE_LINKS = [
   { href: "/service", name: "서비스 소개", desc: "식재부터 화단까지, 작업별 사진 보기", img: "/service/work-bed.webp" },
   { href: "/guide", name: "이용 안내", desc: "견적을 받은 뒤 진행되는 과정", img: "/guide/hero-shot.webp" },

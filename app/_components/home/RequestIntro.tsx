@@ -213,7 +213,7 @@ export function RequestIntro() {
                       접수번호 <b>TD-2610-0001</b>
                     </span>
                     <ol className="ri-done__track">
-                      {["견적 요청", "내용 확인", "방문 실측", "견적 확인"].map((t, k) => (
+                      {["접수", "확인", "실측", "견적", "결정", "완료"].map((t, k) => (
                         <li key={t} className={k === 0 ? "is-done" : k === 1 ? "is-now" : ""}>
                           <i />
                           {t}

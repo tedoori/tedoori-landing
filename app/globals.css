@@ -273,10 +273,10 @@ button {
 
 .site-header__inner {
   display: grid;
-  grid-template-columns: auto 1fr auto auto;
+  grid-template-columns: auto 1fr auto auto auto;
   grid-template-areas:
-    "brand . cta menu"
-    "nav nav nav nav";
+    "brand . cta account menu"
+    "nav nav nav nav nav";
   align-items: center;
   column-gap: 4px;
   max-width: calc(1312px + 64px * 2);
@@ -374,8 +374,8 @@ button {
 
 @media (min-width: 900px) {
   .site-header__inner {
-    grid-template-columns: auto 1fr auto auto auto;
-    grid-template-areas: "brand . nav cta menu";
+    grid-template-columns: auto 1fr auto auto auto auto;
+    grid-template-areas: "brand . nav cta account menu";
     column-gap: 4px;
     padding-block: 12px;
     padding-inline: 64px;

@@ -14,8 +14,8 @@
 }
 
 .site-header--float .site-header__inner {
-  grid-template-columns: auto 1fr auto auto;
-  grid-template-areas: "brand . cta menu";
+  grid-template-columns: auto 1fr auto auto auto;
+  grid-template-areas: "brand . cta account menu";
   max-width: 1240px;
   padding: 6px 6px 6px 16px;
   border: 1px solid rgba(22, 35, 27, 0.08);
@@ -81,8 +81,8 @@
   }
 
   .site-header--float .site-header__inner {
-    grid-template-columns: auto 1fr auto auto auto;
-    grid-template-areas: "brand . nav cta menu";
+    grid-template-columns: auto 1fr auto auto auto auto;
+    grid-template-areas: "brand . nav cta account menu";
     padding: 6px 6px 6px 22px;
   }
 
