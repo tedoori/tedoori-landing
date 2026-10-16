@@ -186,3 +186,15 @@
   .bl-tab { padding: 10px 10px 12px; font-size: 14.5px; }
   .bl-tab::after { left: 10px; right: 10px; }
 }
+
+/* 목록 페이지: 글 카드와 상담 띠 사이 간격 */
+.bl > .container > .bl-cta { margin-top: clamp(56px, 7vw, 88px); }
+
+/* 휴대폰 분류: 밑줄 탭 대신 같은 크기 칸 4개씩 (7개 → 4 + 3, 칸 맞춤) */
+@media (max-width: 700px) {
+  .bl-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 12px; padding-bottom: 16px; }
+  .bl-tab { padding: 9px 4px; border-radius: 10px; background: #fff; border: 1px solid #e2e6e1; font-size: 13.5px; white-space: nowrap; }
+  .bl-tab::after { display: none; }
+  .bl-tab[aria-selected="true"] { background: var(--forest); border-color: var(--forest); color: #fff; }
+}
+@media (max-width: 700px) { .bl-tabs { width: 100%; } .bl-hero .bl-search { max-width: none; } }
