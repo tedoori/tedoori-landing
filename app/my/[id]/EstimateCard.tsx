@@ -93,7 +93,11 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
     setSaving(true);
     try {
       const { toPng } = await import("html-to-image");
-      const url = await toPng(paper.current, { pixelRatio: 2, backgroundColor: "#fffdf8", filter: (n) => !(n instanceof HTMLElement && n.dataset.noCapture === "1") });
+      // 휴대폰에서도 업체 견적서와 같은 표 모양으로 찍음 (잠시 넓게 펼쳤다가 되돌림)
+      paper.current.classList.add("is-capture");
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+      const url = await toPng(paper.current, {
+        width: 760, pixelRatio: 2, backgroundColor: "#fffdf8", filter: (n) => !(n instanceof HTMLElement && n.dataset.noCapture === "1") });
       const a = document.createElement("a");
       a.href = url;
       a.download = `테두리-견적서-${receiptNo ?? "예시"}.png`;
@@ -101,6 +105,7 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
     } catch {
       window.alert("이미지를 만들지 못했어요. 잠시 후 다시 시도해주세요.");
     } finally {
+      paper.current?.classList.remove("is-capture");
       setSaving(false);
     }
   };
@@ -148,73 +153,99 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
           </strong>
         </div>
 
-        {/* 공종별 줄: PC는 표, 휴대폰은 줄마다 카드 */}
-        <div className="est-table" role="table" aria-label="견적 내역">
-          <div className="est-tr est-tr--head" role="row">
-            <span role="columnheader">공종명</span>
-            <span role="columnheader">규격</span>
-            <span role="columnheader">단위</span>
-            <span role="columnheader">수량</span>
-            <span role="columnheader">단가</span>
-            <span role="columnheader">금액</span>
-          </div>
-          {e.items.map((i) => {
-            const priced = (i.unit_price ?? 0) > 0;
-            return (
-              <div key={i.id} className="est-tr" role="row">
-                <span role="cell" className="est-td--name">
-                  <strong>
-                    {(i.unit_price ?? 0) > 0 && <i className={`est-kind est-kind--${i.kind ?? "material"}`}>{KIND_LABEL[i.kind ?? "material"]}</i>}
-                    {i.work}
-                  </strong>
-                  {i.material && <small>{i.material}</small>}
-                  {i.note && <em>{i.note}</em>}
-                  {/* 휴대폰: 규격 · 수량단위 × 단가 한 줄 */}
-                  <span className="est-td__meta">
-                    {[i.spec, priced ? `${qtyText(Number(i.qty ?? 1))}${i.unit ?? ""} × ${num(i.unit_price ?? 0)}원` : i.quantity].filter(Boolean).join(" · ")}
-                  </span>
-                </span>
-                <span role="cell" className="est-td--spec" data-k="규격">
-                  {i.spec || "—"}
-                </span>
-                <span role="cell" className="est-td--unit" data-k="단위">
-                  {priced ? i.unit || "—" : "—"}
-                </span>
-                <span role="cell" className="est-td--qty" data-k="수량">
-                  {priced ? qtyText(Number(i.qty ?? 1)) : i.quantity || "—"}
-                </span>
-                <span role="cell" className="est-td--price" data-k="단가">
-                  {priced ? `${num(i.unit_price ?? 0)}원` : "—"}
-                </span>
-                <span role="cell" className="est-td--amt">
-                  {num(itemAmount(i))}원
-                </span>
-              </div>
-            );
-          })}
-          {t.legacyExtra > 0 && (
-            <div className="est-tr" role="row">
-              <span role="cell" className="est-td--name">
-                <strong>추가 비용</strong>
-                {e.extra_note && <em>{e.extra_note}</em>}
-              </span>
-              <span role="cell" className="est-td--spec" data-k="규격">
-                —
-              </span>
-              <span role="cell" className="est-td--unit" data-k="단위">
-                식
-              </span>
-              <span role="cell" className="est-td--qty" data-k="수량">
-                1
-              </span>
-              <span role="cell" className="est-td--price" data-k="단가">
-                {num(t.legacyExtra)}원
-              </span>
-              <span role="cell" className="est-td--amt">
-                {num(t.legacyExtra)}원
-              </span>
-            </div>
-          )}
+        {/* 업체 견적서와 같은 표: 공종명 · 규격 · 단위 · [견적내역 수량 · 단가 · 금액] · 비고 → 계 · 공과잡비 · 합계 */}
+        <div className="est-sheet">
+          <table className="est-xl">
+            <colgroup>
+              <col className="c-name" />
+              <col className="c-spec" />
+              <col className="c-unit" />
+              <col className="c-qty" />
+              <col className="c-price" />
+              <col className="c-amt" />
+              <col className="c-note" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th rowSpan={2}>공종명</th>
+                <th rowSpan={2}>규 격</th>
+                <th rowSpan={2}>단위</th>
+                <th colSpan={3}>견 적 내 역</th>
+                <th rowSpan={2}>비 고</th>
+              </tr>
+              <tr>
+                <th>수 량</th>
+                <th>단 가</th>
+                <th>금 액</th>
+              </tr>
+            </thead>
+            <tbody>
+              {e.items.map((i) => {
+                const priced = (i.unit_price ?? 0) > 0;
+                return (
+                  <tr key={i.id}>
+                    <td className="t-name">
+                      {i.work}
+                      {i.material ? ` ${i.material}` : ""}
+                      {/* 휴대폰: 규격 · 수량단위 × 단가 한 줄 */}
+                      <span className="est-td__meta">
+                        {[i.spec, priced ? `${qtyText(Number(i.qty ?? 1))}${i.unit ?? ""} × ${num(i.unit_price ?? 0)}원` : i.quantity].filter(Boolean).join(" · ")}
+                      </span>
+                      {i.note && <span className="est-td__note">비고 · {i.note}</span>}
+                    </td>
+                    <td className="t-spec">{i.spec || ""}</td>
+                    <td className="t-unit">{priced ? i.unit || "" : "식"}</td>
+                    <td className="t-num">{priced ? qtyText(Number(i.qty ?? 1)) : i.quantity || "1"}</td>
+                    <td className="t-num">{priced ? num(i.unit_price ?? 0) : num(itemAmount(i))}</td>
+                    <td className="t-num t-amt">{num(itemAmount(i))}</td>
+                    <td className="t-note">{i.note || ""}</td>
+                  </tr>
+                );
+              })}
+              {t.legacyExtra > 0 && (
+                <tr>
+                  <td className="t-name">추가 비용</td>
+                  <td className="t-spec" />
+                  <td className="t-unit">식</td>
+                  <td className="t-num">1</td>
+                  <td className="t-num">{num(t.legacyExtra)}</td>
+                  <td className="t-num t-amt">{num(t.legacyExtra)}</td>
+                  <td className="t-note">{e.extra_note || ""}</td>
+                </tr>
+              )}
+            </tbody>
+            <tfoot>
+              <tr className="t-sub">
+                <td className="t-name">계</td>
+                <td className="t-spec" />
+                <td className="t-unit" />
+                <td className="t-num" />
+                <td className="t-num" />
+                <td className="t-num t-amt">{num(t.subtotal)}</td>
+                <td className="t-note" />
+              </tr>
+              {t.overhead > 0 && (
+                <tr className="t-sub">
+                  <td className="t-name">공과잡비</td>
+                  <td className="t-spec t-center">{t.rate}%</td>
+                  <td className="t-unit" />
+                  <td className="t-num" />
+                  <td className="t-num" />
+                  <td className="t-num t-amt">{num(t.overhead)}</td>
+                  <td className="t-note" />
+                </tr>
+              )}
+              <tr className="t-total">
+                <td className="t-name">합 계</td>
+                <td className="t-spec" />
+                <td className="t-unit" />
+                <td className="t-num">{qtyText(e.items.reduce((a, i) => a + ((i.unit_price ?? 0) > 0 ? Number(i.qty ?? 1) : 1), 0))}</td>
+                <td className="t-num" />
+                <td className="t-num t-amt">{num(t.subtotal + t.overhead)}</td>
+                <td className="t-note">{e.vat_included ? "부가세 포함" : "부가세 별도"}</td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
 
         {/* 자재비 · 배송비 · 시공비 나눠 보기 (공과잡비·부가세 전) */}
@@ -229,16 +260,6 @@ export function EstimateCard({ estimate: e, receiptNo, customer }: { estimate: E
         </div>
 
         <dl className="est-totals">
-          <div>
-            <dt>계</dt>
-            <dd>{num(t.subtotal)}원</dd>
-          </div>
-          {t.overhead > 0 && (
-            <div>
-              <dt>공과잡비 ({t.rate}%)</dt>
-              <dd>{num(t.overhead)}원</dd>
-            </div>
-          )}
           <div>
             <dt>공급가액</dt>
             <dd>{num(t.supply)}원</dd>

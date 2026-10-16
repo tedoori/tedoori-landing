@@ -295,7 +295,7 @@ export function EstimateEditor({ quoteId, status, onSent }: { quoteId: string; s
             {!UNITS.includes(it.unit) && (
               <input className="ui-input adm-etr__unit" value={it.unit} placeholder="단위 직접 입력" aria-label={`${i + 1}번 단위 직접 입력`} onChange={(e) => setI(i, { unit: e.target.value })} />
             )}
-            <input className="ui-input adm-etr__note" value={it.note} placeholder="줄 메모 (선택) · 예: 현관까지 일자로" aria-label={`${i + 1}번 메모`} onChange={(e) => setI(i, { note: e.target.value })} />
+            <input className="ui-input adm-etr__note" value={it.note} placeholder="비고 (선택) · 예: 주차장에서 현관, 테두리마감석" aria-label={`${i + 1}번 비고`} onChange={(e) => setI(i, { note: e.target.value })} />
           </div>
         ))}
         <button type="button" className="adm-btn" onClick={() => setItems((p) => [...p, blankItem()])}>

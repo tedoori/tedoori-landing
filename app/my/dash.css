@@ -653,3 +653,98 @@
 .est-save { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 0 16px; border: 1px solid #1d2420; border-radius: 10px; background: #fff; color: #1d2420; font: inherit; font-size: 13.5px; font-weight: 800; cursor: pointer; }
 .est-save:active { transform: scale(0.97); }
 .est-save:disabled { opacity: 0.6; }
+
+/* ---------- 업체 견적서 모양 표 (엑셀 견적서처럼) ---------- */
+.est-sheet { overflow-x: auto; margin-top: 4px; }
+.est-xl { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 13.5px; font-variant-numeric: tabular-nums; color: #1d2420; }
+.est-xl col.c-name { width: 22%; }
+.est-xl col.c-spec { width: 16%; }
+.est-xl col.c-unit { width: 7%; }
+.est-xl col.c-qty { width: 8%; }
+.est-xl col.c-price { width: 13%; }
+.est-xl col.c-amt { width: 15%; }
+.est-xl col.c-note { width: 19%; }
+.est-xl th, .est-xl td { padding: 7px 8px; border: 1px solid #2a2a28; }
+.est-xl tbody td { border-top: 1px dotted #9a968c; border-bottom: 1px dotted #9a968c; }
+.est-xl thead th { background: #fff3a6; font-size: 13px; font-weight: 800; text-align: center; white-space: nowrap; }
+.est-xl .t-num { text-align: right; }
+.est-xl .t-unit, .est-xl .t-center { text-align: center; }
+.est-xl .t-note { color: #4b524d; font-size: 12.5px; }
+.est-xl .t-name { font-weight: 700; }
+.est-xl tfoot td { background: #d9d9d9; font-weight: 700; }
+.est-xl tfoot .t-total td { background: #c9c9c9; font-size: 14.5px; font-weight: 800; }
+.est-xl .est-td__meta, .est-xl .est-td__note { display: none; }
+
+/* 휴대폰: 줄마다 카드 (공종명 + 금액, 아래 규격·수량×단가, 비고) */
+@media (max-width: 640px) {
+  .est-sheet { overflow: visible; }
+  .est-xl { min-width: 0; }
+  .est-xl colgroup, .est-xl thead { display: none; }
+  .est-xl, .est-xl tbody, .est-xl tfoot { display: block; }
+  .est-xl tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 12px 4px; border-bottom: 1px solid #e3e0d6; }
+  .est-xl td { display: none; padding: 0; border: 0 !important; background: none !important; }
+  .est-xl td.t-name, .est-xl td.t-amt { display: block; }
+  .est-xl td.t-amt { font-weight: 800; }
+  .est-xl .est-td__meta { display: block; margin-top: 2px; color: #4b524d; font-size: 13px; font-weight: 500; }
+  .est-xl .est-td__note { display: block; margin-top: 2px; color: #8a6d3b; font-size: 12.5px; font-weight: 500; }
+  .est-xl tbody { border-top: 2px solid #1d2420; }
+  .est-xl tfoot { background: #f1f0eb; border-top: 2px solid #1d2420; }
+  .est-xl tfoot tr { padding: 8px 6px; border-bottom: 1px solid #e3e0d6; }
+  .est-xl tfoot td.t-spec:not(:empty) { display: block; grid-column: 1; color: #6b716c; font-size: 12.5px; }
+  .est-xl tfoot .t-total td.t-note { display: block; grid-column: 1 / -1; color: #6b716c; font-size: 12px; font-weight: 600; }
+}
+
+/* 휴대폰: 공과잡비 % 왼쪽 정렬 */
+@media (max-width: 640px) {
+  .est-xl tfoot td.t-spec:not(:empty) { text-align: left; }
+}
+/* 이미지로 저장할 때: 화면 크기와 상관없이 PC 표 모양 */
+.est-paper.is-capture { width: 760px !important; max-width: none !important; }
+.est-paper.is-capture .est-xl { display: table !important; min-width: 0; }
+.est-paper.is-capture .est-xl colgroup { display: table-column-group !important; }
+.est-paper.is-capture .est-xl thead { display: table-header-group !important; }
+.est-paper.is-capture .est-xl tbody { display: table-row-group !important; border: 0; }
+.est-paper.is-capture .est-xl tfoot { display: table-footer-group !important; border: 0; background: none; }
+.est-paper.is-capture .est-xl tr { display: table-row !important; padding: 0; border: 0; }
+.est-paper.is-capture .est-xl td { display: table-cell !important; padding: 7px 8px !important; border: 1px solid #2a2a28 !important; }
+.est-paper.is-capture .est-xl tbody td { border-top: 1px dotted #9a968c !important; border-bottom: 1px dotted #9a968c !important; }
+.est-paper.is-capture .est-xl tfoot td { background: #d9d9d9 !important; }
+.est-paper.is-capture .est-xl tfoot .t-total td { background: #c9c9c9 !important; }
+.est-paper.is-capture .est-xl .est-td__meta, .est-paper.is-capture .est-xl .est-td__note { display: none !important; }
+.est-paper.is-capture .est-parts { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+
+/* ---------- 테두리 느낌으로 다시: 칸 구성은 업체 견적서, 모양은 테두리 ---------- */
+.est-xl { border-top: 2px solid #1d2420; }
+.est-xl th, .est-xl td { border: 0; border-bottom: 1px solid #ebe8df; padding: 11px 10px; }
+.est-xl tbody td { border-top: 0; border-bottom: 1px solid #ebe8df; }
+.est-xl thead th { background: #f4f1ea; color: #4b524d; font-size: 12px; font-weight: 800; letter-spacing: 0.02em; }
+.est-xl thead tr:first-child th[colspan] { padding-bottom: 4px; border-bottom: 1px solid #e3ded2; color: #0e7a33; }
+.est-xl thead tr:last-child th { padding-top: 6px; }
+.est-xl .t-name { font-weight: 800; }
+.est-xl .t-amt { font-weight: 800; }
+.est-xl .t-note { color: #8a6d3b; }
+.est-xl tbody tr:hover td { background: #fbfaf6; }
+.est-xl tfoot td { background: none; border-bottom: 1px solid #ebe8df; color: #4b524d; font-weight: 700; }
+.est-xl tfoot .t-sub td.t-amt { color: #1d2420; }
+.est-xl tfoot .t-total td { background: #eef6f0; border-top: 2px solid #1d2420; border-bottom: 0; color: #1d2420; font-size: 15px; }
+.est-xl tfoot .t-total td.t-amt { color: #0e7a33; font-size: 17px; }
+.est-xl tfoot .t-total td.t-note { color: #4b524d; font-size: 12px; }
+.est-paper.is-capture .est-xl td { border: 0 !important; border-bottom: 1px solid #ebe8df !important; padding: 11px 10px !important; }
+.est-paper.is-capture .est-xl tbody td { border-top: 0 !important; }
+.est-paper.is-capture .est-xl tfoot td { background: none !important; }
+.est-paper.is-capture .est-xl tfoot .t-total td { background: #eef6f0 !important; border-top: 2px solid #1d2420 !important; }
+@media (max-width: 640px) {
+  .est-xl { border-top: 0; }
+  .est-xl tfoot .t-total { background: #eef6f0; border-radius: 12px; border: 0; }
+  .est-xl tfoot .t-total td { border-top: 0; }
+  .est-xl tfoot { background: none; }
+}
+@media (max-width: 640px) {
+  .est-xl td { padding: 0 !important; border: 0 !important; }
+  .est-xl tbody tr { padding: 12px 2px; }
+  .est-xl tfoot tr { grid-template-columns: auto minmax(0, 1fr) auto; align-items: baseline; gap: 0 8px; padding: 10px 6px; }
+  .est-xl tfoot td.t-spec:not(:empty) { grid-column: auto; padding-left: 2px !important; }
+  .est-xl tfoot td.t-amt { grid-column: 3; }
+  .est-xl tfoot .t-total { margin-top: 6px; padding: 12px; }
+  .est-xl tfoot .t-total td.t-note { grid-column: 1 / -1; }
+}
