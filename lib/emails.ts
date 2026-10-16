@@ -247,3 +247,56 @@ export function operatorDeleteEmail(q: QuoteRow) {
     html: shell({ preheader: `${q.region} ${q.district} 신청이 삭제됐어요`, body, footer: "테두리 운영 알림" }),
   };
 }
+
+// ---------- 진행 상태 알림 (실측 예정 · 견적 도착) ----------
+const SITE = "https://tedoori.com";
+const button = (href: string, text: string) =>
+  `<a href="${href}" style="display:inline-block;padding:14px 22px;border-radius:12px;background-color:#1DA049;font-family:${FONT};font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;">${esc(text)}</a>`;
+
+export type StatusRow = { id: string; receipt_no: string; email: string; name: string | null; status: string; visit_at: string | null; visit_note: string | null };
+
+const visitText = (v: string) =>
+  new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "long", day: "numeric", weekday: "short", hour: "numeric", minute: "2-digit" }).format(new Date(v));
+
+/** 상태가 visit / quoted 로 바뀔 때 고객에게 보내는 메일. 다른 상태면 null */
+export function statusEmail(q: StatusRow) {
+  const who = q.name ? `${esc(q.name)} 님, ` : "";
+  const link = `${SITE}/my/${q.id}`;
+  if (q.status === "visit") {
+    const when = q.visit_at ? visitText(q.visit_at) : "일정 확정 후 다시 알려드려요";
+    const body = `
+      ${section(`
+        <h1 style="margin:0;font-family:${FONT};font-size:22px;line-height:1.4;font-weight:800;color:#16231B;">실측 방문 일정이 정해졌어요</h1>
+        <p style="margin:10px 0 0 0;font-family:${FONT};font-size:15px;line-height:1.6;color:#4E5A53;">${who}담당자가 방문해 작업할 곳의 크기와 바닥 상태를 확인해요.</p>
+      `, "28px 32px 0 32px")}
+      ${section(`
+        <div style="background-color:#E7DFCF;border-radius:12px;padding:20px;text-align:center;font-family:${FONT};">
+          <div style="font-size:13px;color:#46524B;margin-bottom:6px;">방문 일시</div>
+          <div style="font-size:22px;font-weight:800;color:#16231B;">${esc(when)}</div>
+          ${q.visit_note ? `<div style="font-size:13px;line-height:1.6;color:#46524B;margin-top:8px;">${esc(q.visit_note)}</div>` : ""}
+        </div>
+      `)}
+      ${section(`<p style="margin:0;font-family:${FONT};font-size:13px;line-height:1.7;color:#4E5A53;">일정을 바꾸고 싶으면 이 메일에 회신하거나 카카오톡 채널 @테두리로 알려주세요.</p>`)}
+      ${section(button(link, "내 신청 보기"), "20px 32px 28px 32px")}
+    `;
+    return {
+      subject: `[테두리] 실측 방문 일정 안내 (${q.receipt_no})`,
+      html: shell({ preheader: `방문 일시 ${when}`, body, footer: "테두리 · 서울·경기·인천 부분조경 견적<br>이 메일에 회신하시면 테두리 운영자에게 전달돼요." }),
+    };
+  }
+  if (q.status === "quoted") {
+    const body = `
+      ${section(`
+        <h1 style="margin:0;font-family:${FONT};font-size:22px;line-height:1.4;font-weight:800;color:#16231B;">견적서가 도착했어요</h1>
+        <p style="margin:10px 0 0 0;font-family:${FONT};font-size:15px;line-height:1.6;color:#4E5A53;">${who}실측한 내용을 바탕으로 자재비·배송비·시공비를 나눈 견적서를 보내드려요.</p>
+      `, "28px 32px 0 32px")}
+      ${section(button(link, "견적서 확인하기"), "24px 32px 0 32px")}
+      ${section(`<p style="margin:0;padding:14px 16px;border-radius:12px;background-color:#f4f1ea;font-family:${FONT};font-size:13px;line-height:1.7;color:#4E5A53;">견적서는 발행일부터 14일 동안 유효해요. 진행 여부나 궁금한 점은 이 메일에 회신하거나 카카오톡 채널 @테두리로 알려주세요.</p>`, "24px 32px 28px 32px")}
+    `;
+    return {
+      subject: `[테두리] 견적서가 도착했어요 (${q.receipt_no})`,
+      html: shell({ preheader: "항목별 견적서를 확인해보세요.", body, footer: "테두리 · 서울·경기·인천 부분조경 견적<br>이 메일에 회신하시면 테두리 운영자에게 전달돼요." }),
+    };
+  }
+  return null;
+}
