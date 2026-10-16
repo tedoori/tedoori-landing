@@ -224,6 +224,8 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
   const counts = {
     active: rows.filter((r) => ACTIVE.includes(r.status)).length,
     quoted: rows.filter((r) => r.status === "quoted").length,
+    // 견적서를 받은 신청 (견적 도착 뒤 진행 확정·보류 포함)
+    estimates: rows.filter((r) => ["quoted", "done", "hold"].includes(r.status)).length,
   };
   const name = h?.name ?? d?.name;
   const canAddress = d ? ADDRESS_OPEN.includes(d.status) : false;
@@ -231,7 +233,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
     ["home", "홈", null],
     ["list", "신청 내역", total],
     ["visit", "방문 일정", null],
-    ["estimate", "견적서", counts.quoted || null],
+    ["estimate", "견적서", counts.estimates || null],
   ];
 
   return (

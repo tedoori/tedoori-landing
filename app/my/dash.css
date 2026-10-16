@@ -462,3 +462,5 @@
 .resp--done .resp-kicker { font-size: 12px; }
 .resp--done .resp-title { font-size: 17px; }
 .resp--done .resp-result { font-size: 14px; line-height: 1.65; }
+.dash-all ul button { padding: 7px 12px; }
+.dash-all .dash-all__more { justify-content: center; gap: 4px; padding: 10px 12px; font-size: 13px; font-weight: 700; color: #137a37; }
