@@ -408,3 +408,5 @@
   .my-auth-links { display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center; gap: 16px; }
   .my-auth-links .btn { width: auto; min-height: 0; padding: 4px 0; border: 0; background: none; color: #137a37; font-size: 13px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; box-shadow: none; }
 }
+.dash-all__more { display: flex; justify-content: center; align-items: center; gap: 6px; width: 100%; margin-top: 2px; padding: 12px; border: 0; border-top: 1px solid #eef0ee; border-radius: 0 0 14px 14px; background: transparent; color: #137a37; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.dash-all__more:hover { background: #f5f7f5; }

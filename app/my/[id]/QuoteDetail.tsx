@@ -324,7 +324,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
                   전체 신청 현황 <small>최신순</small>
                 </p>
                 <ul>
-                  {rows.map((r) => (
+                  {rows.slice(0, 2).map((r) => (
                     <li key={r.id}>
                       <button type="button" onClick={() => pick(r.id)}>
                         <span className="dash-all__txt">
@@ -338,6 +338,11 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
                     </li>
                   ))}
                 </ul>
+                {rows.length > 2 && (
+                  <button type="button" className="dash-all__more" onClick={() => goTab("list")}>
+                    신청 {rows.length - 2}건 더 보기 <span aria-hidden="true">→</span>
+                  </button>
+                )}
               </section>
             )}
 
