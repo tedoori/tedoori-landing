@@ -1048,3 +1048,28 @@
   animation: rm-dot 400ms cubic-bezier(0.2, 0.8, 0.2, 1.6) both;
   animation-delay: calc(400ms + var(--i) * 960ms);
 }
+
+/* ---------- 견적 구성: 가격표 안 예시 줄 · 금액, 아래 합계·조건 ---------- */
+.ct-tag__bars { display: none; }
+.ct-tag__lines { display: grid; gap: 4px; margin-top: 8px; padding-top: 10px; border-top: 1px dashed currentColor; font-size: 12.5px; }
+.ct-tag__lines > span { display: flex; justify-content: space-between; gap: 8px; opacity: 0.82; }
+.ct-tag__won { align-self: flex-end; margin-top: 8px; font-size: 20px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.ct-sum { display: grid; gap: 14px; align-items: center; margin-top: 28px; padding: 18px 20px; border-radius: 16px; background: #fff; box-shadow: 0 14px 30px -24px rgba(60, 45, 30, 0.6); opacity: 0; transform: translateY(10px); transition: opacity 500ms ease 1.6s, transform 600ms cubic-bezier(0.23, 1, 0.32, 1) 1.6s; }
+.ct.is-on .ct-sum { opacity: 1; transform: none; }
+@media (min-width: 900px) { .ct-sum { grid-template-columns: auto minmax(0, 1fr); gap: 32px; padding: 20px 28px; } }
+.ct-sum__total { display: grid; gap: 2px; }
+.ct-sum__total small { color: var(--text-muted, #6b746e); font-size: 13px; font-weight: 700; }
+.ct-sum__total strong { color: #0e7a33; font-size: clamp(26px, 1.2rem + 1vw, 32px); font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.ct-sum__terms { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 14px; color: #3d4842; }
+.ct-sum__terms li { display: inline-flex; align-items: center; gap: 8px; }
+.ct-sum__terms em { padding: 2px 9px; border-radius: 999px; background: #efe9de; color: #8a6d3b; font-size: 12px; font-style: normal; font-weight: 800; }
+.ct-sum__terms em.is-add { background: #fde9e4; color: #a8452d; }
+.ct-sum__terms em.is-ok { background: #e3f3e6; color: #0e7a33; }
+.ct-sample { margin-top: 12px; color: #6b675e; font-size: 12px; text-align: center; }
+@media (max-width: 699px) {
+  .ct-sum__terms { flex-direction: column; }
+  .ct-tag__won { font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ct-sum { opacity: 1; transform: none; transition: none; }
+}

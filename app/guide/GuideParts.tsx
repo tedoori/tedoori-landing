@@ -136,9 +136,17 @@ const COSTS = [
   ["배송비", "업체가 산정한 배송 조건과 금액"],
   ["시공비", "견적에 포함된 작업과 금액"],
 ];
+// 가격표 안 예시 줄 (홈 견적서 예시와 같은 금액)
+const COST_LINES: [string, string][][] = [
+  [["화강석 판석 600×300", "12장"], ["마사토 · 부자재", "1식"]],
+  [["1톤 화물 배송", "1회"], ["하차 · 현장 이동", "포함"]],
+  [["판석 깔기 · 수평 잡기", "2인"], ["주변 정리", "포함"]],
+];
+const COST_WON = [420000, 80000, 360000];
+const won = (n: number) => `${n.toLocaleString("ko-KR")}원`;
 
 export function CostTags() {
-  const [ref, on] = useInView<HTMLDivElement>(0.35);
+  const [ref, on] = useInView<HTMLDivElement>(0.15);
   return (
     <div ref={ref} className={`ct${on ? " is-on" : ""}`}>
       <p className="ct-label">견적 구성 예시</p>
@@ -154,14 +162,37 @@ export function CostTags() {
               </span>
               <strong className="ct-tag__name">{name}</strong>
               <span className="ct-tag__desc">{desc}</span>
-              <span className="ct-tag__bars" aria-hidden="true">
-                <i />
-                <i />
+              <span className="ct-tag__lines">
+                {COST_LINES[i].map(([k, v]) => (
+                  <span key={k}>
+                    <span>{k}</span>
+                    <span>{v}</span>
+                  </span>
+                ))}
               </span>
+              <span className="ct-tag__won">{won(COST_WON[i])}</span>
             </div>
           </li>
         ))}
       </ul>
+      <div className="ct-sum">
+        <span className="ct-sum__total">
+          <small>합계 · 부가세 포함</small>
+          <strong>{won(COST_WON.reduce((a, b) => a + b, 0))}</strong>
+        </span>
+        <ul className="ct-sum__terms" aria-label="함께 적는 조건">
+          <li>
+            <em>제외</em> 기존 바닥 철거·폐기물 처리
+          </li>
+          <li>
+            <em className="is-add">추가 비용</em> 장비가 들어가기 어려운 현장은 별도 협의
+          </li>
+          <li>
+            <em className="is-ok">유효기간</em> 발행일부터 14일
+          </li>
+        </ul>
+      </div>
+      <p className="ct-sample">금액은 이해를 돕기 위한 예시예요. 디딤석 화강석 판석 12장, 경기 용인시 기준</p>
     </div>
   );
 }
