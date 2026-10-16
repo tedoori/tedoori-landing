@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     },
   },
   metadataBase: new URL("https://tedoori.com"),
+  alternates: { types: { "application/rss+xml": [{ url: "/rss.xml", title: "테두리 조경 블로그" }] } },
   openGraph: {
     title: "테두리 · 전원주택 조경 견적",
     description:

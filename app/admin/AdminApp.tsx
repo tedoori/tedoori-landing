@@ -43,6 +43,7 @@ type Row = {
   completed_at: string | null;
   completion_note: string | null;
   completion_photos: string[] | null;
+  care_posts?: string[] | null;
   created_at: string;
 };
 
@@ -333,6 +334,7 @@ export function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> })
   const kindLabel = kind === "delivery" ? "배송" : kind === "material" ? "자재 준비" : "시공";
   const [doneNote, setDoneNote] = useState(r.completion_note ?? "");
   const [donePaths, setDonePaths] = useState<string[]>(r.completion_photos ?? []);
+  const [careSlugs, setCareSlugs] = useState<string[]>(r.care_posts ?? []);
   const [doneUrls, setDoneUrls] = useState<Record<string, string>>({});
   const [uploading, setUploading] = useState(false);
   const [donePreview, setDonePreview] = useState(false);
@@ -392,6 +394,7 @@ export function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> })
         next_desc: nextDesc.trim() || null,
         completion_note: doneNote || null,
         completion_photos: donePaths,
+        care_posts: careSlugs,
         completed_at: status === "completed" ? (r.completed_at ?? new Date().toISOString()) : r.completed_at,
       })
       .eq("id", r.id);
@@ -590,12 +593,13 @@ export function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> })
                 {uploading ? "올리는 중…" : "+ 완료 사진"}
               </label>
             </div>
+            <CarePicker value={careSlugs} onChange={setCareSlugs} />
             {donePreview && (
               <div className="adm-preview">
                 <p className="adm-preview__head">
                   고객에게 이렇게 보여요 <small>저장 전 내용 기준</small>
                 </p>
-                <CompletionCard note={doneNote || null} photos={donePaths.map((p) => ({ path: p, url: doneUrls[p] ?? null }))} at={r.completed_at ?? new Date().toISOString()} />
+                <CompletionCard note={doneNote || null} photos={donePaths.map((p) => ({ path: p, url: doneUrls[p] ?? null }))} at={r.completed_at ?? new Date().toISOString()} careSlugs={careSlugs} />
               </div>
             )}
             <div className="adm-done__bar">
@@ -645,6 +649,66 @@ export function Detail({ r, onSaved }: { r: Row; onSaved: () => Promise<void> })
           </ul>
         )}
       </div>
+    </div>
+  );
+}
+
+type CarePost = { slug: string; title: string; category: string; cover_url: string | null };
+
+/** 완료 보고에 함께 보여줄 블로그 글 고르기: 검색 + 관리 방법 글 먼저 + 고른 순서대로 최대 3개 */
+function CarePicker({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+  const sb = getAdminSupabase();
+  const [posts, setPosts] = useState<CarePost[]>([]);
+  const [q, setQ] = useState("");
+  useEffect(() => {
+    if (!sb) return;
+    void sb
+      .from("blog_posts")
+      .select("slug, title, category, cover_url")
+      .eq("published", true)
+      .order("published_at", { ascending: false })
+      .then(({ data }) => setPosts((data ?? []) as CarePost[]));
+  }, [sb]);
+  const k = q.trim().toLowerCase();
+  const list = posts
+    .filter((p) => !k || `${p.title} ${p.category}`.toLowerCase().includes(k))
+    .sort((a, b) => Number(b.category === "관리 방법") - Number(a.category === "관리 방법"));
+  const picked = value.map((v) => posts.find((p) => p.slug === v)).filter((p): p is CarePost => !!p);
+  const toggle = (slug: string) => onChange(value.includes(slug) ? value.filter((v) => v !== slug) : value.length >= 3 ? value : [...value, slug]);
+
+  return (
+    <div className="adm-care">
+      <p className="adm-care__head">
+        함께 보여줄 블로그 글 <small>최대 3개 · 안 고르면 관리 방법 최신 글이 자동으로 보여요</small>
+      </p>
+      {picked.length > 0 && (
+        <ol className="adm-care__picked">
+          {picked.map((p) => (
+            <li key={p.slug}>
+              <span>{p.title}</span>
+              <button type="button" aria-label={`${p.title} 빼기`} onClick={() => toggle(p.slug)}>
+                ×
+              </button>
+            </li>
+          ))}
+        </ol>
+      )}
+      <input className="ui-input adm-care__search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="글 제목·분류로 찾기 (예: 잔디, 물 주기)" />
+      <ul className="adm-care__list">
+        {list.map((p) => {
+          const on = value.includes(p.slug);
+          return (
+            <li key={p.slug}>
+              <label className={on ? "is-on" : ""}>
+                <input type="checkbox" checked={on} disabled={!on && value.length >= 3} onChange={() => toggle(p.slug)} />
+                <span className="adm-care__cat">{p.category}</span>
+                <span className="adm-care__title">{p.title}</span>
+              </label>
+            </li>
+          );
+        })}
+        {list.length === 0 && <li className="adm-note">{posts.length ? "찾는 글이 없어요." : "공개된 블로그 글이 아직 없어요."}</li>}
+      </ul>
     </div>
   );
 }

@@ -391,7 +391,7 @@ export function QuoteFlow({ initialWorks }: { initialWorks: string[] }) {
       </p>
     ) : null;
 
-  if (!restored) return <div className="q-shell" aria-busy="true" />;
+  // 처음 그릴 때도 첫 질문을 바로 보여줌 (검색 로봇·느린 연결에서 빈 화면이 되지 않게). 이어 쓰기는 곧바로 이어서 열림
 
   if (phase === "done") {
     const summary = [

@@ -46,6 +46,7 @@ export type QuoteDetailData = {
   next_desc?: string | null;
   completed_at?: string | null;
   completion_note?: string | null;
+  care_posts?: string[] | null;
   completion_photos?: { path: string; url: string | null }[];
   estimate: Estimate | null;
   review?: Review | null;
@@ -439,7 +440,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
                   <b aria-hidden="true">→</b>
                 </button>
               ))}
-            {h.status === "completed" && <CompletionCard note={h.completion_note ?? null} photos={h.completion_photos ?? []} at={h.completed_at ?? null} />}
+            {h.status === "completed" && <CompletionCard note={h.completion_note ?? null} photos={h.completion_photos ?? []} at={h.completed_at ?? null} careSlugs={h.care_posts} />}
             {/* 시공이 끝났으면 후기 요청을 맨 위에 */}
             {canReview(h) && (
               <div className={h.review ? "" : "rv-spot"}>
@@ -611,7 +612,7 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
             <TabHead title="완료 보고" rows={rows.filter((r) => r.status === "completed")} selId={selId} onPick={(id) => pick(id, "complete")} />
             {d.status === "completed" ? (
               <>
-                <CompletionCard note={d.completion_note ?? null} photos={d.completion_photos ?? []} at={d.completed_at ?? null} />
+                <CompletionCard note={d.completion_note ?? null} photos={d.completion_photos ?? []} at={d.completed_at ?? null} careSlugs={d.care_posts} />
                 <button type="button" className={`dash-go dash-go--estimate${d.review ? "" : " dash-go--shine"}`} onClick={() => goTab("review")}>
                   <Icon k="review" />
                   <span>

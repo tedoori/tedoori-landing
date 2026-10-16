@@ -7,7 +7,7 @@ import { BlogList } from "./BlogList";
 import "./blog.css";
 
 export const metadata: Metadata = {
-  alternates: { canonical: "/blog" },
+  alternates: { canonical: "/blog", types: { "application/rss+xml": [{ url: "/rss.xml", title: "테두리 조경 블로그" }] } },
   title: "전원주택 조경 블로그 | 테두리",
   description: "전원주택 조경견적, 잔디·자갈·디딤석 선택과 마당 부분조경 정보를 테두리가 쉽게 안내해요.",
 };

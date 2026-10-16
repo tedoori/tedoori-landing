@@ -7,7 +7,7 @@ import { getSupabase } from "../../../lib/supabase";
 const day = (v: string) => new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "long", day: "numeric" }).format(new Date(v));
 
 /** 완료 보고: 업체·담당자가 남긴 말 + 작업 완료 사진 */
-export function CompletionCard({ note, photos, at }: { note: string | null; photos: { path: string; url: string | null }[]; at: string | null }) {
+export function CompletionCard({ note, photos, at, careSlugs }: { note: string | null; photos: { path: string; url: string | null }[]; at: string | null; careSlugs?: string[] | null }) {
   const shown = photos.filter((p) => p.url);
   return (
     <section className="done-card" aria-labelledby="done-title">
@@ -39,28 +39,27 @@ export function CompletionCard({ note, photos, at }: { note: string | null; phot
           <p>{note}</p>
         </div>
       )}
-      <CareLinks />
+      <CareLinks slugs={careSlugs ?? []} />
     </section>
   );
 }
 
-type Care = { slug: string; title: string; cover_url: string | null };
+type Care = { slug: string; title: string; category: string; cover_url: string | null };
 
-/** 완료 뒤 관리법: 블로그 관리 방법 분류 글 최신 3개. 글이 없으면 아무것도 보이지 않음 */
-function CareLinks() {
+/** 완료 뒤 관리법: 관리자가 고른 글(고른 순서), 안 골랐으면 관리 방법 분류 최신 3개. 글이 없으면 보이지 않음 */
+function CareLinks({ slugs }: { slugs: string[] }) {
   const [posts, setPosts] = useState<Care[]>([]);
+  const key = slugs.join(",");
   useEffect(() => {
     const sb = getSupabase();
     if (!sb) return;
-    void sb
-      .from("blog_posts")
-      .select("slug, title, cover_url")
-      .eq("published", true)
-      .eq("category", "관리 방법")
-      .order("published_at", { ascending: false })
-      .limit(3)
-      .then(({ data }) => setPosts((data ?? []) as Care[]));
-  }, []);
+    const base = sb.from("blog_posts").select("slug, title, category, cover_url").eq("published", true);
+    const query = key ? base.in("slug", key.split(",")) : base.eq("category", "관리 방법").order("published_at", { ascending: false }).limit(3);
+    void query.then(({ data }) => {
+      const rows = (data ?? []) as Care[];
+      setPosts(key ? key.split(",").map((v) => rows.find((r) => r.slug === v)).filter((r): r is Care => !!r) : rows);
+    });
+  }, [key]);
   if (!posts.length) return null;
   return (
     <div className="care">
@@ -80,7 +79,7 @@ function CareLinks() {
                 )}
               </span>
               <span className="care__txt">
-                <small>관리 방법 · 테두리 블로그</small>
+                <small>{p.category} · 테두리 블로그</small>
                 <strong>{p.title}</strong>
               </span>
               <span aria-hidden="true">›</span>
