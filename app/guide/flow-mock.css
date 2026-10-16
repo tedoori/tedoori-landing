@@ -291,3 +291,31 @@
   .fm-screen, .fm-in, .fm-step__bar, .fm-track .is-now i::after, .fm-cal__d.is-next, .fm-cal__d.is-next::after,
   .fm-typing i, .fm-answers .is-on, .fm-stars i, .fm-now, .fm-appbar__tab, .fm-progress span { animation: none; }
 }
+
+/* 견적 요청: 칩을 누르는 장면 */
+.fm-chips button { padding: 11px; border-radius: 12px; border: 1px solid #e2e6e1; background: #fff; color: var(--forest); text-align: center; font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease; }
+.fm-chips button.is-on { background: var(--primary); border-color: var(--primary); color: #fff; }
+.fm-chips button.is-tap, .fm-btn.is-tap { animation: fm-tap 420ms var(--ease); }
+@keyframes fm-tap {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(29, 160, 73, 0.45); }
+  35% { transform: scale(0.94); }
+  100% { transform: none; box-shadow: 0 0 0 10px rgba(29, 160, 73, 0); }
+}
+.fm-btn:not(.fm-btn--line) { transition: background-color 200ms ease; background: #c9cfca; }
+.fm-btn.is-ready:not(.fm-btn--line) { background: var(--forest); }
+
+/* 완료: 관리법 블로그 링크 + 후기 유도 */
+.fm-photo { aspect-ratio: 16 / 9; }
+.fm-guide-link { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 12px; border-radius: 12px; background: #fff; border: 1px solid #e2e6e1; font-size: 16px; color: #8a938d; }
+.fm-guide-link__icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: #e3f3e6; color: #0e7a33; }
+.fm-guide-link span:nth-child(2) { display: flex; flex-direction: column; min-width: 0; }
+.fm-guide-link small { color: #0e7a33; font-size: 10.5px; font-weight: 800; }
+.fm-guide-link strong { color: var(--forest); font-size: 12.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fm-review { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px; border-radius: 16px; background: #fff; border: 1px solid #e2e6e1; font-size: 13px; font-weight: 800; }
+.fm-review__go { position: relative; overflow: hidden; width: 100%; padding: 9px; border-radius: 12px; border: 2px solid var(--primary); color: #0e7a33; text-align: center; font-size: 12.5px; animation: fm-glow 2s ease-out 1s infinite; }
+.fm-review__go::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(29, 160, 73, 0.18) 50%, transparent 70%); transform: translateX(-120%); animation: fm-shine 2.4s ease-in-out 1s infinite; }
+@keyframes fm-glow { 0% { box-shadow: 0 0 0 0 rgba(29, 160, 73, 0.4); } 70%, 100% { box-shadow: 0 0 0 8px rgba(29, 160, 73, 0); } }
+@keyframes fm-shine { 60%, 100% { transform: translateX(120%); } }
+@media (prefers-reduced-motion: reduce) {
+  .fm-chips button.is-tap, .fm-btn.is-tap, .fm-review__go, .fm-review__go::after { animation: none; }
+}

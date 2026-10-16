@@ -17,10 +17,11 @@ const STEPS = [
 ];
 const TRACK = ["접수", "확인", "실측", "견적", "결정", "완료"];
 const AUTO_MS = 2400;
+// 고르는 장면(견적 요청)·완료 화면은 볼 게 많아 조금 더 머묾. 단계를 눌러도 자동 넘김은 계속
+const msOf = (n: number) => (n === 0 || n === 6 ? 3600 : AUTO_MS);
 
 export function FlowMock() {
   const [i, setI] = useState(0);
-  const [auto, setAuto] = useState(true);
   const [seen, setSeen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLOListElement>(null);
@@ -34,10 +35,10 @@ export function FlowMock() {
     return () => io.disconnect();
   }, []);
   useEffect(() => {
-    if (!auto || !seen || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = window.setTimeout(() => setI((v) => (v + 1) % STEPS.length), AUTO_MS);
+    if (!seen || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = window.setTimeout(() => setI((v) => (v + 1) % STEPS.length), msOf(i));
     return () => window.clearTimeout(id);
-  }, [i, auto, seen]);
+  }, [i, seen]);
 
   // 휴대폰 가로 탭: 지금 단계가 보이게 옆으로만 스크롤
   useEffect(() => {
@@ -48,12 +49,11 @@ export function FlowMock() {
   }, [i]);
 
   const pick = (n: number) => {
-    setAuto(false);
     setI(n);
   };
 
   return (
-    <div ref={ref} className="fm" style={{ "--auto": `${AUTO_MS}ms` } as React.CSSProperties}>
+    <div ref={ref} className="fm" style={{ "--auto": `${msOf(i)}ms` } as React.CSSProperties}>
       <ol ref={listRef} className="fm-steps" aria-label="진행 단계">
         {STEPS.map((s, n) => (
           <li key={s.k}>
@@ -63,7 +63,7 @@ export function FlowMock() {
                 <strong>{s.k}</strong>
                 <span>{s.desc}</span>
               </span>
-              {n === i && auto && seen && <i className="fm-step__bar" key={i} aria-hidden="true" />}
+              {n === i && seen && <i className="fm-step__bar" key={i} aria-hidden="true" />}
             </button>
           </li>
         ))}
@@ -143,20 +143,44 @@ function Calendar({ marks }: { marks: Record<number, "done" | "next"> }) {
 
 const D = (n: number) => ({ "--d": n }) as React.CSSProperties;
 
-function Screen({ i }: { i: number }) {
-  if (i === 0)
-    return (
-      <>
-        <div className="fm-progress fm-in" style={D(0)}><span /></div>
-        <p className="fm-q fm-in" style={D(1)}>어떤 작업이 필요하세요?</p>
-        <div className="fm-chips fm-in" style={D(2)}>
-          {["식재", "잔디", "자갈", "디딤석", "화단", "기타"].map((c) => (
-            <span key={c} className={c === "잔디" || c === "디딤석" ? "is-on" : ""}>{c}</span>
-          ))}
-        </div>
-        <span className="fm-btn fm-in" style={D(3)}>다음</span>
-      </>
+/** 견적 요청: 잔디 → 디딤석을 차례로 누르고 다음. 목업 안 칩은 직접 눌러도 바뀜 */
+function PickWorks() {
+  const [on, setOn] = useState<string[]>([]);
+  const [tap, setTap] = useState<string | null>(null);
+  useEffect(() => {
+    const seq: [number, string][] = [[600, "잔디"], [1300, "디딤석"], [2200, "다음"]];
+    const ids = seq.map(([t, c]) =>
+      window.setTimeout(() => {
+        setTap(c);
+        if (c !== "다음") setOn((v) => (v.includes(c) ? v : [...v, c]));
+      }, t),
     );
+    return () => ids.forEach(window.clearTimeout);
+  }, []);
+  const toggle = (c: string) => {
+    setTap(c);
+    setOn((v) => (v.includes(c) ? v.filter((x) => x !== c) : [...v, c]));
+  };
+  return (
+    <>
+      <div className="fm-progress fm-in" style={D(0)}><span /></div>
+      <p className="fm-q fm-in" style={D(1)}>어떤 작업이 필요하세요?</p>
+      <div className="fm-chips fm-in" style={D(2)}>
+        {["식재", "잔디", "자갈", "디딤석", "화단", "기타"].map((c) => (
+          <button type="button" key={c} className={`${on.includes(c) ? "is-on" : ""}${tap === c ? " is-tap" : ""}`} aria-pressed={on.includes(c)} onClick={() => toggle(c)} onAnimationEnd={() => setTap(null)}>
+            {c}
+          </button>
+        ))}
+      </div>
+      <span className={`fm-btn fm-in${on.length ? " is-ready" : ""}${tap === "다음" ? " is-tap" : ""}`} style={D(3)}>
+        {on.length ? `다음 · ${on.length}개 선택` : "다음"}
+      </span>
+    </>
+  );
+}
+
+function Screen({ i }: { i: number }) {
+  if (i === 0) return <PickWorks />;
   if (i === 1)
     return (
       <div className="fm-card fm-in" style={D(1)}>
@@ -224,15 +248,31 @@ function Screen({ i }: { i: number }) {
       </>
     );
   return (
-    <div className="fm-card fm-in" style={D(1)}>
-      <span className="fm-kicker">완료 보고</span>
-      <img className="fm-photo" src="/service/garden-end-s.webp" alt="" loading="lazy" decoding="async" />
-      <strong className="fm-card__title">테두리가 완료됐어요</strong>
-      <span className="fm-stars" aria-label="별점 5점">
-        {[0, 1, 2, 3, 4].map((n) => (
-          <i key={n} style={D(n)}>★</i>
-        ))}
-      </span>
-    </div>
+    <>
+      <div className="fm-card fm-in" style={D(1)}>
+        <span className="fm-kicker">완료 보고 · 업체가 올린 사진</span>
+        <img className="fm-photo" src="/service/garden-end-s.webp" alt="" loading="lazy" decoding="async" />
+        <strong className="fm-card__title">테두리가 완료됐어요</strong>
+        <span className="fm-guide-link">
+          <span className="fm-guide-link__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14Z" /><path d="M5 19 13 11" /></svg>
+          </span>
+          <span>
+            <small>관리 방법 · 테두리 블로그</small>
+            <strong>심은 나무, 첫 한 달 물 주기</strong>
+          </span>
+          <span aria-hidden="true">›</span>
+        </span>
+      </div>
+      <div className="fm-review fm-in" style={D(3)}>
+        <span>새 정원은 마음에 드세요?</span>
+        <span className="fm-stars" aria-label="별점 5점">
+          {[0, 1, 2, 3, 4].map((n) => (
+            <i key={n} style={D(n)}>★</i>
+          ))}
+        </span>
+        <span className="fm-review__go">후기 남기러 가기</span>
+      </div>
+    </>
   );
 }
