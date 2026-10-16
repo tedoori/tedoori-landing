@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Callout, EmptyState, StatusBadge, type QuoteStatus } from "../../_components/ui";
 import { QuoteApiError, quoteApi } from "../../../lib/quote-api";
 import { EstimateCard, HelpStrip, estimateGrand, estimateParts, type Estimate } from "./EstimateCard";
-import { BUILD_COPY, VisitCard, type BuildKind } from "./VisitCard";
+import { BUILD_COPY, type BuildKind } from "./VisitCard";
 import { AddressCard } from "./AddressCard";
 import { RespondPanel } from "./RespondPanel";
 import { ReviewCard, type Review } from "./ReviewCard";
@@ -572,30 +572,24 @@ export function MyDashboard({ email, rows, total, initialId, onLogout, onListCha
           </>
         )}
 
-        {/* ---------- 방문 일정 ---------- */}
+        {/* ---------- 방문 일정: 일정 한 장 ---------- */}
         {d && tab === "visit" && (
           <>
-            <TabHead badge={(r) => (r.build_at ? "작업일 확정" : r.visit_at ? "실측일 확정" : null)} title={d.status === "done" || d.status === "completed" ? `${BUILD_COPY[buildKindOf(d)].label.replace(" 일정", "")}·방문 일정` : "방문 일정"} rows={rows} selId={selId} onPick={(id) => pick(id, "visit")} />
-            <ScheduleLine d={d} kindLabel={BUILD_COPY[buildKindOf(d)].label.replace(" 일정", "")} />
-            {(d.status === "done" || d.status === "completed") && <VisitCard kind="build" buildKind={buildKindOf(d)} at={d.build_at} note={d.build_note} />}
-            {canAddress && (
-              <AddressCard
-                id={d.id}
-                address={d.visit_address}
-                detail={d.visit_address_detail}
-                memo={d.visit_memo}
-                onSaved={() => void load()}
-                intro="상세 주소를 미리 입력해 두시면 실측 일정을 더 빨리 잡을 수 있어요."
-              />
+            <TabHead title="일정" rows={rows} selId={selId} onPick={(id) => pick(id, "visit")} />
+            {canAddress && !d.visit_address && (
+              <AddressCard id={d.id} address={null} detail={null} memo={null} onSaved={() => void load()} intro="상세 주소를 미리 입력해 두시면 실측 일정을 더 빨리 잡을 수 있어요." />
             )}
-            <VisitCard at={d.visit_at} note={d.visit_note} address={canAddress ? undefined : d.visit_address} detail={d.visit_address_detail} memo={canAddress ? undefined : d.visit_memo} />
+            <Timeline d={d} kind={buildKindOf(d)} />
+            {canAddress && d.visit_address && (
+              <AddressCard id={d.id} address={d.visit_address} detail={d.visit_address_detail} memo={d.visit_memo} onSaved={() => void load()} />
+            )}
           </>
         )}
 
         {/* ---------- 완료 ---------- */}
         {d && tab === "complete" && (
           <>
-            <TabHead title="완료 보고" badge={(r) => (r.status === "completed" ? "완료" : null)} rows={sortFirst(rows, (r) => r.status === "completed")} selId={selId} onPick={(id) => pick(id, "complete")} />
+            <TabHead title="완료 보고" rows={rows.filter((r) => r.status === "completed")} selId={selId} onPick={(id) => pick(id, "complete")} />
             {d.status === "completed" ? (
               <>
                 <CompletionCard note={d.completion_note ?? null} photos={d.completion_photos ?? []} at={d.completed_at ?? null} />
@@ -674,30 +668,58 @@ const HAS_ESTIMATE = ["quoted", "done", "completed", "hold"];
 /** 조건에 맞는 신청을 앞으로 (나머지는 최신순 그대로) */
 const sortFirst = (rows: ListRow[], first: (r: ListRow) => boolean) => [...rows.filter(first), ...rows.filter((r) => !first(r))];
 
-/** 방문 일정 맨 위: 실측 → 견적 → 작업 → 완료 를 날짜와 함께 한 줄로 */
-function ScheduleLine({ d, kindLabel }: { d: QuoteDetailData; kindLabel: string }) {
-  const dayOf = (v: string) => new Date(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" }).format(new Date(v))).getTime();
+/** 일정 한 장: 실측 → 견적 → 작업 → 완료. 날짜가 왼쪽, 다음 일정만 강조 */
+function Timeline({ d, kind }: { d: QuoteDetailData; kind: BuildKind }) {
+  const tz = { timeZone: "Asia/Seoul" } as const;
+  const dayOf = (v: string) => new Date(new Intl.DateTimeFormat("en-CA", tz).format(new Date(v))).getTime();
   const today = dayOf(new Date().toISOString());
-  const items: { k: string; at: string | null; done: boolean }[] = [
-    { k: "실측 방문", at: d.visit_at, done: !!d.visit_at && dayOf(d.visit_at) < today },
-    { k: "견적서", at: d.estimate?.issued_at ?? null, done: !!d.estimate },
-    { k: kindLabel, at: d.build_at, done: d.status === "completed" || (!!d.build_at && dayOf(d.build_at) < today) },
-    { k: "완료", at: d.completed_at ?? null, done: d.status === "completed" },
+  const p = (v: string, o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("ko-KR", { ...tz, ...o }).format(new Date(v));
+  const bc = BUILD_COPY[kind];
+  const work = bc.label.replace(" 일정", "");
+  const items: { k: string; at: string | null; time: boolean; note: string; done: boolean }[] = [
+    { k: "실측 방문", at: d.visit_at, time: true, note: d.visit_note || "담당자가 방문해 크기와 바닥 상태를 확인해요.", done: !!d.visit_at && dayOf(d.visit_at) < today },
+    { k: "견적서 도착", at: d.estimate?.issued_at ?? null, time: false, note: "자재비·배송비·시공비를 나눠 보내드려요.", done: !!d.estimate },
+    { k: work, at: d.build_at, time: true, note: d.build_note || (d.build_at ? bc.ready : bc.waiting), done: d.status === "completed" || (!!d.build_at && dayOf(d.build_at) < today) },
+    { k: "완료", at: d.completed_at ?? null, time: false, note: "완료 사진과 관리법 안내를 올려드려요.", done: d.status === "completed" },
   ];
   const next = items.findIndex((i) => !i.done);
   return (
-    <ol className="sched" aria-label="일정 한눈에 보기">
+    <ol className="tl" aria-label="일정">
       {items.map((i, n) => {
         const left = i.at ? Math.round((dayOf(i.at) - today) / 86400000) : null;
+        const pill = i.done ? "완료" : n === next ? (left === null ? "조율 중" : left === 0 ? "오늘" : left > 0 ? `D-${left}` : "진행 중") : "예정";
         return (
-          <li key={i.k} className={i.done ? "is-done" : n === next ? "is-next" : ""}>
-            <span className="sched__dot" aria-hidden="true">{i.done ? "✓" : n + 1}</span>
-            <strong>{i.k}</strong>
-            <span className="sched__at">{i.at ? shortDay(i.at) : "정해지면 알려드려요"}</span>
-            {n === next && left !== null && left >= 0 && <em className="sched__dday">{left === 0 ? "오늘" : `D-${left}`}</em>}
+          <li key={i.k} className={`tl-item${i.done ? " is-done" : ""}${n === next ? " is-next" : ""}`}>
+            <div className="tl-date" aria-hidden={!i.at}>
+              {i.at ? (
+                <>
+                  <span>{p(i.at, { month: "long" })}</span>
+                  <strong>{p(i.at, { day: "numeric" }).replace("일", "")}</strong>
+                  <span>{p(i.at, { weekday: "short" })}</span>
+                </>
+              ) : (
+                <strong className="tl-date__none">–</strong>
+              )}
+            </div>
+            <div className="tl-body">
+              <p className="tl-head">
+                <strong>{i.k}</strong>
+                <em className="tl-pill">{pill}</em>
+              </p>
+              {i.at && i.time && <p className="tl-time">{p(i.at, { hour: "numeric", minute: "2-digit" })}</p>}
+              {(n === next || !i.at) && <p className="tl-note">{i.at ? i.note : n === next ? i.note : "정해지면 바로 알려드려요."}</p>}
+            </div>
           </li>
         );
       })}
+      {d.visit_address && !ADDRESS_OPEN.includes(d.status) && (
+        <li className="tl-addr">
+          <span>방문 주소</span>
+          <strong>
+            {d.visit_address} {d.visit_address_detail}
+          </strong>
+        </li>
+      )}
     </ol>
   );
 }
@@ -711,17 +733,16 @@ function TabHead({ title, rows, selId, onPick, badge }: { title: string; rows: L
     <header className="dash-tabhead">
       <h1 className="dash-tabhead__title">{title}</h1>
       {rows.length > 1 ? (
-        <div className="dash-pick" role="group" aria-label="신청 고르기">
-          {rows.map((r) => (
-            <button key={r.id} type="button" className={r.id === selId ? "is-on" : ""} aria-pressed={r.id === selId} onClick={() => onPick(r.id)}>
-              <strong>{worksText(r)}</strong>
-              <span>
-                {shortDay(r.created_at)} 신청
-                {badge?.(r) && <em className="dash-pick__badge">{badge(r)}</em>}
-              </span>
-            </button>
-          ))}
-        </div>
+        <label className="dash-select">
+          <span className="sr-only">신청 고르기</span>
+          <select value={selId ?? ""} onChange={(e) => onPick(e.target.value)}>
+            {rows.map((r) => (
+              <option key={r.id} value={r.id}>
+                {worksText(r)} · {shortDay(r.created_at)} 신청{badge?.(r) ? ` · ${badge(r)}` : ""}
+              </option>
+            ))}
+          </select>
+        </label>
       ) : (
         cur && (
           <p className="dash-tabhead__sub">
