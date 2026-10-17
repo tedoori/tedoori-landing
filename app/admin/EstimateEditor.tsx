@@ -27,8 +27,36 @@ type Est = {
 };
 
 // 자주 쓰는 공종명·단위 (직접 입력도 돼요)
-const WORK_HINTS = ["주차장판석", "디딤돌", "디딤석", "자연석", "잔디", "잔디엣지", "터밭", "화단", "수전", "왕사", "마사토", "자갈", "소나무", "에메랄드그린", "미측백", "식재", "포크레인", "인건비", "운반비"];
-const UNITS = ["식", "빠렛", "주", "일", "타", "㎡", "장", "개", "본", "대", "톤", "m"];
+// 조경업체 실제 견적서(2025)에서 쓰는 공종 · 단위 · 구분. 공종명을 고르면 단위·구분이 채워져요
+const WORK_HINTS: [string, string, Kind][] = [
+  ["부대토목", "식", "labor"],
+  ["현관 판석", "m2", "material"],
+  ["계단 및 판석", "m2", "material"],
+  ["주차장 판석", "m2", "material"],
+  ["주차장판석", "식", "material"],
+  ["집주변 판석", "m2", "material"],
+  ["보도블럭", "m2", "material"],
+  ["효피석", "m2", "material"],
+  ["화단마주석", "m", "material"],
+  ["화단 판석", "m", "material"],
+  ["디딤돌", "빠렛", "material"],
+  ["왕사", "빠렛", "material"],
+  ["잔디", "빠렛", "material"],
+  ["잔디엣지", "타", "material"],
+  ["터밭", "식", "labor"],
+  ["수전", "식", "labor"],
+  ["소나무", "주", "material"],
+  ["에메랄드그린", "주", "material"],
+  ["미측백", "주", "material"],
+  ["라일락", "주", "material"],
+  ["해당화", "주", "material"],
+  ["박태기", "주", "material"],
+  ["단풍나무", "주", "material"],
+  ["화살나무", "주", "material"],
+  ["포크레인", "일", "labor"],
+  ["운반비", "식", "delivery"],
+];
+const UNITS = ["식", "m2", "m", "빠렛", "주", "일", "타", "장", "개", "본", "대", "톤"];
 const blankItem = (): Item => ({ kind: "material", work: "", spec: "", unit: "식", qty: "1", unit_price: 0, note: "" });
 // 공종명으로 구분 짐작 (바꿀 수 있어요)
 const guessKind = (w: string): Kind => (/운반|배송|운송|화물/.test(w) ? "delivery" : /포크레인|굴삭|장비|인건|인부|시공|설치|깔기|식재|정리|철거|폐기/.test(w) ? "labor" : "material");
@@ -236,8 +264,8 @@ export function EstimateEditor({ quoteId, status, onSent }: { quoteId: string; s
       </h3>
 
       <datalist id="est-works">
-        {WORK_HINTS.map((w) => (
-          <option key={w} value={w} />
+        {WORK_HINTS.map(([w, u]) => (
+          <option key={w} value={w} label={`${w} · ${u}`} />
         ))}
       </datalist>
 
@@ -266,12 +294,17 @@ export function EstimateEditor({ quoteId, status, onSent }: { quoteId: string; s
               className="ui-input"
               list="est-works"
               value={it.work}
-              placeholder="예: 디딤돌"
+              placeholder="예: 주차장 판석"
               aria-label={`${i + 1}번 공종명`}
-              onChange={(e) => setI(i, { work: e.target.value, ...(it.work ? {} : { kind: guessKind(e.target.value) }) })}
+              onChange={(e) => {
+                const v = e.target.value;
+                const hint = WORK_HINTS.find(([w]) => w === v);
+                // 목록에서 고르면 단위·구분까지 채움
+                setI(i, hint ? { work: v, unit: hint[1], kind: hint[2] } : { work: v, ...(it.work ? {} : { kind: guessKind(v) }) });
+              }}
               onBlur={(e) => !it.unit_price && setI(i, { kind: guessKind(e.target.value) })}
             />
-            <input className="ui-input" value={it.spec} placeholder="예: 자연석 600" aria-label={`${i + 1}번 규격`} onChange={(e) => setI(i, { spec: e.target.value })} />
+            <input className="ui-input" value={it.spec} placeholder="예: 주차장에서 현관" aria-label={`${i + 1}번 규격`} onChange={(e) => setI(i, { spec: e.target.value })} />
             <select className="ui-input" value={UNITS.includes(it.unit) ? it.unit : "_"} aria-label={`${i + 1}번 단위`} onChange={(e) => setI(i, { unit: e.target.value === "_" ? "" : e.target.value })}>
               {UNITS.map((u) => (
                 <option key={u}>{u}</option>
