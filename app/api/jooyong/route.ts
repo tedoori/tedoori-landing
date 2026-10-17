@@ -1,8 +1,10 @@
 import crypto from "node:crypto";
 
 // 미래조경 견적서 앱(/jooyong) 저장 API
-// 환경변수: APP_PASSWORD(로그인 비밀번호), AUTH_SECRET(토큰 서명용 긴 문자열),
-//           KV_REST_API_URL / KV_REST_API_TOKEN (Vercel 마켓플레이스 Upstash Redis 연결 시 자동 생성)
+// 기존 사이트와 겹치지 않게 JOOYONG_ 로 시작하는 환경변수만 사용
+//   JOOYONG_PASSWORD     로그인 비밀번호
+//   JOOYONG_AUTH_SECRET  토큰 서명용 긴 문자열
+//   JOOYONG_KV_REST_API_URL / JOOYONG_KV_REST_API_TOKEN  (Upstash Redis 연결 시 접두어 JOOYONG 지정)
 
 export const dynamic = "force-dynamic";
 
@@ -11,8 +13,8 @@ const P = "jooyong:";
 const TOKEN_DAYS = 180;
 
 async function redis(...cmd: (string | number)[]) {
-  const url = process.env.KV_REST_API_URL, token = process.env.KV_REST_API_TOKEN;
-  if (!url || !token) throw new Error("저장소(KV_REST_API_URL)가 설정되지 않았어요");
+  const url = process.env.JOOYONG_KV_REST_API_URL, token = process.env.JOOYONG_KV_REST_API_TOKEN;
+  if (!url || !token) throw new Error("저장소(JOOYONG_KV_REST_API_URL)가 설정되지 않았어요");
   const r = await fetch(url, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
@@ -24,7 +26,7 @@ async function redis(...cmd: (string | number)[]) {
   return j.result;
 }
 
-const secret = () => process.env.AUTH_SECRET || process.env.APP_PASSWORD || "";
+const secret = () => process.env.JOOYONG_AUTH_SECRET || process.env.JOOYONG_PASSWORD || "";
 const sign = (exp: string | number) => crypto.createHmac("sha256", secret()).update("jooyong:" + exp).digest("hex");
 const makeToken = () => { const exp = Date.now() + TOKEN_DAYS * 864e5; return exp + "." + sign(exp); };
 function validToken(t: string) {
@@ -35,7 +37,7 @@ function validToken(t: string) {
 }
 function samePassword(p: unknown) {
   const a = crypto.createHash("sha256").update(String(p ?? "")).digest();
-  const b = crypto.createHash("sha256").update(process.env.APP_PASSWORD || "").digest();
+  const b = crypto.createHash("sha256").update(process.env.JOOYONG_PASSWORD || "").digest();
   return crypto.timingSafeEqual(a, b);
 }
 
@@ -44,7 +46,7 @@ const json = (data: unknown, status = 200) =>
 
 export async function POST(req: Request) {
   try {
-    if (!process.env.APP_PASSWORD) return json({ error: "서버에 APP_PASSWORD가 설정되지 않았어요" }, 500);
+    if (!process.env.JOOYONG_PASSWORD) return json({ error: "서버에 JOOYONG_PASSWORD가 설정되지 않았어요" }, 500);
     const b = await req.json().catch(() => ({}));
 
     if (b.action === "login") {
