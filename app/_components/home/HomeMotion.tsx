@@ -241,9 +241,15 @@ export function HomeMotion() {
       const y = (e as CustomEvent<number>).detail;
       // 위로 되돌아가는 반복은 순간 이동 (히어로는 그동안 흐려져 있음)
       if (y < window.scrollY) {
+        // 장면 맞춤(휠 스냅)이 이 순간 이동을 위로 굴린 것으로 오해해 이전 장면으로 끌어당기지 않게 잠시 막음
+        snapping = true;
+        rest = y;
         if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
         else window.scrollTo({ top: y, behavior: "instant" });
-        rest = y;
+        window.setTimeout(() => {
+          rest = y;
+          snapping = false;
+        }, 200);
         return;
       }
       if (!lenis || window.matchMedia("(pointer: coarse)").matches) return window.scrollTo({ top: y, behavior: "smooth" });
