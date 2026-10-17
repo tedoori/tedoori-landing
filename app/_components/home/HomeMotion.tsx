@@ -137,7 +137,8 @@ export function HomeMotion() {
     // ---------- 히어로가 위로 빠지며 사라짐 (Tara) ----------
     const mm = gsap.matchMedia();
     if (!reduce) {
-      mm.add("all", () => {
+      // 휴대폰은 영상 위 흐림·축소가 무거워 끊김 → 넓은 화면에서만
+      mm.add("(min-width: 900px)", () => {
         gsap.to(".ys-sticky", {
           yPercent: -10,
           scale: 0.92,
