@@ -148,6 +148,17 @@ export function HomeMotion() {
           scrollTrigger: { trigger: ".ys", start: "bottom bottom", end: "bottom 45%", scrub: true },
         });
       });
+      // 휴대폰: 같은 빠짐 효과를 가볍게 (흐림 없이 위치·크기·투명도만 → 화면 그리기 부담 적음)
+      mm.add("(max-width: 899px)", () => {
+        gsap.to(".ys-sticky", {
+          yPercent: 12,
+          scale: 0.9,
+          opacity: 0,
+          ease: "none",
+          force3D: true,
+          scrollTrigger: { trigger: ".ys", start: "top top", end: "bottom 25%", scrub: true },
+        });
+      });
     }
 
     // ---------- 히어로 단계 넘김 (Apple) ----------
