@@ -120,7 +120,7 @@ export function EstimateCard({ estimate: e, receiptNo, customer, variant }: { es
       <div className="est-paper" ref={paper}>
         <header className="est-top">
           <div>
-            <p className="est-brand">테두리 · 부분조경</p>
+            <p className="est-brand">테두리 · 정원 조경 부분견적</p>
             <h2 id="est-title" className="est-title">
               견적서
             </h2>
