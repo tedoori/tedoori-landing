@@ -49,6 +49,9 @@ export function RequestIntro() {
     // 휴대폰: 세게 쓸어 올려도 폰과 집이 만나는 첫 장면을 놓치지 않게, 섹션에 들어서면 시간으로 끝까지 재생
     const INTRO_END = 0.48;
     const INTRO_MS = 3200;
+    // 대화 8단계 + 접수 화면까지 걸리는 시간 (한 단계 약 1초)
+    const CHAT_MS = 8500;
+    const CHAT_END = 0.92;
     let introAt: number | null = null;
     // 재생하는 동안 관성 스크롤에 휙 지나가지 않게 그 자리에 잠깐 붙잡음 (휴대폰, 맨 위에서 내려올 때마다 한 번)
     let lockY: number | null = null;
@@ -91,9 +94,11 @@ export function RequestIntro() {
         }
         if (introAt !== null && pScroll === 0) introAt = null;
         if (introAt !== null) {
-          const k = Math.min(1, (performance.now() - introAt) / INTRO_MS);
-          p = Math.max(pScroll, k * INTRO_END);
-          if (k < 1) raf = requestAnimationFrame(update);
+          // 폰·집 장면(시간) → 이어서 대화가 한 줄씩(시간) → 접수 완료 화면에서 멈춤. 스크롤을 더 내리면 그만큼 앞서 감
+          const el2 = performance.now() - introAt;
+          const pTime = el2 < INTRO_MS ? (el2 / INTRO_MS) * INTRO_END : Math.min(CHAT_END, INTRO_END + ((el2 - INTRO_MS) / CHAT_MS) * (CHAT_END - INTRO_END));
+          p = Math.max(pScroll, pTime);
+          if (pTime < CHAT_END) raf = requestAnimationFrame(update);
         }
       }
       // 히어로가 올라가는 동안 바로 시작 (섹션이 히어로 마지막 화면과 겹쳐 있음)

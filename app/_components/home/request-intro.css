@@ -754,3 +754,8 @@
 .ri-status__icons svg { width: auto; height: calc(var(--pw) * 0.042); }
 .ri-photos { max-width: 100%; }
 .ri-photos img, .ri-photos span { width: clamp(36px, calc((var(--pw) - 48px) / 3.4), 54px); height: clamp(36px, calc((var(--pw) - 48px) / 3.4), 54px); flex: none; }
+
+/* 휴대폰: 대화·접수 화면은 시간으로 재생되므로 스크롤 구간을 줄여 다 본 뒤 바로 다음 섹션으로 */
+@media (max-width: 899px) {
+  .ri-track { height: 230vh; }
+}
