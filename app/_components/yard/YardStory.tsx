@@ -47,6 +47,39 @@ export function YardStory() {
   const [reduced] = useState(false);
   const [compact, setCompact] = useState(false);
 
+  // 스크롤 + 자동 재생: 히어로에서 가만히 있으면 다음 장면 위치로 화면이 부드럽게 내려감 (장면과 스크롤이 늘 같이 움직임)
+  // 스크롤·터치·휠·키를 쓰면 타이머를 처음부터 다시 셈. 마지막 장면에서는 멈춤
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let timer = 0;
+    const go = () => {
+      const r = el.getBoundingClientRect();
+      const total = r.height - window.innerHeight;
+      // 히어로가 화면에 고정돼 있을 때만 (위로 지나갔거나 아직 안 왔으면 쉼)
+      if (document.hidden || total <= 0 || r.top > 1 || -r.top > total + 1) return arm();
+      const idx = stepIndexAt(clamp01(-r.top / total));
+      if (idx >= YARD_STEPS.length - 1) return;
+      const next = YARD_STEPS[idx + 1];
+      const y = window.scrollY + r.top + total * (next.start + (next.end - next.start) * 0.35);
+      window.dispatchEvent(new CustomEvent("tedoori:scroll-to", { detail: Math.round(y) }));
+    };
+    const arm = () => {
+      window.clearTimeout(timer);
+      const r = el.getBoundingClientRect();
+      const total = r.height - window.innerHeight;
+      const idx = total > 0 ? stepIndexAt(clamp01(-r.top / total)) : 0;
+      timer = window.setTimeout(go, idx === 0 ? 4200 : 3400);
+    };
+    const events = ["scroll", "touchstart", "wheel", "keydown"] as const;
+    events.forEach((e) => window.addEventListener(e, arm, { passive: true }));
+    arm();
+    return () => {
+      window.clearTimeout(timer);
+      events.forEach((e) => window.removeEventListener(e, arm));
+    };
+  }, []);
+
   // 로고를 누르면 첫 장면부터 다시
   useEffect(() => {
     const top = () => setStep(0);

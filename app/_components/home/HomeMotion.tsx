@@ -236,6 +236,23 @@ export function HomeMotion() {
     };
     brand?.addEventListener("click", toTop);
 
+    // ---------- 히어로 자동 재생: 다음 장면 위치로 부드럽게 ----------
+    const autoTo = (e: Event) => {
+      const y = (e as CustomEvent<number>).detail;
+      if (!lenis || window.matchMedia("(pointer: coarse)").matches) return window.scrollTo({ top: y, behavior: "smooth" });
+      snapping = true;
+      lenis.scrollTo(y, {
+        duration: 1.1,
+        force: true,
+        easing: (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+        onComplete: () => {
+          rest = y;
+          snapping = false;
+        },
+      });
+    };
+    window.addEventListener("tedoori:scroll-to", autoTo);
+
     // 이미지·3D 가 자리 잡은 뒤 위치 다시 계산
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener("load", refresh);
@@ -247,6 +264,7 @@ export function HomeMotion() {
       window.clearTimeout(resume);
       window.removeEventListener("wheel", watchWheel, { capture: true });
       brand?.removeEventListener("click", toTop);
+      window.removeEventListener("tedoori:scroll-to", autoTo);
       window.removeEventListener("load", refresh);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
