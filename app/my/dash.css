@@ -948,3 +948,5 @@
 .est--sheet .est-paper.is-capture .est-xl tbody tr:not(.t-group) td.t-name { padding-left: 26px !important; }
 .est--sheet .est-terms div { align-items: center; min-height: 44px; padding: 8px 0; }
 @media (max-width: 640px) { .est--sheet .est-xl .t-group td, .est--sheet .est-xl tbody td { height: auto !important; } .est--sheet .est-xl .t-group { align-items: center; } }
+/* 묶음 소계 금액: 초록으로 구분 */
+.est--sheet .est-xl .t-group td.t-amt { color: #0e7a33; }
