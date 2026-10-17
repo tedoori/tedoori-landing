@@ -47,44 +47,12 @@ export function YardStory() {
   const [reduced] = useState(false);
   const [compact, setCompact] = useState(false);
 
-  // 휴대폰(좁은 화면): 히어로는 한 화면 높이. 장면은 시간으로 자동 넘김, 옆으로 밀면 다음/이전.
-  // 위아래 스크롤은 막지 않아 바로 다음 섹션으로 부드럽게 넘어감 (예전 강제 스냅은 끊김·튕김 원인이라 뺌)
-  const [paused, setPaused] = useState(false);
-  useEffect(() => {
-    if (!compact || !inView || paused) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const ms = step === 0 ? 4200 : YARD_STEPS[step].id === "outro" ? 5200 : 3400;
-    const id = window.setTimeout(() => setStep((v) => (v + 1) % YARD_STEPS.length), ms);
-    return () => window.clearTimeout(id);
-  }, [compact, inView, paused, step]);
   // 로고를 누르면 첫 장면부터 다시
   useEffect(() => {
     const top = () => setStep(0);
     window.addEventListener("tedoori:home-top", top);
     return () => window.removeEventListener("tedoori:home-top", top);
   }, []);
-  // 다른 앱으로 갔다 오면 그 사이엔 멈춤
-  useEffect(() => {
-    const on = () => setPaused(document.hidden);
-    document.addEventListener("visibilitychange", on);
-    return () => document.removeEventListener("visibilitychange", on);
-  }, []);
-  // 옆으로 밀기: 다음 / 이전 장면
-  const swipe = useRef<{ x: number; y: number } | null>(null);
-  const onTouchStart = (e: React.TouchEvent) => {
-    if (!compact) return;
-    swipe.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-  };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    const st = swipe.current;
-    swipe.current = null;
-    if (!compact || !st) return;
-    const dx = e.changedTouches[0].clientX - st.x;
-    const dy = e.changedTouches[0].clientY - st.y;
-    if (Math.abs(dx) < 44 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
-    setStep((v) => (dx < 0 ? (v + 1) % YARD_STEPS.length : (v - 1 + YARD_STEPS.length) % YARD_STEPS.length));
-  };
-
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 899px)");
     setCompact(mq.matches);
@@ -100,6 +68,28 @@ export function YardStory() {
 
     let raf = 0;
     let hdr = 0;
+    // 휴대폰 장면 따라가기
+    const STEP_GAP = 450;
+    let target = 0;
+    let shown = 0;
+    let lastMove = 0;
+    let chaseTimer = 0;
+    const chase = () => {
+      if (shown === target) return;
+      const wait = STEP_GAP - (performance.now() - lastMove);
+      if (wait > 0) {
+        if (!chaseTimer) chaseTimer = window.setTimeout(() => ((chaseTimer = 0), chase()), wait);
+        return;
+      }
+      shown += target > shown ? 1 : -1;
+      lastMove = performance.now();
+      setStep(shown);
+      if (shown !== target) chaseTimer = window.setTimeout(() => ((chaseTimer = 0), chase()), STEP_GAP);
+    };
+    const onTop = () => {
+      target = shown = 0;
+    };
+    window.addEventListener("tedoori:home-top", onTop);
     // 헤더 높이만큼 아래에서 고정되도록 (스크롤해도 글자 위치가 그대로)
     const measure = () => {
       hdr = document.querySelector(".site-header")?.getBoundingClientRect().height ?? 0;
@@ -114,9 +104,12 @@ export function YardStory() {
       const p = clamp01(total > 0 ? -r.top / total : 0);
       progress.current = p;
       const idx = stepIndexAt(p);
-      // 휴대폰은 시간으로 넘기므로 스크롤이 장면을 바꾸지 않음 (글자는 늘 또렷하게)
       if (window.matchMedia("(max-width: 899px)").matches) {
+        // 휴대폰: 스크롤 위치를 따라가되 한 번에 한 장면씩, 장면마다 최소 STEP_GAP 은 보여줌
+        target = idx;
+        chase();
         textRef.current?.style.setProperty("--t", "1");
+        el.style.setProperty("--p", String(p));
         return;
       }
       setStep(idx);
@@ -140,6 +133,8 @@ export function YardStory() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       if (raf) cancelAnimationFrame(raf);
+      window.clearTimeout(chaseTimer);
+      window.removeEventListener("tedoori:home-top", onTop);
     };
   }, []);
 
@@ -156,28 +151,10 @@ export function YardStory() {
   const isOutro = current.id === "outro";
 
   return (
-    <section ref={sectionRef} className={`ys ys--film${compact ? " ys--auto" : ""}`} aria-labelledby="ys-title">
-      <div className="ys-sticky" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+    <section ref={sectionRef} className="ys ys--film" aria-labelledby="ys-title">
+      <div className="ys-sticky">
         {/* 실사 정원 영상: 첫 화면은 흔들리는 정원, 단계마다 조경이 하나씩 생김 */}
         <HeroFilm step={current.id} />
-        {compact && (
-          <div className="ys-dots" role="tablist" aria-label="장면">
-            {YARD_STEPS.map((x, i) => (
-              <button
-                key={x.id}
-                type="button"
-                role="tab"
-                aria-selected={i === step}
-                aria-label={`${i + 1}번째 장면`}
-                className={i < step ? "is-past" : i === step ? "is-on" : ""}
-                onClick={() => setStep(i)}
-              >
-                <i key={i === step ? `on-${step}` : "off"} style={{ "--ms": `${i === 0 ? 4200 : x.id === "outro" ? 5200 : 3400}ms` } as React.CSSProperties} />
-              </button>
-            ))}
-          </div>
-        )}
-
         <div className="ys-copy" ref={textRef}>
           {step > 0 && (
             <div className="ys-progress" aria-hidden="true">

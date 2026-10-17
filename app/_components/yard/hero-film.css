@@ -220,3 +220,8 @@
 @media (prefers-reduced-motion: reduce) {
   .ys-dots .is-on i::after { animation: none; transform: none; }
 }
+
+/* 휴대폰: 스크롤로 장면 넘김 (강제 스냅 없음). 장면당 약 0.7화면 */
+@media (max-width: 899px) {
+  .ys.ys--film { height: 560vh; }
+}

@@ -156,7 +156,7 @@ export function HomeMotion() {
           opacity: 0,
           ease: "none",
           force3D: true,
-          scrollTrigger: { trigger: ".ys", start: "top top", end: "bottom 25%", scrub: true },
+          scrollTrigger: { trigger: ".ys", start: "bottom bottom", end: "bottom 35%", scrub: true },
         });
       });
     }
