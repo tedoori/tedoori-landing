@@ -50,6 +50,29 @@ export function RequestIntro() {
     const INTRO_END = 0.48;
     const INTRO_MS = 1800;
     let introAt: number | null = null;
+    // 재생하는 동안 관성 스크롤에 휙 지나가지 않게 그 자리에 잠깐 붙잡음 (휴대폰, 맨 위에서 내려올 때마다 한 번)
+    let lockY: number | null = null;
+    let unlockTimer = 0;
+    const holdTouch = (e: TouchEvent) => {
+      if (lockY !== null) e.preventDefault();
+    };
+    const holdScroll = () => {
+      if (lockY !== null && Math.abs(window.scrollY - lockY) > 1) window.scrollTo(0, lockY);
+    };
+    const lock = () => {
+      lockY = Math.max(1, Math.round(window.scrollY));
+      window.scrollTo(0, lockY);
+      document.documentElement.style.overscrollBehavior = "none";
+      window.addEventListener("touchmove", holdTouch, { passive: false });
+      window.addEventListener("scroll", holdScroll, { passive: true });
+      unlockTimer = window.setTimeout(unlock, INTRO_MS + 250);
+    };
+    const unlock = () => {
+      lockY = null;
+      document.documentElement.style.overscrollBehavior = "";
+      window.removeEventListener("touchmove", holdTouch);
+      window.removeEventListener("scroll", holdScroll);
+    };
     const update = () => {
       raf = 0;
       const r = el.getBoundingClientRect();
@@ -61,7 +84,11 @@ export function RequestIntro() {
       if (!reduce && vw < 900) {
         // 이 섹션은 히어로 화면과 겹쳐 있어, 히어로를 올리기 시작하면(조금이라도 내려가면) 재생 시작.
         // 맨 위로 완전히 되돌아가면 처음부터 다시
-        if (introAt === null && pScroll > 0.004) introAt = performance.now();
+        if (introAt === null && pScroll > 0.004) {
+          introAt = performance.now();
+          // 새로고침으로 중간에서 열린 경우 등은 붙잡지 않음
+          if (pScroll < 0.2) lock();
+        }
         if (introAt !== null && pScroll === 0) introAt = null;
         if (introAt !== null) {
           const k = Math.min(1, (performance.now() - introAt) / INTRO_MS);
@@ -101,6 +128,8 @@ export function RequestIntro() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       if (raf) cancelAnimationFrame(raf);
+      window.clearTimeout(unlockTimer);
+      unlock();
     };
   }, []);
 
