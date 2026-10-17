@@ -212,7 +212,15 @@ export function HomeMotion() {
     const toTop = (e: MouseEvent) => {
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
       e.preventDefault();
-      if (!lenis) return window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+      // 히어로도 첫 장면으로 (휴대폰은 장면이 시간으로 넘어가므로)
+      window.dispatchEvent(new Event("tedoori:home-top"));
+      // 휴대폰(손가락)·움직임 줄이기: 브라우저 기본 스크롤로 확실하게 맨 위까지
+      if (!lenis || window.matchMedia("(pointer: coarse)").matches) {
+        window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+        // 관성 등에 막혀 덜 올라갔으면 마저 올림
+        window.setTimeout(() => window.scrollY > 2 && window.scrollTo({ top: 0, behavior: "auto" }), 1400);
+        return;
+      }
       // 올라가는 동안 히어로 단계 넘김이 끼어들지 않게
       snapping = true;
       lenis.scrollTo(0, {

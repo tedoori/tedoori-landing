@@ -57,6 +57,12 @@ export function YardStory() {
     const id = window.setTimeout(() => setStep((v) => (v + 1) % YARD_STEPS.length), ms);
     return () => window.clearTimeout(id);
   }, [compact, inView, paused, step]);
+  // 로고를 누르면 첫 장면부터 다시
+  useEffect(() => {
+    const top = () => setStep(0);
+    window.addEventListener("tedoori:home-top", top);
+    return () => window.removeEventListener("tedoori:home-top", top);
+  }, []);
   // 다른 앱으로 갔다 오면 그 사이엔 멈춤
   useEffect(() => {
     const on = () => setPaused(document.hidden);
