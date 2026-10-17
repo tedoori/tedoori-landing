@@ -50,7 +50,19 @@ export function RequestIntro() {
     const INTRO_END = 0.48;
     const INTRO_MS = 3200;
     // 대화 8단계 + 접수 화면까지 걸리는 시간 (한 단계 약 1초)
-    const CHAT_MS = 8500;
+    // 대화 단계마다 머무는 시간: 질문1 · 답1 · 질문2 · 작업 칩 · 답2 · 질문3(현재 모습) · 사진 · 접수 화면
+    // 사진이 올라온 뒤 접수 화면으로 넘어가기 전 충분히 보이도록 사진 단계를 길게
+    const CHAT_STEP_MS = [900, 900, 900, 1300, 900, 1300, 2800, 1500];
+    // 경과 시간 → 대화 진행도(0~1)
+    const chatAt = (t: number) => {
+      let acc = 0;
+      for (let i = 0; i < CHAT_STEP_MS.length; i++) {
+        const d = CHAT_STEP_MS[i];
+        if (t < acc + d) return (i + (t - acc) / d) / CHAT_STEPS;
+        acc += d;
+      }
+      return 1;
+    };
     const CHAT_END = 0.92;
     let introAt: number | null = null;
     // 재생하는 동안 관성 스크롤에 휙 지나가지 않게 그 자리에 잠깐 붙잡음 (휴대폰, 맨 위에서 내려올 때마다 한 번)
@@ -96,7 +108,7 @@ export function RequestIntro() {
         if (introAt !== null) {
           // 폰·집 장면(시간) → 이어서 대화가 한 줄씩(시간) → 접수 완료 화면에서 멈춤. 스크롤을 더 내리면 그만큼 앞서 감
           const el2 = performance.now() - introAt;
-          const pTime = el2 < INTRO_MS ? (el2 / INTRO_MS) * INTRO_END : Math.min(CHAT_END, INTRO_END + ((el2 - INTRO_MS) / CHAT_MS) * (CHAT_END - INTRO_END));
+          const pTime = el2 < INTRO_MS ? (el2 / INTRO_MS) * INTRO_END : INTRO_END + chatAt(el2 - INTRO_MS) * (CHAT_END - INTRO_END);
           p = Math.max(pScroll, pTime);
           if (pTime < CHAT_END) raf = requestAnimationFrame(update);
         }
