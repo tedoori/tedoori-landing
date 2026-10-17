@@ -225,3 +225,7 @@
 @media (max-width: 899px) {
   .ys.ys--film { height: 560vh; }
 }
+
+/* 히어로 무한 반복: 마지막 → 처음으로 넘어갈 때 잠깐 흐려짐 */
+.ys .ys-copy, .ys .hf { transition: opacity 340ms ease; }
+.ys.is-looping .ys-copy, .ys.is-looping .hf { opacity: 0; }

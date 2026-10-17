@@ -59,7 +59,17 @@ export function YardStory() {
       // 히어로가 화면에 고정돼 있을 때만 (위로 지나갔거나 아직 안 왔으면 쉼)
       if (document.hidden || total <= 0 || r.top > 1 || -r.top > total + 1) return arm();
       const idx = stepIndexAt(clamp01(-r.top / total));
-      if (idx >= YARD_STEPS.length - 1) return;
+      if (idx >= YARD_STEPS.length - 1) {
+        // 마지막 장면에서도 가만히 있으면 처음으로 (무한 반복): 잠깐 흐려졌다가 첫 장면으로 바로 바뀜
+        const top = Math.round(window.scrollY + r.top);
+        el.classList.add("is-looping");
+        window.setTimeout(() => {
+          window.dispatchEvent(new CustomEvent("tedoori:scroll-to", { detail: top }));
+          window.dispatchEvent(new Event("tedoori:home-top"));
+          window.setTimeout(() => el.classList.remove("is-looping"), 60);
+        }, 350);
+        return;
+      }
       const next = YARD_STEPS[idx + 1];
       const y = window.scrollY + r.top + total * (next.start + (next.end - next.start) * 0.35);
       window.dispatchEvent(new CustomEvent("tedoori:scroll-to", { detail: Math.round(y) }));
@@ -69,7 +79,7 @@ export function YardStory() {
       const r = el.getBoundingClientRect();
       const total = r.height - window.innerHeight;
       const idx = total > 0 ? stepIndexAt(clamp01(-r.top / total)) : 0;
-      timer = window.setTimeout(go, idx === 0 ? 4200 : 3400);
+      timer = window.setTimeout(go, idx === 0 ? 4200 : idx >= YARD_STEPS.length - 1 ? 5200 : 3400);
     };
     const events = ["scroll", "touchstart", "wheel", "keydown"] as const;
     events.forEach((e) => window.addEventListener(e, arm, { passive: true }));

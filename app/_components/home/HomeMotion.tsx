@@ -239,6 +239,13 @@ export function HomeMotion() {
     // ---------- 히어로 자동 재생: 다음 장면 위치로 부드럽게 ----------
     const autoTo = (e: Event) => {
       const y = (e as CustomEvent<number>).detail;
+      // 위로 되돌아가는 반복은 순간 이동 (히어로는 그동안 흐려져 있음)
+      if (y < window.scrollY) {
+        if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
+        else window.scrollTo({ top: y, behavior: "instant" });
+        rest = y;
+        return;
+      }
       if (!lenis || window.matchMedia("(pointer: coarse)").matches) return window.scrollTo({ top: y, behavior: "smooth" });
       snapping = true;
       lenis.scrollTo(y, {
