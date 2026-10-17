@@ -46,13 +46,29 @@ export function RequestIntro() {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let raf = 0;
     let last = -2;
+    // 휴대폰: 세게 쓸어 올려도 폰과 집이 만나는 첫 장면을 놓치지 않게, 섹션에 들어서면 시간으로 끝까지 재생
+    const INTRO_END = 0.48;
+    const INTRO_MS = 1800;
+    let introAt: number | null = null;
     const update = () => {
       raf = 0;
       const r = el.getBoundingClientRect();
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const total = r.height - vh;
-      const p = reduce ? 1 : clamp01(total > 0 ? -r.top / total : 0);
+      const pScroll = reduce ? 1 : clamp01(total > 0 ? -r.top / total : 0);
+      let p = pScroll;
+      if (!reduce && vw < 900) {
+        // 이 섹션은 히어로 화면과 겹쳐 있어, 히어로를 올리기 시작하면(조금이라도 내려가면) 재생 시작.
+        // 맨 위로 완전히 되돌아가면 처음부터 다시
+        if (introAt === null && pScroll > 0.004) introAt = performance.now();
+        if (introAt !== null && pScroll === 0) introAt = null;
+        if (introAt !== null) {
+          const k = Math.min(1, (performance.now() - introAt) / INTRO_MS);
+          p = Math.max(pScroll, k * INTRO_END);
+          if (k < 1) raf = requestAnimationFrame(update);
+        }
+      }
       // 히어로가 올라가는 동안 바로 시작 (섹션이 히어로 마지막 화면과 겹쳐 있음)
       const a = ease(seg(p, 0.0, 0.09));
       const t = seg(p, 0.05, 0.22);
