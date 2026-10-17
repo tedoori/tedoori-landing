@@ -203,3 +203,20 @@
 .ys-snap--end {
   top: 100%;
 }
+
+/* ---------- 휴대폰: 히어로 한 화면 + 장면 자동 넘김 (스크롤은 자유) ---------- */
+@media (max-width: 899px) {
+  .ys.ys--auto { height: auto; }
+  .ys.ys--auto .ys-sticky { position: relative; top: 0; height: 100svh; min-height: 560px; touch-action: pan-y; }
+  .ys.ys--auto .ys-snap { display: none; }
+  .ys-dots { position: absolute; z-index: 4; left: var(--gutter); right: var(--gutter); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
+  .ys-dots button { height: 22px; padding: 9px 0; border: 0; background: none; cursor: pointer; }
+  .ys-dots i { position: relative; display: block; height: 3px; border-radius: 3px; background: rgba(255, 255, 255, 0.35); overflow: hidden; }
+  .ys-dots i::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: #fff; transform: scaleX(0); transform-origin: left; }
+  .ys-dots .is-past i::after { transform: none; }
+  .ys-dots .is-on i::after { animation: ys-dot var(--ms, 3400ms) linear both; }
+}
+@keyframes ys-dot { to { transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .ys-dots .is-on i::after { animation: none; transform: none; }
+}

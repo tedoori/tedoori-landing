@@ -47,25 +47,37 @@ export function YardStory() {
   const [reduced] = useState(false);
   const [compact, setCompact] = useState(false);
 
-  // 모바일(손가락 스크롤): 세게 쓸어도 장면 하나씩 멈추도록 히어로 안에서만 스냅을 켬.
-  // 히어로를 지난 뒤 화면을 만지면 스냅을 꺼서 아래 섹션은 평소처럼 자유 스크롤
+  // 휴대폰(좁은 화면): 히어로는 한 화면 높이. 장면은 시간으로 자동 넘김, 옆으로 밀면 다음/이전.
+  // 위아래 스크롤은 막지 않아 바로 다음 섹션으로 부드럽게 넘어감 (예전 강제 스냅은 끊김·튕김 원인이라 뺌)
+  const [paused, setPaused] = useState(false);
   useEffect(() => {
-    const el = sectionRef.current;
-    if (!el || !window.matchMedia("(pointer: coarse)").matches) return;
+    if (!compact || !inView || paused) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const root = document.documentElement;
-    const onTouch = () => {
-      const r = el.getBoundingClientRect();
-      // 히어로 마지막 장면을 지나 반 화면 이상 내려왔으면 끔
-      const inHero = r.bottom - window.innerHeight * 0.5 > 0;
-      root.style.scrollSnapType = inHero ? "y mandatory" : "";
-    };
-    window.addEventListener("touchstart", onTouch, { passive: true });
-    return () => {
-      window.removeEventListener("touchstart", onTouch);
-      root.style.scrollSnapType = "";
-    };
+    const ms = step === 0 ? 4200 : YARD_STEPS[step].id === "outro" ? 5200 : 3400;
+    const id = window.setTimeout(() => setStep((v) => (v + 1) % YARD_STEPS.length), ms);
+    return () => window.clearTimeout(id);
+  }, [compact, inView, paused, step]);
+  // 다른 앱으로 갔다 오면 그 사이엔 멈춤
+  useEffect(() => {
+    const on = () => setPaused(document.hidden);
+    document.addEventListener("visibilitychange", on);
+    return () => document.removeEventListener("visibilitychange", on);
   }, []);
+  // 옆으로 밀기: 다음 / 이전 장면
+  const swipe = useRef<{ x: number; y: number } | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (!compact) return;
+    swipe.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const st = swipe.current;
+    swipe.current = null;
+    if (!compact || !st) return;
+    const dx = e.changedTouches[0].clientX - st.x;
+    const dy = e.changedTouches[0].clientY - st.y;
+    if (Math.abs(dx) < 44 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+    setStep((v) => (dx < 0 ? (v + 1) % YARD_STEPS.length : (v - 1 + YARD_STEPS.length) % YARD_STEPS.length));
+  };
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 899px)");
@@ -96,6 +108,11 @@ export function YardStory() {
       const p = clamp01(total > 0 ? -r.top / total : 0);
       progress.current = p;
       const idx = stepIndexAt(p);
+      // 휴대폰은 시간으로 넘기므로 스크롤이 장면을 바꾸지 않음 (글자는 늘 또렷하게)
+      if (window.matchMedia("(max-width: 899px)").matches) {
+        textRef.current?.style.setProperty("--t", "1");
+        return;
+      }
       setStep(idx);
       const s = YARD_STEPS[idx];
       const local = clamp01((p - s.start) / ((s.end - s.start) * 0.6));
@@ -133,10 +150,27 @@ export function YardStory() {
   const isOutro = current.id === "outro";
 
   return (
-    <section ref={sectionRef} className="ys ys--film" aria-labelledby="ys-title">
-      <div className="ys-sticky">
+    <section ref={sectionRef} className={`ys ys--film${compact ? " ys--auto" : ""}`} aria-labelledby="ys-title">
+      <div className="ys-sticky" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         {/* 실사 정원 영상: 첫 화면은 흔들리는 정원, 단계마다 조경이 하나씩 생김 */}
         <HeroFilm step={current.id} />
+        {compact && (
+          <div className="ys-dots" role="tablist" aria-label="장면">
+            {YARD_STEPS.map((x, i) => (
+              <button
+                key={x.id}
+                type="button"
+                role="tab"
+                aria-selected={i === step}
+                aria-label={`${i + 1}번째 장면`}
+                className={i < step ? "is-past" : i === step ? "is-on" : ""}
+                onClick={() => setStep(i)}
+              >
+                <i key={i === step ? `on-${step}` : "off"} style={{ "--ms": `${i === 0 ? 4200 : x.id === "outro" ? 5200 : 3400}ms` } as React.CSSProperties} />
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="ys-copy" ref={textRef}>
           {step > 0 && (
