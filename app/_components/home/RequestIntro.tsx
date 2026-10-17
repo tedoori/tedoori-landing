@@ -48,7 +48,7 @@ export function RequestIntro() {
     let last = -2;
     // 휴대폰: 세게 쓸어 올려도 폰과 집이 만나는 첫 장면을 놓치지 않게, 섹션에 들어서면 시간으로 끝까지 재생
     const INTRO_END = 0.48;
-    const INTRO_MS = 1800;
+    const INTRO_MS = 3200;
     let introAt: number | null = null;
     // 재생하는 동안 관성 스크롤에 휙 지나가지 않게 그 자리에 잠깐 붙잡음 (휴대폰, 맨 위에서 내려올 때마다 한 번)
     let lockY: number | null = null;
